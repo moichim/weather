@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import { Providers } from '../components/providers'
+import { cn } from '@nextui-org/react'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -16,7 +18,17 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body>
+        <div className={cn([
+        inter.className,
+        "h-[100vh]",
+        "bg-black"
+      ])}>
+        <Providers>
+          {children}
+        </Providers>
+        </div>
+      </body>
     </html>
   )
 }
