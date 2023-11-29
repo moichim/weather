@@ -20,13 +20,13 @@ const properties: {
 } = {
     temperature: {
         type: "Float",
-        unit: "stupeň",
+        unit: "°C",
         name: "Teplota",
         field: "temperature",
         color: "bg-red-500"
     },
     wind_dir: {
-        type: "String",
+        type: "Float",
         name: "Směr větru",
         field: "wind_dir",
         color: "bg-green-500"
@@ -53,7 +53,7 @@ const properties: {
     },
     clouds: {
         type: "Float",
-        name: "Tlak",
+        name: "Oblačnost",
         field: "clouds",
         color: "bg-orange-300"
     },
@@ -72,7 +72,22 @@ const properties: {
     }
 }
 
+export type AvailableWeatherProperties = keyof typeof properties;
+
 export class Properties {
+
+    protected static keys() {
+        return Object.keys( properties ) as AvailableWeatherProperties[];
+    }
+
+    public static skeleton() {
+        return Object.fromEntries(
+            Object.entries( properties )
+                .map( ([key,]) => [key as AvailableWeatherProperties,[] as number[]] )
+        ) as {
+            [K in AvailableWeatherProperties]: number[]
+        };
+    }
 
     protected static formatOne( slug: keyof WeatherEntryDataType ) {
         return {
@@ -86,7 +101,10 @@ export class Properties {
         return Object.keys( properties ).map( slug => Properties.formatOne(slug as keyof WeatherEntryDataType) );
     }
 
-    public static index() { return properties; }
+    public static index() { return Object.fromEntries(
+        Object.entries( properties )
+            .map( ([slug,prop]) => [slug,Properties.formatOne(slug as AvailableWeatherProperties)] )
+    ) }
 
     public static one( slug: keyof WeatherEntryDataType ) {
         return Properties.formatOne(slug);

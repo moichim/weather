@@ -12,7 +12,7 @@ export type WeatherEntryMetaType = {
 
 export type WeatherEntryDataType = {
     temperature: number,
-    wind_dir?: string,
+    wind_dir?: number,
     wind_speed?: number,
     bar?: number,
     rain?: number,
@@ -31,7 +31,7 @@ export type Serie = {
 export const weatherTypeDefs = gql`
 
     extend type Query {
-        weatherRange(from:Int,to:Int): [Serie]
+        weatherRange(from:String,to:String): [Serie]
         weatherSingle(time:Int): [Serie]
         sources: [Source]
         properties: [Property]
@@ -43,10 +43,10 @@ export const weatherTypeDefs = gql`
     }
 
     type Entry {
-        time: Int!
+        time: Float!
         is_forecast: Boolean!
         temperature: Float!
-        wind_dir: String
+        wind_dir: Float
         wind_speed: Float
         bar: Float
         rain: Float
@@ -80,13 +80,13 @@ export const weatherResolvers = {
 
     Query: {
         weatherRange: async ( 
-            from: number, 
-            to: number, 
+            parent: any, 
+            args: {from:string,to:string}, 
             sources: string[] = [] 
         ): Promise<Serie[]> => {
 
             return Promise.all([
-                provider.range( from, to )
+                provider.range( args.from, args.to )
             ]);
 
         },

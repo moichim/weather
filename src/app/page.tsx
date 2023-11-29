@@ -1,19 +1,18 @@
-import Image from 'next/image'
 
-import { Button } from '@nextui-org/button';
-import { Input, Navbar, NavbarBrand, NavbarContent, NavbarItem } from '@nextui-org/react';
-import Link from 'next/link';
+import { GraphsGrid } from '@/components/graph/graphsGrid';
+import { GraphGridSettings } from '@/components/graph/settings/graphGridSettings';
 import { Header } from '@/components/header/header';
-import { GraphSettings } from '@/components/graph/graphSettings';
-import Graph from '@/components/graph/graph';
+import { SettingsContainer } from '@/components/settings/settingsContainer';
 
 export default function Home() {
 
   return <>
-    <Header />
     <div className="flex">
-      <Graph />
-      <GraphSettings />
+
+      <GraphsGrid />
+
     </div>
+
+    <SettingsContainer>Ahoj</SettingsContainer>
   </>
 }

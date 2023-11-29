@@ -21,8 +21,8 @@ export default function RootLayout({
       <body>
         <div className={cn([
         inter.className,
-        "h-[100vh]",
-        "bg-black"
+        "h-[100vh]"//,
+        // "bg-black"
       ])}>
         <Providers>
           {children}

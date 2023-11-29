@@ -36,7 +36,11 @@ const sources: {
             "temperature",
             "wind_dir",
             "wind_speed",
-            "uv"
+            "uv",
+            "humidity",
+            "bar",
+            "clouds",
+            "rain"
         ]
     }
 }

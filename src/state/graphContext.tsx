@@ -1,8 +1,12 @@
+"use client";
+
 import { WeatherEntryDataType } from "@/graphql/weather"
-import { createContext, useContext, useState } from "react"
+import { AvailableWeatherProperties } from "@/graphql/weatherSources/properties"
+import { createContext, useContext, useState, useCallback } from "react"
+import { MultipleGraphsHookType, useMultipleGraphs, useMultipleGraphsDefaults } from "./useMultipleGraphs";
 
 enum GraphMode {
-    COMBINED = 1,
+    MULTIPLE = 1,
     SINGLE = 1
 }
 
@@ -15,7 +19,8 @@ type GraphContextType = {
             [T in keyof WeatherEntryDataType]: boolean
         },
         setProperty: ( property: keyof WeatherEntryDataType, state: boolean ) => void
-    }
+    },
+    multiple: MultipleGraphsHookType
 
 }
 
@@ -33,8 +38,9 @@ const initialData: GraphContextType = {
             humidity: true,
             uv: true
         },
-        setProperty: ( property, state ) => {}
-    }
+        setProperty: ( property, state ) => {},
+    },
+    multiple: useMultipleGraphsDefaults()
 }
 
 type PropertiesSettingsType = typeof initialData["single"]["properties"];
@@ -48,6 +54,8 @@ export const GraphContextProvider: React.FC<React.PropsWithChildren> = props => 
     const [ properties, setProperties ] = useState< {
         [T in keyof PropertiesSettingsType]: boolean
     } >( initialData.single.properties );
+
+    const multiple = useMultipleGraphs();
 
     const setProperty = ( property: keyof PropertiesSettingsType, state: boolean ) => {
         setProperties( propers => {
@@ -64,7 +72,8 @@ export const GraphContextProvider: React.FC<React.PropsWithChildren> = props => 
         single: {
             properties,
             setProperty
-        }
+        },
+        multiple
     };
 
     return <GraphContext.Provider value={value}>

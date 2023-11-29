@@ -11,17 +11,23 @@ const properties = Properties.index();
 const Graph: React.FC = () => {
 
     const config = useGraphContext();
-    const content = useDataContext();
+    const {weather} = useDataContext();
 
-    const {data} = content;
+    const activeData = Object.entries( config.single.properties )
+        .filter( ( [key, prop] ) => {
+            return prop;
+        } )
+        .map( e => {
+            const property = Properties.one( e[0] as unknown as any );
 
-    const activeData = Object.entries( config.single.properties ).filter( ( [key, prop] ) => prop ).map( e => e[0] );
+            return property;
+        } );
 
-    return <LineChart width={1200} height={800} data={data}>
+    return <LineChart width={1200} height={800} data={weather}>
 
         {activeData.map(row =>{
 
-            const item = properties[row as keyof WeatherEntryDataType];
+            // const item = properties[row as keyof WeatherEntryDataType];
             // console.log(item)
             // const item = properties[row as any];
             // return <Line key={item?.field} type="monotone" dataKey={ item?.field } stroke={item!.color}/>

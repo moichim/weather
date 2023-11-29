@@ -9,7 +9,7 @@ import React from "react"
 
 const client = new ApolloClient({
 
-    uri: 'https://flyby-router-demo.herokuapp.com/',
+    uri: '/api/',
 
     cache: new InMemoryCache(),
 
@@ -18,7 +18,9 @@ const client = new ApolloClient({
 export const Providers: React.FC<React.PropsWithChildren> = props => {
     return <ApolloProvider client={client}>
         <NextUIProvider>
-            <main className="dark text-foreground bg-background">
+            <main 
+                //className="dark text-foreground bg-background"
+            >
                 <FilterContextProvider>
                     <DataContextProvider>
                         <GraphContextProvider>

@@ -1,59 +1,82 @@
 "use client";
 
-import { AvailableSources, Sources } from "@/graphql/weatherSources/source"
-import { subHours } from "date-fns"
-import { Dispatch, SetStateAction, createContext, useContext, useReducer, useState } from "react";
+import { AvailableSources, Sources } from "@/graphql/weatherSources/source";
+import { addDays, format, subHours, subMonths } from "date-fns";
+import { Dispatch, SetStateAction, createContext, useContext, useState } from "react";
 
+export const stringFromDate = (date: Date) => format(date, "yyyy-MM-dd")
+export const dateFromString = (date: string) => new Date(date)
 
-const getInitialFrom = () => subHours( new Date, 24 )
-const getInitialTo = () => new Date();
+export const getAddedDate = ( date: string, numDays: number ) => stringFromDate( addDays( dateFromString( date ), numDays ) );
+export const getTodayDateString = () => stringFromDate( new Date )
+
+const getInitialFrom = () => stringFromDate(subHours(new Date, 24))
+const getInitialTo = () => stringFromDate((new Date()))
+
+export const getTimeMin = () => stringFromDate(subMonths(new Date, 12))
+export const getTimeMax = () => stringFromDate(addDays(new Date, 5))
 
 const getInitialLat = () => 4
 const getInitialLon = () => 6
 
-const getDefaultSources = () => Sources.all().map(s=>s.slug);
+const getDefaultSources = () => Sources.all().map(s => s.slug);
+
+type StringStateSetterType = Dispatch<SetStateAction<string>>;
 
 type FilterContextType = {
-    from: Date,
-    to: Date,
-    setFrom: Dispatch<SetStateAction<Date>>,
-    setTo: Dispatch<SetStateAction<Date>>,
+
+    from: string,
+    setFrom: Dispatch<SetStateAction<string>>,
+
+    to: string,
+    setTo: Dispatch<SetStateAction<string>>,
+
+
     lat: number,
     lon: number,
     sources: AvailableSources[],
-    toggleSource: ( source: AvailableSources ) => void
+    toggleSource: (source: AvailableSources) => void,
+
+    expanded: boolean,
+    setExpanded: Dispatch<SetStateAction<boolean>>
 }
+
+const initialFrom = getInitialFrom();
 
 const initial: FilterContextType = {
     from: getInitialFrom(),
     to: getInitialTo(),
-    setFrom: () => {},
-    setTo: () => {},
+    setFrom: () => { },
+    setTo: () => { },
     lat: getInitialLat(),
     lon: getInitialLon(),
     sources: getDefaultSources(),
-    toggleSource: ( source: AvailableSources ) => {}
+    toggleSource: (source: AvailableSources) => { },
+    expanded: false,
+    setExpanded: () => { }
 }
 
 
 
-const FilterContext = createContext( initial );
+const FilterContext = createContext(initial);
 
-export const FilterContextProvider: React.FC<React.PropsWithChildren> = ( props ) => {
+export const FilterContextProvider: React.FC<React.PropsWithChildren> = (props) => {
 
-    const [from, setFrom] = useState<Date>( getInitialFrom() );
-    const [to, setTo] = useState<Date>( getInitialTo() );
-    
-    const [lon, setLat] = useState<number>( getInitialLat() );
-    const [lat, setLon] = useState<number>( getInitialLon() );
+    const [from, setFrom] = useState<string>(getInitialFrom());
+    const [to, setTo] = useState<string>(getInitialTo());
 
-    const [sources, setSources] = useState<AvailableSources[]>( getDefaultSources() );
+    const [lon, setLat] = useState<number>(getInitialLat());
+    const [lat, setLon] = useState<number>(getInitialLon());
 
-    const toggleSource = ( source: AvailableSources ) => {
-        if ( sources.includes(source as string) )
-            setSources( sources.filter( s => s !== source ) );
+    const [expanded, setExpanded] = useState<boolean>(false);
+
+    const [sources, setSources] = useState<AvailableSources[]>(getDefaultSources());
+
+    const toggleSource = (source: AvailableSources) => {
+        if (sources.includes(source as string))
+            setSources(sources.filter(s => s !== source));
         else {
-            setSources( [...sources, source ] );
+            setSources([...sources, source]);
         }
     }
 
@@ -65,7 +88,9 @@ export const FilterContextProvider: React.FC<React.PropsWithChildren> = ( props 
         sources,
         toggleSource,
         lat,
-        lon
+        lon,
+        expanded,
+        setExpanded
     }
 
     return <FilterContext.Provider value={value}>
@@ -74,5 +99,5 @@ export const FilterContextProvider: React.FC<React.PropsWithChildren> = ( props 
 }
 
 export const useFilterContext = () => {
-    return useContext( FilterContext );
+    return useContext(FilterContext);
 }

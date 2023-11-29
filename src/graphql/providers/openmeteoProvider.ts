@@ -4,14 +4,15 @@ import { IProvider } from "./abstractProvider";
 import { Sources } from "../weatherSources/source";
 
 export class OpenmeteoProvider implements IProvider {
-    public range = async (from: number, to: number) => {
+
+    public range = async (from: string, to: string) => {
 
         const params = {
             "latitude": 49.7245947848106,
             "longitude": 13.327946050435685,
             "hourly": ["temperature_2m", "rain", "showers", "snowfall", "snow_depth", "surface_pressure", "cloud_cover", "evapotranspiration", "wind_speed_10m", "wind_direction_10m"],
-            "start_date": "2023-11-08",
-            "end_date": "2023-11-24"
+            "start_date": from,
+            "end_date": to
         };
         const url = "https://api.open-meteo.com/v1/forecast";
         const responses = await fetchWeatherApi(url, params);
@@ -66,7 +67,7 @@ export class OpenmeteoProvider implements IProvider {
                 return {
                     time: date.getTime(),
                     temperature: getValue( "temperature2m", index ),
-                    wind_dir: getValue<string>("windDirection10m", index),
+                    wind_dir: getValue("windDirection10m", index),
                     wind_speed: getValue( "windSpeed10m", index ),
                     bar: getValue("surfacePressure", index ),
                     rain: getValue( "rain", index ),
