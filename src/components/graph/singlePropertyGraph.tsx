@@ -94,7 +94,7 @@ export const SinglePropertyGraph: React.FC<SinglePropertyGraphPropsType> = props
         </div>
         <div>
         <ResponsiveContainer width={"100%"} height={graph.height}>
-            <LineChart data={data} margin={{left: 50}}>
+            <LineChart data={data} margin={{left: 50}} >
                 {content.data?.weatherRange.map( d => <Line 
                     key={d.source.slug}
                     type="monotone" 
@@ -120,6 +120,8 @@ export const SinglePropertyGraph: React.FC<SinglePropertyGraphPropsType> = props
                     labelFormatter={(value) => {
                         return format( new Date( value ), "d. M. Y H:mm" );
                     }}
+                    // active={true}
+                    // coordinate={{x:10}}
                 />
             </LineChart>
             </ResponsiveContainer>
