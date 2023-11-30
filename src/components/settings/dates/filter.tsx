@@ -1,11 +1,11 @@
 "use client";
 
+import { Sources } from "@/graphql/weatherSources/source";
 import { Button, ButtonGroup } from "@nextui-org/react";
 import { useState } from "react";
-import { RangeFilter } from "./rangeFilter";
 import { DateFilter } from "./dateFilter";
-import { SourceButton } from "@/components/header/sourceButton";
-import { Sources } from "@/graphql/weatherSources/source";
+import { RangeFilter } from "./rangeFilter";
+import { SourceButton } from "./sourceButton";
 
 const sources = Sources.all();
 

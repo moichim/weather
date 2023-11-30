@@ -29,7 +29,7 @@ const sources: {
             // "clouds",
             "humidity",
             "uv",
-            "rain",
+            // "rain",
             "radiance"
         ]
     },

@@ -2,7 +2,7 @@
 
 import { WeatherEntryDataType } from "@/graphql/weather";
 import { Dispatch, SetStateAction, createContext, useContext, useState } from "react";
-import { MultipleGraphsHookType, useMultipleGraphs, useMultipleGraphsDefaults } from "./useMultipleGraphs";
+import { MultipleGraphsHookType, useMultipleGraphs, getMultipleGraphsDefaults } from "./useMultipleGraphs";
 
 enum GraphMode {
     MULTIPLE = 1,
@@ -42,7 +42,7 @@ const initialData: DisplayContextType = {
         },
         setProperty: ( property, state ) => {},
     },
-    multiple: useMultipleGraphsDefaults(),
+    multiple: getMultipleGraphsDefaults(),
     expanded: false,
     setExpanded: () => {}
 }

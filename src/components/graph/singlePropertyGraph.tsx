@@ -70,7 +70,7 @@ export const SinglePropertyGraph: React.FC<SinglePropertyGraphPropsType> = props
                 ? "lg:w-1/2"
                 : "lg:w-1/3"
     ])} >
-        <div className="pb-5">
+        <div className="pb-5 flex items-center justify-center">
             <Dropdown>
                 <DropdownTrigger>
                     <Button
@@ -94,32 +94,31 @@ export const SinglePropertyGraph: React.FC<SinglePropertyGraphPropsType> = props
         </div>
         <div>
         <ResponsiveContainer width={"100%"} height={graph.height}>
-            <LineChart data={data}>
+            <LineChart data={data} margin={{left: 50}}>
                 {content.data?.weatherRange.map( d => <Line 
+                    key={d.source.slug}
                     type="monotone" 
                     dataKey={d.source.slug} 
-                    unit={" " + property.unit}
+                    unit={" " + property.unit ?? ""}
                     dot={false}
                     stroke={d.source.stroke}
                 /> )}
                 <CartesianGrid />
                 <XAxis 
                     dataKey="time" 
-                    label="Čas" 
-                    angle={90}
-                    // tickCount={5}
+                    // angle={90}
                     tickFormatter={ name => {
-                        return format( new Date(name), "h:mm" )
+                        return format( new Date(name), "H" )
                     } }
                     minTickGap={20}
                 />
-                <YAxis/>
+                <YAxis unit={property.unit}/>
                 <Tooltip 
                     formatter={(value: number, name, props) => {
                         return [value.toFixed(3), Sources.one(name).name];
                     }}
                     labelFormatter={(value) => {
-                        return format( new Date( value ), "d. M. Y h:mm" );
+                        return format( new Date( value ), "d. M. Y H:mm" );
                     }}
                 />
             </LineChart>

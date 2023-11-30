@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from "react"
 const properties = Properties.index();
 
 const getDefaultActiveProperties = (): AvailableWeatherProperties[] => [
-    "temperature", "clouds"
+    "temperature", "radiance", "humidity"
 ];
 
 const getRemainingProperties = (active: AvailableWeatherProperties[]): AvailableWeatherProperties[] => {
@@ -30,9 +30,9 @@ export const useMultipleGraphs = () => {
 
     const [availableProps, setAvailableProps] = useState<AvailableWeatherProperties[]>([]);
 
-    const [ columns, setColumns ] = useState<MultipleGraphColumn>( MultipleGraphColumn.TWO );
+    const [ columns, setColumns ] = useState<MultipleGraphColumn>( MultipleGraphColumn.THREE );
 
-    const [ height, setHeight ] = useState<number>( 500 );
+    const [ height, setHeight ] = useState<number>( 700 );
 
     useEffect(() => {
 
@@ -70,7 +70,7 @@ export const useMultipleGraphs = () => {
 
         }
 
-    }, []);
+    }, [activeProps]);
 
     return {
         activeProps,
@@ -86,7 +86,7 @@ export const useMultipleGraphs = () => {
 
 }
 
-export const useMultipleGraphsDefaults = (): MultipleGraphsHookType => {
+export const getMultipleGraphsDefaults = (): MultipleGraphsHookType => {
     return {
         activeProps: [],
         availableProps: [],

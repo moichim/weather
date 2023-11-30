@@ -2,7 +2,7 @@
 
 import { WeatherSourceType } from "@/graphql/weatherSources/source";
 import { useFilterContext } from "@/state/filterContext";
-import { Button, Switch } from "@nextui-org/react";
+import { Switch } from "@nextui-org/react";
 
 export const SourceButton: React.FC<WeatherSourceType> = (props) => {
 

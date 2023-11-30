@@ -32,7 +32,7 @@ export const GraphGridSettings: React.FC = () => {
 
         return () => clearTimeout(timeout);
 
-    }, [value]);
+    }, [value, graph]);
 
     useEffect(() => {
         if (graph.height !== value) {

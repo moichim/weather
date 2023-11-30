@@ -10,7 +10,7 @@ export const DateFilter: React.FC = () => {
 
     useEffect(() => {
         filter.setTo(filter.from)
-    }, []);
+    }, [filter]);
 
     const setDates = (date: string) => {
         filter.setFrom(date);
