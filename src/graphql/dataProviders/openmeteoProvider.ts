@@ -5,7 +5,7 @@ import { Sources } from "../weatherSources/source";
 
 export class OpenmeteoProvider implements IProvider {
 
-    public range = async (from: string, to: string) => {
+    public fetch = async (from: string, to: string) => {
 
         const params = {
             "latitude": 49.7245947848106,

@@ -1,4 +1,4 @@
-import { GraphGridSettings } from "../graph/settings/graphGridSettings"
+import { GraphGridSettings } from "./graphs/graphGridSettings"
 import { Filter } from "./dates/filter"
 
 export const SettingsBar: React.FC<React.PropsWithChildren> = props => {

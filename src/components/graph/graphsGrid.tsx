@@ -1,11 +1,11 @@
 "use client";
 
-import { useGraphContext } from "@/state/graphContext"
+import { useDisplayContext } from "@/state/displayContext"
 import { SinglePropertyGraph } from "./singlePropertyGraph";
 
 export const GraphsGrid: React.FC = () => {
 
-    const setting = useGraphContext();
+    const setting = useDisplayContext();
 
     return <div className="flex items-stretch flex-wrap w-full h-full">
 

@@ -1,14 +1,14 @@
 "use client";
 
-import { Properties } from "@/graphql/weatherSources/properties"
-import { useGraphContext } from "@/state/graphContext";
-import { Switch, cn } from "@nextui-org/react";
+import { Properties } from "@/graphql/weatherSources/properties";
+import { useDisplayContext } from "@/state/displayContext";
+import { cn } from "@nextui-org/react";
 
 const properties = Properties.all();
 
 export const GraphSettings: React.FC = () => {
 
-    const context = useGraphContext();
+    const context = useDisplayContext();
 
     return <div>
 

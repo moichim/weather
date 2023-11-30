@@ -64,6 +64,13 @@ const properties: {
         unit: "%",
         color: "bg-teal-300"
     },
+    radiance: {
+        type: "Float",
+        name: "Sluneční svit",
+        field: "radiance",
+        unit: "W/m2",
+        color: "bg-teal-300"
+    },
     uv: {
         type: "Float",
         name: "UV",

@@ -4,6 +4,7 @@ import { Properties, WeatherProperty } from "./properties"
 type WeatherSourceBaseType = {
     name: string,
     color: "default" | "primary" | "secondary" | "success" | "warning" | "danger",
+    stroke: string,
     props: Array<keyof WeatherEntryDataType>
 }
 
@@ -18,20 +19,24 @@ const sources: {
 } = {
     ntc: {
         name: "NTC",
-        color: "success",
+        color: "danger",
+        stroke: "red",
         props: [
             "temperature",
-            "wind_dir",
+            // "wind_dir",
             "wind_speed",
             "bar",
-            "clouds",
+            // "clouds",
             "humidity",
-            "uv"
+            "uv",
+            "rain",
+            "radiance"
         ]
     },
     openmeteo: {
         name: "Open Meteo",
-        color: "danger",
+        color: "success",
+        stroke: "green",
         props: [
             "temperature",
             "wind_dir",
@@ -40,7 +45,8 @@ const sources: {
             "humidity",
             "bar",
             "clouds",
-            "rain"
+            "rain",
+            "uv"
         ]
     }
 }

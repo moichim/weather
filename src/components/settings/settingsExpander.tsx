@@ -1,11 +1,11 @@
 "use client"
 
-import { useFilterContext } from "@/state/filterContext";
+import { useDisplayContext } from "@/state/displayContext";
 import { Button } from "@nextui-org/react";
 
 export const SettingsExpander: React.FC = () => {
 
-    const { expanded, setExpanded } = useFilterContext();
+    const { expanded, setExpanded } = useDisplayContext();
 
 
     return <Button

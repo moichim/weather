@@ -1,8 +1,8 @@
 'use client'
 
-import { DataContextProvider } from "@/state/dataContext"
+import { DataContextProvider } from "@/state/weatherContext"
 import { FilterContextProvider } from "@/state/filterContext"
-import { GraphContextProvider } from "@/state/graphContext"
+import { DisplayContextProvider } from "@/state/displayContext"
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client"
 import { NextUIProvider } from "@nextui-org/react"
 import React from "react"
@@ -23,9 +23,9 @@ export const Providers: React.FC<React.PropsWithChildren> = props => {
             >
                 <FilterContextProvider>
                     <DataContextProvider>
-                        <GraphContextProvider>
+                        <DisplayContextProvider>
                             {props.children}
-                        </GraphContextProvider>
+                        </DisplayContextProvider>
                     </DataContextProvider>
                 </FilterContextProvider>
             </main>

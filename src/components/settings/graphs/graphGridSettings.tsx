@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useGraphContext } from "@/state/graphContext";
+import { useDisplayContext } from "@/state/displayContext";
 import { Button, Input, Pagination } from "@nextui-org/react";
 import { MultipleGraphColumn, maxHeight, minHeight } from "@/state/useMultipleGraphs";
 import { GraphColumnButton } from "./graphColumnsButton";
 
 export const GraphGridSettings: React.FC = () => {
 
-    const { multiple: graph } = useGraphContext();
+    const { multiple: graph } = useDisplayContext();
 
     const [value, setValue] = useState<number>(graph.height);
 

@@ -1,14 +1,11 @@
 "use client";
 
 import { AvailableSources, Sources } from "@/graphql/weatherSources/source";
+import { dateFromString, stringFromDate } from "@/utils/time";
 import { addDays, format, subHours, subMonths } from "date-fns";
 import { Dispatch, SetStateAction, createContext, useContext, useState } from "react";
 
-export const stringFromDate = (date: Date) => format(date, "yyyy-MM-dd")
-export const dateFromString = (date: string) => new Date(date)
 
-export const getAddedDate = ( date: string, numDays: number ) => stringFromDate( addDays( dateFromString( date ), numDays ) );
-export const getTodayDateString = () => stringFromDate( new Date )
 
 const getInitialFrom = () => stringFromDate(subHours(new Date, 24))
 const getInitialTo = () => stringFromDate((new Date()))
@@ -37,8 +34,6 @@ type FilterContextType = {
     sources: AvailableSources[],
     toggleSource: (source: AvailableSources) => void,
 
-    expanded: boolean,
-    setExpanded: Dispatch<SetStateAction<boolean>>
 }
 
 const initialFrom = getInitialFrom();
@@ -51,9 +46,7 @@ const initial: FilterContextType = {
     lat: getInitialLat(),
     lon: getInitialLon(),
     sources: getDefaultSources(),
-    toggleSource: (source: AvailableSources) => { },
-    expanded: false,
-    setExpanded: () => { }
+    toggleSource: (source: AvailableSources) => { }
 }
 
 
@@ -67,8 +60,6 @@ export const FilterContextProvider: React.FC<React.PropsWithChildren> = (props) 
 
     const [lon, setLat] = useState<number>(getInitialLat());
     const [lat, setLon] = useState<number>(getInitialLon());
-
-    const [expanded, setExpanded] = useState<boolean>(false);
 
     const [sources, setSources] = useState<AvailableSources[]>(getDefaultSources());
 
@@ -88,9 +79,7 @@ export const FilterContextProvider: React.FC<React.PropsWithChildren> = (props) 
         sources,
         toggleSource,
         lat,
-        lon,
-        expanded,
-        setExpanded
+        lon
     }
 
     return <FilterContext.Provider value={value}>

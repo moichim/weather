@@ -2,7 +2,8 @@ import gql from "graphql-tag"
 import { Sources, WeatherSourceType } from "./weatherSources/source";
 import { Properties } from "./weatherSources/properties";
 import { Source } from "postcss";
-import { OpenmeteoProvider } from "./providers/openmeteoProvider";
+import { OpenmeteoProvider } from "./dataProviders/openmeteoProvider";
+import { NtcProvider } from "./dataProviders/ntcProvider";
 
 export type WeatherEntryMetaType = {
     time: number,
@@ -18,7 +19,8 @@ export type WeatherEntryDataType = {
     rain?: number,
     clouds?: number,
     humidity?: number,
-    uv?: number
+    uv?: number,
+    radiance?: number
 }
 
 export type WeatherEntryType = WeatherEntryMetaType & WeatherEntryDataType;
@@ -53,6 +55,7 @@ export const weatherTypeDefs = gql`
         clouds: Float
         humidity: Float
         uv: Float
+        radiance: Float
     }
 
     type Property {
@@ -68,13 +71,15 @@ export const weatherTypeDefs = gql`
     type Source {
         name: String!
         color: String!
+        stroke: String!
         slug: String!
         props:[String]
     }
 
 `;
 
-const provider = new OpenmeteoProvider;
+const openMeteoProvider = new OpenmeteoProvider;
+const ntcProvider = new NtcProvider;
 
 export const weatherResolvers = {
 
@@ -86,7 +91,8 @@ export const weatherResolvers = {
         ): Promise<Serie[]> => {
 
             return Promise.all([
-                provider.range( args.from, args.to )
+                ntcProvider.fetch( args.from, args.to ),
+                openMeteoProvider.fetch( args.from, args.to )
             ]);
 
         },

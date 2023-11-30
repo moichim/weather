@@ -1,6 +1,6 @@
 "use client";
 
-import { useGraphContext } from "@/state/graphContext";
+import { useDisplayContext } from "@/state/displayContext";
 import { MultipleGraphColumn } from "@/state/useMultipleGraphs";
 import { Button } from "@nextui-org/react";
 
@@ -10,7 +10,7 @@ type GraphColumnButtonProps = {
 
 export const GraphColumnButton: React.FC<GraphColumnButtonProps> = (props) => {
 
-    const { multiple: graph } = useGraphContext();
+    const { multiple: graph } = useDisplayContext();
 
     return <Button
         onClick={ () => {

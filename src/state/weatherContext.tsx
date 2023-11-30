@@ -11,7 +11,7 @@ const properties = Properties.all();
 
 type QueryHookType = QueryResult<WeatherQueryType, OperationVariables>;
 
-type DataContextType = {
+type WeatherContextType = {
     weather: GraphDataFormat,
     data: QueryHookType["data"],
     error?: QueryHookType["error"],
@@ -19,7 +19,7 @@ type DataContextType = {
 
 }
 
-const initialData: DataContextType = {
+const initialData: WeatherContextType = {
     weather: [],
     data: {
         weatherRange: []
@@ -67,7 +67,7 @@ const prepareSerieForGraph = (data: Serie): GraphDataSerieFormat => {
 
 }
 
-const DataContext = createContext<DataContextType>(initialData);
+const WeatherContext = createContext<WeatherContextType>(initialData);
 
 const API_REQUEST = gql`
 query Query($from: String, $to: String) {
@@ -77,6 +77,7 @@ query Query($from: String, $to: String) {
         props
         slug
         color
+        stroke
       }
       entries {
         bar
@@ -89,6 +90,7 @@ query Query($from: String, $to: String) {
         clouds
         wind_dir
         wind_speed
+        radiance
       }
     }
   }
@@ -119,25 +121,27 @@ export const DataContextProvider: React.FC<React.PropsWithChildren> = props => {
         },
 
         onError: e => {
-            console.log("error loading data", e);
+
+            console.error("error loading data", e);
+            
         }
 
     });
 
 
-    const value: DataContextType = {
+    const value: WeatherContextType = {
         weather: weather,
         data: query.data,
         loading: query.loading,
         error: query.error,
     };
 
-    return <DataContext.Provider value={value}>
+    return <WeatherContext.Provider value={value}>
         {props.children}
-    </DataContext.Provider>
+    </WeatherContext.Provider>
 
 }
 
-export const useDataContext = () => {
-    return useContext(DataContext);
+export const useWeatherContext = () => {
+    return useContext(WeatherContext);
 }

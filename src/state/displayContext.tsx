@@ -1,8 +1,7 @@
 "use client";
 
-import { WeatherEntryDataType } from "@/graphql/weather"
-import { AvailableWeatherProperties } from "@/graphql/weatherSources/properties"
-import { createContext, useContext, useState, useCallback } from "react"
+import { WeatherEntryDataType } from "@/graphql/weather";
+import { Dispatch, SetStateAction, createContext, useContext, useState } from "react";
 import { MultipleGraphsHookType, useMultipleGraphs, useMultipleGraphsDefaults } from "./useMultipleGraphs";
 
 enum GraphMode {
@@ -10,7 +9,7 @@ enum GraphMode {
     SINGLE = 1
 }
 
-type GraphContextType = {
+type DisplayContextType = {
 
     mode: GraphMode,
     setMode: ( mode: GraphMode ) => void,
@@ -20,11 +19,14 @@ type GraphContextType = {
         },
         setProperty: ( property: keyof WeatherEntryDataType, state: boolean ) => void
     },
-    multiple: MultipleGraphsHookType
+    multiple: MultipleGraphsHookType,
+
+    expanded: boolean,
+    setExpanded: Dispatch<SetStateAction<boolean>>
 
 }
 
-const initialData: GraphContextType = {
+const initialData: DisplayContextType = {
     mode: GraphMode.SINGLE,
     setMode: () => {},
     single: {
@@ -40,14 +42,16 @@ const initialData: GraphContextType = {
         },
         setProperty: ( property, state ) => {},
     },
-    multiple: useMultipleGraphsDefaults()
+    multiple: useMultipleGraphsDefaults(),
+    expanded: false,
+    setExpanded: () => {}
 }
 
 type PropertiesSettingsType = typeof initialData["single"]["properties"];
 
-const GraphContext = createContext( initialData );
+const DisplayContext = createContext( initialData );
 
-export const GraphContextProvider: React.FC<React.PropsWithChildren> = props => {
+export const DisplayContextProvider: React.FC<React.PropsWithChildren> = props => {
 
     const [ mode, setMode ] = useState<GraphMode>( GraphMode.SINGLE );
 
@@ -56,6 +60,8 @@ export const GraphContextProvider: React.FC<React.PropsWithChildren> = props => 
     } >( initialData.single.properties );
 
     const multiple = useMultipleGraphs();
+
+    const [expanded, setExpanded] = useState<boolean>(false);
 
     const setProperty = ( property: keyof PropertiesSettingsType, state: boolean ) => {
         setProperties( propers => {
@@ -66,21 +72,23 @@ export const GraphContextProvider: React.FC<React.PropsWithChildren> = props => 
         } );
     };
 
-    const value: GraphContextType = {
+    const value: DisplayContextType = {
         mode: mode,
         setMode,
         single: {
             properties,
             setProperty
         },
-        multiple
+        multiple,
+        expanded,
+        setExpanded
     };
 
-    return <GraphContext.Provider value={value}>
+    return <DisplayContext.Provider value={value}>
         {props.children}
-    </GraphContext.Provider>
+    </DisplayContext.Provider>
 }
 
-export const useGraphContext = () => {
-    return useContext( GraphContext );
+export const useDisplayContext = () => {
+    return useContext( DisplayContext );
 }
