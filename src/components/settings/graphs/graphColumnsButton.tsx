@@ -10,7 +10,7 @@ type GraphColumnButtonProps = {
 
 export const GraphColumnButton: React.FC<GraphColumnButtonProps> = (props) => {
 
-    const { multiple: graph } = useDisplayContext();
+    const { grid: graph } = useDisplayContext();
 
     return <Button
         onClick={ () => {

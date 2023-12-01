@@ -12,7 +12,9 @@ export type WeatherProperty = {
     unit?: string,
     name: string,
     field: keyof WeatherEntryDataType,
-    color: string
+    color: string,
+    min?: number,
+    max?: number
 }
 
 const properties: {
@@ -23,59 +25,78 @@ const properties: {
         unit: "°C",
         name: "Teplota",
         field: "temperature",
-        color: "bg-red-500"
+        color: "bg-red-500",
+        min: -20,
+        max: 50,
     },
     wind_dir: {
         type: "Float",
         name: "Směr větru",
         field: "wind_dir",
-        color: "bg-green-500"
+        color: "bg-green-500",
+        min: 0,
+        max: 360
     },
     wind_speed: {
         type: "Float",
         name: "Rychlost větru",
         field: "wind_speed",
         unit: "m/s",
-        color: "bg-blue-500"
+        color: "bg-blue-500",
+        min: 0,
+        max: 100
     },
     bar: {
         type: "Float",
         name: "Tlak",
         field: "bar",
         unit: "pascal",
-        color: "bg-yellow-700"
+        color: "bg-yellow-700",
+        min: 0,
+        max: 1200
     },
     rain: {
         type: "Float",
         name: "Srážky",
         field: "rain",
-        color: "bg-violet-700"
+        color: "bg-violet-700",
+        min: 0,
+        max: 8
     },
     clouds: {
         type: "Float",
         name: "Oblačnost",
         field: "clouds",
-        color: "bg-orange-300"
+        color: "bg-orange-300",
+        unit: "%",
+        min: 0,
+        max: 100
     },
     humidity: {
         type: "Float",
         name: "Vlhkost vzduchu",
         field: "humidity",
         unit: "%",
-        color: "bg-teal-300"
+        color: "bg-teal-300",
+        min: 0,
+        max: 100
     },
     radiance: {
         type: "Float",
         name: "Sluneční svit",
         field: "radiance",
         unit: "W/m2",
-        color: "bg-teal-300"
+        color: "bg-teal-300",
+        min: 0,
+        max: 1000
     },
     uv: {
         type: "Float",
         name: "UV",
         field: "uv",
-        color: "bg-pink-400"
+        color: "bg-pink-400",
+        min: 0,
+        max: 255
     }
 }
 

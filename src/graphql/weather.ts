@@ -65,7 +65,9 @@ export const weatherTypeDefs = gql`
         field: String
         in: [String],
         color: String!,
-        slug: String
+        slug: String,
+        min: Float,
+        max: Float
     }
 
     type Source {
