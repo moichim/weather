@@ -26,8 +26,8 @@ const properties: {
         name: "Teplota",
         field: "temperature",
         color: "bg-red-500",
-        min: -20,
-        max: 50,
+        min: -10,
+        max: 40,
     },
     wind_dir: {
         type: "Float",
