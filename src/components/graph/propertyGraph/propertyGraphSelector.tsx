@@ -48,7 +48,7 @@ export const PropertyGraphHeader: React.FC<PropertyGraphPropsType> = props => {
                             style={{width: badgeWidth + "px"}}
                             className="w-full flex items-center justify-center mr-4"
                         >
-                            {p.in.map( s => <div className="rounded-full" style={{
+                            {p.in.map( s => <div key={s} className="rounded-full" style={{
                                 backgroundColor: Sources.one( s as any ).stroke,
                                 width: itemBargeDimension + "px",
                                 height: itemBargeDimension + "px"
