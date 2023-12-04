@@ -46,7 +46,10 @@ const sources: {
             "bar",
             "clouds",
             "rain",
-            "uv"
+            "uv",
+            "radiance",
+            "snow_depth",
+            "evapotranspiration"
         ]
     }
 }

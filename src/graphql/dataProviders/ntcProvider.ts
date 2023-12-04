@@ -1,8 +1,8 @@
 
 import { dateFromString } from "@/utils/time";
-import { Serie, WeatherEntryDataType, WeatherEntryType } from "../weather";
-import { Sources } from "../weatherSources/source";
-import { IProvider } from "./abstractProvider";
+import { WeatherSerie, WeatherEntryDataType, WeatherEntryType, WeatherProviderRequest } from "../weather";
+import { Sources, WeatherSourceType } from "../weatherSources/source";
+import { AbstractWeatherProvider, IProvider } from "./abstractProvider";
 
 type NtcResponseEntryType = {
     id: number,
@@ -26,7 +26,11 @@ type NtcResponseEntryType = {
     high_uv: number
 }
 
-export class NtcProvider implements IProvider {
+export class NtcProvider extends AbstractWeatherProvider {
+
+    protected generateSourceDefinition(): WeatherSourceType {
+        return Sources.one( "ntc" );
+    }
 
     protected prepareRequestUrl( from: string, to: string ) {
 
@@ -66,20 +70,13 @@ export class NtcProvider implements IProvider {
 
     
 
-    public fetch = async ( from: string, to: string ) => {
+    public async doRequest ( args: WeatherProviderRequest ) {
 
-        const url = this.prepareRequestUrl( from, to );
+        const url = this.prepareRequestUrl( args.from, args.to );
 
         const entries = await fetch( url ).then( r => r.json() as unknown as NtcResponseEntryType[] );
 
-        const output: Serie = {
-
-            source: Sources.one("ntc"),
-            entries: entries.map( entry => this.mapResponseToWeatherEntry( entry ) ).reverse()
-
-        }
-
-        return await output;
+        return entries.map( entry => this.mapResponseToWeatherEntry( entry ) ).reverse();
 
     }
 

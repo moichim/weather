@@ -97,6 +97,22 @@ const properties: {
         color: "bg-pink-400",
         min: 0,
         max: 255
+    },
+    snow_depth: {
+        type: "Float",
+        name: "Sníh - hloubka",
+        field: "snow_depth",
+        color: "bg-pink-400",
+        min: 0,
+        max: 255
+    },
+    evapotranspiration: {
+        type: "Float",
+        name: "Evapotranspirace",
+        field: "evapotranspiration",
+        color: "bg-pink-400",
+        min: 0,
+        max: 255
     }
 }
 

@@ -4,11 +4,10 @@ import { Properties } from "./weatherSources/properties";
 import { Source } from "postcss";
 import { OpenmeteoProvider } from "./dataProviders/openmeteoProvider";
 import { NtcProvider } from "./dataProviders/ntcProvider";
+import { NumberDomain } from "recharts/types/util/types";
 
 export type WeatherEntryMetaType = {
     time: number,
-    source: string,
-    is_forecast: boolean,
 }
 
 export type WeatherEntryDataType = {
@@ -20,21 +19,31 @@ export type WeatherEntryDataType = {
     clouds?: number,
     humidity?: number,
     uv?: number,
-    radiance?: number
+    radiance?: number,
+    snow_depth?: number,
+    evapotranspiration?: number
 }
 
 export type WeatherEntryType = WeatherEntryMetaType & WeatherEntryDataType;
 
-export type Serie = {
+export type WeatherSerieIndexType = {
+    [index:number]: WeatherEntryType
+}
+
+export type WeatherSerie = {
     source: WeatherSourceType,
     entries: WeatherEntryType[]
+}
+
+export type WeatherProviderRequest = {
+    from: string,
+    to: string
 }
 
 export const weatherTypeDefs = gql`
 
     extend type Query {
         weatherRange(from:String,to:String): [Serie]
-        weatherSingle(time:Int): [Serie]
         sources: [Source]
         properties: [Property]
     }
@@ -88,18 +97,15 @@ export const weatherResolvers = {
     Query: {
         weatherRange: async ( 
             parent: any, 
-            args: {from:string,to:string}, 
+            args: WeatherProviderRequest, 
             sources: string[] = [] 
-        ): Promise<Serie[]> => {
+        ): Promise<WeatherSerie[]> => {
 
             return Promise.all([
-                ntcProvider.fetch( args.from, args.to ),
-                openMeteoProvider.fetch( args.from, args.to )
+                ntcProvider.fetch( args ),
+                openMeteoProvider.fetch( args )
             ]);
 
-        },
-        weatherSingle: async (time:number): Promise<Serie[]> => {
-            return await []
         },
         sources: () => Sources.all(),
         properties: () => Properties.all()
