@@ -7,18 +7,18 @@ const WeatherPropsDataTypes = {
     String: "string"
 }
 
-export type WeatherProperty = {
+export type WeatherPropertyDefinitionType = {
     type: keyof typeof WeatherPropsDataTypes,
     unit?: string,
     name: string,
     field: keyof WeatherEntryDataType,
     color: string,
-    min?: number,
-    max?: number
+    min: number,
+    max: number
 }
 
 const properties: {
-    [T in keyof WeatherEntryDataType]: WeatherProperty
+    [T in keyof WeatherEntryDataType]: WeatherPropertyDefinitionType
 } = {
     temperature: {
         type: "Float",
@@ -116,9 +116,22 @@ const properties: {
     }
 }
 
+export type WeatherProperty = ReturnType<typeof Properties["formatOne"]>
+
 export type AvailableWeatherProperties = keyof typeof properties;
 
 export class Properties {
+
+    public static pickRandomPropertySlug(): AvailableWeatherProperties {
+        return Object.keys( properties )
+            .sort( () => ( Math.random() * 2 ) - 1 )
+            [0] as AvailableWeatherProperties;
+    }
+
+    public static pickRandomProperty(): WeatherProperty {
+        return Properties.formatOne( Properties.pickRandomPropertySlug() );
+    }
+    
 
     protected static keys() {
         return Object.keys( properties ) as AvailableWeatherProperties[];

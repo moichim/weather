@@ -1,4 +1,5 @@
 import { placesResolvers, placesTypeDefs } from "@/graphql/places";
+import { valueResolvers, valueTypeDefs } from "@/graphql/value";
 import { weatherResolvers, weatherTypeDefs } from "@/graphql/weather";
 import { ApolloServer } from "@apollo/server";
 import { buildSubgraphSchema } from "@apollo/subgraph";
@@ -17,6 +18,11 @@ const server = new ApolloServer({
         {
             typeDefs: weatherTypeDefs,
             resolvers: weatherResolvers,
+        },
+
+        {
+            typeDefs: valueTypeDefs,
+            resolvers: valueResolvers,
         },
     
       ]),

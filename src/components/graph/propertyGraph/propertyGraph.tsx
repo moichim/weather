@@ -61,7 +61,7 @@ export const PropertyGraph: React.FC<PropertyGraphPropsType> = props => {
                 ? "lg:w-1/2"
                 : "lg:w-1/3"
     ])} >
-        <div className="pb-5 flex items-center justify-center gap-3">
+        <div className="pb-5 flex items-center ml-[6rem] gap-3">
             <PropertyGraphSelector prop={props.prop} />
             <PropertyGraphSettings prop={props.prop} min={min} max={max} domain={domain} setMin={setMin} setMax={setMax} setDomain={setDomain}/>
         </div>

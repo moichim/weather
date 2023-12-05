@@ -1,11 +1,12 @@
 "use client";
 
 import { WeatherEntryType, WeatherSerie } from "@/graphql/weather";
-import { AvailableWeatherProperties, Properties, WeatherProperty } from "@/graphql/weatherSources/properties";
-import { WeatherSourceType } from "@/graphql/weatherSources/source";
+import { AvailableWeatherProperties, Properties, WeatherPropertyDefinitionType } from "@/graphql/weatherSources/properties";
+import { Sources, WeatherSourceType } from "@/graphql/weatherSources/source";
 import { OperationVariables, QueryResult, gql, useQuery } from "@apollo/client";
 import { createContext, useContext, useState, useMemo } from "react";
 import { useFilterContext } from "./filterContext";
+import { ValueEntryType, ValueSerieResponseType } from "@/graphql/value";
 
 const properties = Properties.all();
 
@@ -22,7 +23,8 @@ type WeatherContextType = {
 const initialData: WeatherContextType = {
     weather: [],
     data: {
-        weatherRange: []
+        weatherRange: [],
+        valueRange: []
     },
     loading: false
 }
@@ -94,9 +96,44 @@ export const prepareGraphData = (
     const prop = Properties.one(property);
     const availableSources = prop.in;
 
-    const availableValues = ["some_value", "some_other_value"];
+    let availableValues: string[] = [];
+
+    let availableValuesSeries: ValueSerieResponseType[] = [];
+
+    let mappedValues:  {
+        [index:string]: {
+            [index:string]: ValueEntryType
+        }
+    } = {};
+
+    if ( queryResponse.valueRange ) {
+
+        availableValuesSeries = queryResponse.valueRange
+            .filter( serie => serie.in
+                .map( s => s.slug )
+                .includes( property ) 
+            );
+
+        availableValues = availableValuesSeries.map( s => s.slug );
+
+        mappedValues = Object.fromEntries(
+            queryResponse.valueRange.map( serie => [ 
+                serie.slug, 
+                Object.fromEntries( serie.values.map( value => [ value.time, value ] ) )
+            ] )
+        );
+
+    }
 
     const allGraphSequences = [...availableSources, ...availableValues];
+
+    const labels: {
+        [index:string]: string
+    } = Object.fromEntries( [
+        ...availableSources.map( source => [ source, Sources.one( source ).name ] ),
+        ...availableValuesSeries.map( serie => [serie.slug, serie.name] )
+    ]
+    );
 
     const dataBuffer = Object.fromEntries([
         createGraphSequenceFromSlug("time"),
@@ -108,8 +145,6 @@ export const prepareGraphData = (
     };
 
     const records: any[] = [];
-
-    console.log(dataBuffer);
 
     if (Object.keys(queryResponse.weatherRange).length > 0) {
 
@@ -143,15 +178,20 @@ export const prepareGraphData = (
 
                     item[ serie.source.slug ] = value;
 
-                    dataBuffer[serie.source.slug].push(value);
+                    // dataBuffer[serie.source.slug].push(value);
 
                 });
 
 
             // Iterate over all custom values and pass them into a buffer
             availableValues.forEach( valueSlug => {
-                dataBuffer[ valueSlug ].push( null );
-                item[ valueSlug ] = undefined;
+
+                let value = mappedValues[ valueSlug ]
+                    ? mappedValues[ valueSlug ][ entry.time ]
+                    : null;
+
+                // dataBuffer[ valueSlug ].push( value ? value.value : null );
+                item[ valueSlug ] = value ? value.value : null;
             } );
 
             records.push( item );
@@ -166,7 +206,8 @@ export const prepareGraphData = (
         property: prop,
         data: records,
         lines: queryResponse.weatherRange.map(serie => serie.source),
-        dots: availableValues
+        dots: availableValuesSeries,
+        labels: labels
     }
 
 }
@@ -198,11 +239,30 @@ query Query($from: String, $to: String) {
         radiance
       }
     }
-  }
+    valueRange(from: $from, to: $to) {
+        values {
+          time
+          value
+          note
+        }
+        name
+        slug
+        id
+        color
+        in {
+          slug
+          min
+          max
+          in
+          field
+        }
+    }
+}
 `;
 
 type WeatherQueryType = {
-    weatherRange: WeatherSerie[]
+    weatherRange: WeatherSerie[],
+    valueRange: ValueSerieResponseType[]
 }
 
 export const DataContextProvider: React.FC<React.PropsWithChildren> = props => {
