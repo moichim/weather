@@ -1,7 +1,8 @@
-import { SelectIcon, ZoomIcon } from "@/components/ui/icons";
+import { SelectIcon, ZoomInIcon } from "@/components/ui/icons";
 import { ToolDefinitionType } from "@/components/ui/toolbar/toolbar";
 import { AvailableWeatherProperties, Properties } from "@/graphql/weatherSources/properties"
-import { useState, useCallback, useEffect, useMemo } from "react"
+import { useState, useCallback, useEffect, useMemo, SetStateAction } from "react"
+import { useGraphScale } from "./useGraphScale";
 
 const properties = Properties.index();
 
@@ -24,6 +25,7 @@ export enum MultipleGraphColumn {
 }
 
 export enum Tool {
+    INSPECT = 0,
     SELECT = 1,
     ZOOM = 2
 }
@@ -43,9 +45,6 @@ export const useMultipleGraphs = () => {
     const [availableProps, setAvailableProps] = useState<AvailableWeatherProperties[]>([]);
 
     const [ columns, setColumns ] = useState<MultipleGraphColumn>( MultipleGraphColumn.TWO );
-
-    const [ referenceFrom, setReferenceFrom ] = useState<number|undefined>();
-    const [ referenceTo, setReferenceTo ] = useState<number|undefined>();
 
     const [ reference, setReference ] = useState<undefined|SharedReference>();
 
@@ -67,14 +66,14 @@ export const useMultipleGraphs = () => {
                 slug: Tool.ZOOM,
                 name: "Přiblížit rozsah",
                 tooltip: "Vyberte oblast a přibližte ji",
-                icon: ZoomIcon,
+                icon: ZoomInIcon,
                 onActivate: () => {
                     setTool( Tool.ZOOM )
                 }
             }
         ] as ToolDefinitionType[]
 
-    }, [ tool ] );
+    }, [] );
 
     const [ height, setHeight ] = useState<number>( 350 );
 
@@ -84,6 +83,10 @@ export const useMultipleGraphs = () => {
         setAvailableProps(updatedValue);
 
     }, [activeProps]);
+
+    const scale = useGraphScale();
+
+    const [isSelecting, setIsSelecting] = useState<boolean>(false);
 
     const replaceProp = useCallback((
         old: AvailableWeatherProperties,
@@ -130,7 +133,10 @@ export const useMultipleGraphs = () => {
         setTool,
         toolbar,
         reference,
-        setReference
+        setReference,
+        scale,
+        isSelecting,
+        setIsSelecting
     }
 
 }
@@ -150,6 +156,16 @@ export const getMultipleGraphsDefaults = (): MultipleGraphsHookType => {
         setTool: () => {},
         toolbar: [],
         reference: undefined,
-        setReference: () => {}
+        setReference: () => {},
+        scale: {
+            scaleUp: undefined,
+            scaleDown: undefined,
+            height: 0,
+            setScale: function (value: SetStateAction<number>): void {
+                throw new Error("Function not implemented.");
+            }
+        },
+        isSelecting: false,
+        setIsSelecting: () => {}
     }
 }

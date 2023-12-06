@@ -8,6 +8,7 @@ import { useCallback, useEffect, useState } from "react";
 import { CartesianGrid, ComposedChart, Line, ReferenceArea, ResponsiveContainer, Scatter, Tooltip, XAxis, YAxis } from "recharts";
 import { CategoricalChartFunc } from "recharts/types/chart/generateCategoricalChart";
 import { PropertyGraphModes, PropertyGraphWithStateType } from "../useGraph";
+import { useDisplayContext } from "@/state/displayContext";
 
 export const GraphChart: React.FC<PropertyGraphWithStateType> = props => {
 
@@ -16,8 +17,10 @@ export const GraphChart: React.FC<PropertyGraphWithStateType> = props => {
         ? ["auto","auto"]
         : [ props.min ?? "auto", props.max ?? "auto" ]
 
-    const [isHovering, setIsHovering] = useState<boolean>( false );
-    const [isSelecting, setIsSelecting] = useState<boolean>( false );
+    const isHovering = props.isHovering;
+    const isSelecting = props.isSelecting;
+    const setIsHovering = props.setIsHovering;
+    const setIsSelecting = props.setIsSelecting;
 
     useEffect( () => {
         if ( isHovering === false && isSelecting === true )
@@ -127,7 +130,7 @@ export const GraphChart: React.FC<PropertyGraphWithStateType> = props => {
     return <div className="relative">
         <ResponsiveContainer
             width={"100%"}
-            height={props.display.height}
+            height={props.scale.height}
         >
             <ComposedChart
                 data={props.data.data}
@@ -149,7 +152,7 @@ export const GraphChart: React.FC<PropertyGraphWithStateType> = props => {
                     />
                 }
 
-                {props.data.lines.map( src => {
+                {props.data.lines.filter( src => props.filter.sources.includes( src.slug ) ).map( src => {
 
                     return <Line 
                         key={src.slug}

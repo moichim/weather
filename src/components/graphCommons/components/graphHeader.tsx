@@ -14,7 +14,8 @@ export const GraphHeader: React.FC<PropertyGraphWithStateType> = props => {
         <DropdownTrigger>
             <Button
                 variant="light"
-                className="bg-white shadow-2xl"
+                className="bg-white shadow-xl"
+                size="lg"
             >
                 {props.property.name}
                 {props.apiData.loading && <Spinner size="sm" color="default"/>}
