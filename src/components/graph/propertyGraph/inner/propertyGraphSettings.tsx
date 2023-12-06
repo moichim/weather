@@ -1,19 +1,12 @@
-import { useDisplayContext } from "@/state/displayContext";
 import { useWeatherContext } from "@/state/weatherContext";
-import { As, Badge, Button, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Radio, RadioGroup, useDisclosure } from "@nextui-org/react";
-import { useMemo } from "react";
-import { PropertyGraphModes, PropertyGraphWithStateType } from "./propertyGraph";
+import { Badge, Button, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Radio, RadioGroup, useDisclosure } from "@nextui-org/react";
+import { PropertyGraphModes, PropertyGraphWithStateType } from "../useGraph";
 import { SettingsButton } from "./settingsButton";
 
 export const PropertyGraphSettings: React.FC<PropertyGraphWithStateType> = props => {
 
-    const { grid: graph } = useDisplayContext();
 
     const content = useWeatherContext();
-
-    const property = useMemo(() => {
-        return graph.allProps[props.prop];
-    }, [props.prop, graph.allProps]);
 
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
@@ -40,7 +33,7 @@ export const PropertyGraphSettings: React.FC<PropertyGraphWithStateType> = props
             <ModalContent>
                 {(onClose) => (
                     <>
-                        <ModalHeader className="flex flex-col gap-1">{property.name}</ModalHeader>
+                        <ModalHeader className="flex flex-col gap-1">{props.property.name}</ModalHeader>
                         <ModalBody>
 
                             <RadioGroup
@@ -48,7 +41,7 @@ export const PropertyGraphSettings: React.FC<PropertyGraphWithStateType> = props
                                 onValueChange={ value => props.setDomain(value as PropertyGraphModes) }
                                 value={props.domain}
                             >
-                                <Radio value={PropertyGraphModes.RECOMMENDED} description="Doporučeno.">{property.min} - {property.max} {property.unit}</Radio>
+                                <Radio value={PropertyGraphModes.RECOMMENDED} description="Doporučeno.">{props.property.min} - {props.property.max} {props.property.unit}</Radio>
                                 <Radio value={PropertyGraphModes.MANUAL}>Ručně zadaný rozsah</Radio>
                                 <Radio value={PropertyGraphModes.NONE} description="Rozsah se upraví dle nejvyšší a nejnižší zobrazené hodnoty.">Automaticky</Radio>
                             </RadioGroup>

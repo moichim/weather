@@ -1,26 +1,16 @@
 "use client";
 
-import { Sources } from "@/graphql/weatherSources/source";
-import { useDisplayContext } from "@/state/displayContext";
-import { prepareGraphData, useWeatherContext } from "@/state/weatherContext";
-import { Spinner } from "@nextui-org/react";
-import { format } from "date-fns";
-import { useMemo, useState, useEffect, useCallback } from "react";
-import { CartesianGrid, ComposedChart, Line, LineChart, ReferenceArea, ResponsiveContainer, Scatter, Tooltip, XAxis, YAxis } from "recharts";
-import { PropertyGraphModes, PropertyGraphWithStateType } from "./propertyGraph";
-import { useFilterContext } from "@/state/filterContext";
-import { CategoricalChartFunc } from "recharts/types/chart/generateCategoricalChart";
 import { Tool } from "@/state/useMultipleGraphs";
 import { stringFromTimestampFrom, stringFromTimestampTo } from "@/utils/time";
+import { Spinner } from "@nextui-org/react";
+import { format } from "date-fns";
+import { useCallback, useEffect, useState } from "react";
+import { CartesianGrid, ComposedChart, Line, ReferenceArea, ResponsiveContainer, Scatter, Tooltip, XAxis, YAxis } from "recharts";
+import { CategoricalChartFunc } from "recharts/types/chart/generateCategoricalChart";
+import { PropertyGraphModes, PropertyGraphWithStateType } from "../useGraph";
 
 export const PropertyGraphChart: React.FC<PropertyGraphWithStateType> = props => {
-    const queryData = useWeatherContext();
 
-    const { grid: graph } = useDisplayContext();
-
-    const filter = useFilterContext();
-
-    const content = useMemo(()=> prepareGraphData( props.prop, queryData.data ?? {weatherRange: [], valueRange: []} ), [ props.prop, queryData.data ]);
 
     const domain = props.domain === PropertyGraphModes.NONE
         ? ["auto","auto"]
@@ -54,14 +44,14 @@ export const PropertyGraphChart: React.FC<PropertyGraphWithStateType> = props =>
 
                 const coord = parseInt( event.activeLabel! );
 
-                if ( coord < graph.reference!.from )
-                    graph.setReference( {
+                if ( coord < props.display.reference!.from )
+                    props.display.setReference( {
                         from: coord,
-                        to: graph.reference!.to
+                        to: props.display.reference!.to
                     } );
                 else {
-                    graph.setReference( {
-                        from: graph.reference!.from,
+                    props.display.setReference( {
+                        from: props.display.reference!.from,
                         to: coord
                     } );
                 }
@@ -69,7 +59,7 @@ export const PropertyGraphChart: React.FC<PropertyGraphWithStateType> = props =>
             }
         }
 
-    }, [isHovering, setIsHovering, graph.reference ] );
+    }, [isHovering, setIsHovering, props.display.reference ] );
 
     const onMouseLeave: CategoricalChartFunc = useCallback( () => {
         setIsHovering( false );
@@ -87,7 +77,7 @@ export const PropertyGraphChart: React.FC<PropertyGraphWithStateType> = props =>
                 setIsSelecting( true );
 
                 const value = parseInt( event.activeLabel );
-                graph.setReference({
+                props.display.setReference({
                     from: value,
                     to: value
                 });
@@ -97,7 +87,7 @@ export const PropertyGraphChart: React.FC<PropertyGraphWithStateType> = props =>
         }
 
 
-    }, [ graph.reference, isSelecting ] );
+    }, [ props.display.reference, isSelecting ] );
 
     const onUp: CategoricalChartFunc = event => {
 
@@ -110,10 +100,10 @@ export const PropertyGraphChart: React.FC<PropertyGraphWithStateType> = props =>
 
         }
 
-        if ( graph.reference ) {
+        if ( props.display.reference ) {
 
-            if ( graph.reference.from === graph.reference.to )
-                graph.setReference( undefined );
+            if ( props.display.reference.from === props.display.reference.to )
+                props.display.setReference( undefined );
         }
 
     }
@@ -121,12 +111,12 @@ export const PropertyGraphChart: React.FC<PropertyGraphWithStateType> = props =>
 
     const onSelectionComplete = () => {
 
-        if ( graph.tool === Tool.SELECT ) {}
-        else if ( graph.tool === Tool.ZOOM ) {
+        if ( props.display.tool === Tool.SELECT ) {}
+        else if ( props.display.tool === Tool.ZOOM ) {
 
-            if ( graph.reference ) {
-                filter.setFrom( stringFromTimestampFrom( graph.reference.from ) );
-                filter.setTo( stringFromTimestampTo( graph.reference.to ) );
+            if ( props.display.reference ) {
+                props.filter.setFrom( stringFromTimestampFrom( props.display.reference.from ) );
+                props.filter.setTo( stringFromTimestampTo( props.display.reference.to ) );
             }
 
         }
@@ -137,10 +127,10 @@ export const PropertyGraphChart: React.FC<PropertyGraphWithStateType> = props =>
     return <div className="relative">
         <ResponsiveContainer
             width={"100%"}
-            height={graph.height}
+            height={props.display.height}
         >
             <ComposedChart
-                data={content.data}
+                data={props.data.data}
                 margin={{ left: 50 }}
                 syncId={"syncId"}
                 onMouseMove={onMouseMove}
@@ -151,20 +141,20 @@ export const PropertyGraphChart: React.FC<PropertyGraphWithStateType> = props =>
 
                 <CartesianGrid />
 
-                {graph.reference && 
+                {props.display.reference && 
                     <ReferenceArea
-                        x1={graph.reference.from}
-                        x2={graph.reference.to}
+                        x1={props.display.reference.from}
+                        x2={props.display.reference.to}
                         strokeOpacity={0.3}
                     />
                 }
 
-                {content.lines.map( src => {
+                {props.data.lines.map( src => {
 
                     return <Line 
                         key={src.slug}
                         dataKey={src.slug}
-                        unit={content.property.unit ?? ""}
+                        unit={props.property.unit ?? ""}
                         dot={false}
                         stroke={src.stroke}
                         isAnimationActive={false}
@@ -172,7 +162,7 @@ export const PropertyGraphChart: React.FC<PropertyGraphWithStateType> = props =>
                     
                 } ) }
 
-                {content.dots.map( src => {
+                {props.data.dots.map( src => {
 
                     return <Scatter 
                         key={src.slug}
@@ -194,13 +184,13 @@ export const PropertyGraphChart: React.FC<PropertyGraphWithStateType> = props =>
                 />
 
                 <YAxis 
-                    unit={content.property.unit} 
+                    unit={props.property.unit} 
                     domain={domain as any}
                 />
 
                 <Tooltip
-                    formatter={(value: number, name, props) => {
-                        return [value.toFixed(3), content.labels[name] ?? name];
+                    formatter={(value: number, name) => {
+                        return [value.toFixed(3), props.data.labels[name] ?? name];
                     }}
                     labelFormatter={(value) => {
                         return format(new Date(value), "d. M. Y H:mm");
@@ -212,7 +202,7 @@ export const PropertyGraphChart: React.FC<PropertyGraphWithStateType> = props =>
 
         </ResponsiveContainer>
 
-        {queryData.loading && <div className="w-full h-full absolute top-0 left-0 flex items-center justify-center">
+        {props.apiData.loading && <div className="w-full h-full absolute top-0 left-0 flex items-center justify-center">
             <Spinner size="lg" color="default"/>
         </div>}
     </div>
