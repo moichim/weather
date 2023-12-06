@@ -1,5 +1,5 @@
 import { WeatherEntryDataType, WeatherEntryMetaType, WeatherEntryType } from "../weather"
-import { Properties, WeatherProperty } from "./properties"
+import { Properties, WeatherPropertyDefinitionType } from "./properties"
 
 type WeatherSourceBaseType = {
     name: string,

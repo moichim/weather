@@ -8,7 +8,7 @@ import { GraphColumnButton } from "./graphColumnsButton";
 
 export const GraphGridSettings: React.FC = () => {
 
-    const { grid: graph } = useDisplayContext();
+    const { set: graph } = useDisplayContext();
 
     const [value, setValue] = useState<number>(graph.height);
 

@@ -5,13 +5,13 @@ import { MultipleGraphsHookType, getMultipleGraphsDefaults, useMultipleGraphs } 
 
 
 type DisplayContextType = {
-    grid: MultipleGraphsHookType,
+    set: MultipleGraphsHookType,
     expanded: boolean,
     setExpanded: Dispatch<SetStateAction<boolean>>
 }
 
 const initialData: DisplayContextType = {
-    grid: getMultipleGraphsDefaults(),
+    set: getMultipleGraphsDefaults(),
     expanded: false,
     setExpanded: () => {}
 }
@@ -25,7 +25,7 @@ export const DisplayContextProvider: React.FC<React.PropsWithChildren> = props =
     const [expanded, setExpanded] = useState<boolean>(false);
 
     const value: DisplayContextType = {
-        grid: multiple,
+        set: multiple,
         expanded,
         setExpanded
     };

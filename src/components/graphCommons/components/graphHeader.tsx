@@ -1,34 +1,25 @@
 "use client";
 
 import { AvailableWeatherProperties, Properties } from "@/graphql/weatherSources/properties";
-import { useDisplayContext } from "@/state/displayContext";
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner } from "@nextui-org/react";
-import { useMemo } from "react";
-import { PropertyGraphPropsType } from "./propertyGraph";
-import { useWeatherContext } from "@/state/weatherContext";
 import { Sources } from "@/graphql/weatherSources/source";
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner } from "@nextui-org/react";
+import { PropertyGraphWithStateType } from "../useGraph";
 
 const itemBargeDimension = 10;
 const badgeWidth = Sources.all().length * itemBargeDimension;
 
-export const PropertyGraphHeader: React.FC<PropertyGraphPropsType> = props => {
-
-    const { grid: graph } = useDisplayContext();
-
-    const { loading } = useWeatherContext();
-
-    const property = useMemo(() => {
-        return graph.allProps[props.prop];
-    }, [props.prop, graph.allProps]);
+export const GraphHeader: React.FC<PropertyGraphWithStateType> = props => {
 
     return <Dropdown>
         <DropdownTrigger>
             <Button
-                variant="bordered"
+                variant="light"
+                className="bg-white shadow-xl"
+                size="lg"
             >
-                {property.name}
-                {loading && <Spinner size="sm" color="default"/>}
-                {!loading && <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                {props.property.name}
+                {props.apiData.loading && <Spinner size="sm" color="default"/>}
+                {!props.apiData.loading && <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                 </svg>
                 }
@@ -37,11 +28,11 @@ export const PropertyGraphHeader: React.FC<PropertyGraphPropsType> = props => {
         <DropdownMenu
             aria-label="Přepnout vlastnost"
             onAction={(selection) => {
-                graph.replaceProp(props.prop, selection as AvailableWeatherProperties)
+                props.display.replaceProp(props.prop, selection as AvailableWeatherProperties)
             }}
         >
-            {graph.availableProps.map(prop => {
-                const p = graph.allProps[prop]!;
+            {props.display.availableProps.map(prop => {
+                const p = props.display.allProps[prop]!;
                 return <DropdownItem key={prop}>
                     <div className="flex w-full">
                         <div 

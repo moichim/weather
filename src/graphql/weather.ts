@@ -98,7 +98,6 @@ export const weatherResolvers = {
         weatherRange: async ( 
             parent: any, 
             args: WeatherProviderRequest, 
-            sources: string[] = [] 
         ): Promise<WeatherSerie[]> => {
 
             return Promise.all([
