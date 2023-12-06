@@ -33,15 +33,6 @@ type FilterContextType = {
     sources: AvailableSources[],
     toggleSource: (source: AvailableSources) => void,
 
-    isSelectingReference: boolean,
-    setisSelectingReference: Dispatch<SetStateAction<boolean>>,
-
-    fromReferenceCoordinate?: number,
-    toReferenceCoordinate?: number,
-
-    setFromReferenceCoordinate: Dispatch<SetStateAction<number|undefined>>,
-    setToReferenceCoordinate: Dispatch<SetStateAction<number|undefined>>
-
 }
 
 const initialFrom = getInitialFrom();
@@ -55,10 +46,6 @@ const initial: FilterContextType = {
     lon: getInitialLon(),
     sources: getDefaultSources(),
     toggleSource: (source: AvailableSources) => { },
-    setFromReferenceCoordinate: () => { },
-    setToReferenceCoordinate: () => { },
-    isSelectingReference: false,
-    setisSelectingReference: () => { }
 }
 
 
@@ -74,10 +61,6 @@ export const FilterContextProvider: React.FC<React.PropsWithChildren> = (props) 
     const [lat, setLon] = useState<number>(getInitialLon());
 
     const [sources, setSources] = useState<AvailableSources[]>(getDefaultSources());
-
-    const [fromReferenceCoordinate, setFromReferenceCoordinate] = useState<number>();
-    const [toReferenceCoordinate, setToReferenceCoordinate] = useState<number>();
-    const [isSelectingReference, setIsSelectingReference] = useState<boolean>(false);
 
     const toggleSource = (source: AvailableSources) => {
         if (sources.includes(source as string))
@@ -95,13 +78,7 @@ export const FilterContextProvider: React.FC<React.PropsWithChildren> = (props) 
         sources,
         toggleSource,
         lat,
-        lon,
-        fromReferenceCoordinate,
-        setFromReferenceCoordinate,
-        toReferenceCoordinate,
-        setToReferenceCoordinate,
-        isSelectingReference,
-        setIsSelectingReference,
+        lon
     }
 
     return <FilterContext.Provider value={value}>
