@@ -9,7 +9,7 @@ import { CartesianGrid, ComposedChart, Line, ReferenceArea, ResponsiveContainer,
 import { CategoricalChartFunc } from "recharts/types/chart/generateCategoricalChart";
 import { PropertyGraphModes, PropertyGraphWithStateType } from "../useGraph";
 
-export const PropertyGraphChart: React.FC<PropertyGraphWithStateType> = props => {
+export const GraphChart: React.FC<PropertyGraphWithStateType> = props => {
 
 
     const domain = props.domain === PropertyGraphModes.NONE
@@ -139,7 +139,7 @@ export const PropertyGraphChart: React.FC<PropertyGraphWithStateType> = props =>
                 onMouseUp={onUp}
             >
 
-                <CartesianGrid />
+                <CartesianGrid strokeDasharray={"2 2"} />
 
                 {props.display.reference && 
                     <ReferenceArea
@@ -175,6 +175,7 @@ export const PropertyGraphChart: React.FC<PropertyGraphWithStateType> = props =>
 
                 } )}
 
+
                 <XAxis
                     dataKey="time"
                     tickFormatter={name => {
@@ -182,6 +183,7 @@ export const PropertyGraphChart: React.FC<PropertyGraphWithStateType> = props =>
                     }}
                     onMouseDown={console.log}
                 />
+
 
                 <YAxis 
                     unit={props.property.unit} 

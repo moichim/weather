@@ -3,14 +3,14 @@
 import { cn } from "@nextui-org/react";
 
 import { MultipleGraphColumn } from "@/state/useMultipleGraphs";
-import { PropertyGraphChart } from "./inner/propertyGraphChart";
-import { PropertyGraphHeader } from "./inner/propertyGraphHeader";
-import { PropertyGraphSettings } from "./inner/propertyGraphSettings";
-import { PropertyGraphPropsType, useGraphInstance } from "./useGraph";
+import { GraphChart } from "../graphCommons/components/graphChart";
+import { GraphHeader } from "../graphCommons/components/graphHeader";
+import { GraphSettings } from "../graphCommons/components/graphSettings";
+import { PropertyGraphPropsType, useGraphInstance } from "../graphCommons/useGraph";
 
 
 
-export const PropertyGraph: React.FC<PropertyGraphPropsType> = props => {
+export const GraphGridInstance: React.FC<PropertyGraphPropsType> = props => {
 
     const graph = useGraphInstance( props.prop );
 
@@ -23,11 +23,11 @@ export const PropertyGraph: React.FC<PropertyGraphPropsType> = props => {
                 : "lg:w-1/3"
     ])} >
         <div className="pb-5 flex items-center ml-[6rem] gap-3">
-            <PropertyGraphHeader prop={props.prop} {...graph}/>
-            <PropertyGraphSettings prop={props.prop} {...graph}/>
+            <GraphHeader prop={props.prop} {...graph}/>
+            <GraphSettings prop={props.prop} {...graph}/>
         </div>
         <div>
-            <PropertyGraphChart prop={props.prop} {...graph}/>
+            <GraphChart prop={props.prop} {...graph}/>
         </div>
     </div>
 }

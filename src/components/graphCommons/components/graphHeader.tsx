@@ -8,12 +8,13 @@ import { PropertyGraphWithStateType } from "../useGraph";
 const itemBargeDimension = 10;
 const badgeWidth = Sources.all().length * itemBargeDimension;
 
-export const PropertyGraphHeader: React.FC<PropertyGraphWithStateType> = props => {
+export const GraphHeader: React.FC<PropertyGraphWithStateType> = props => {
 
     return <Dropdown>
         <DropdownTrigger>
             <Button
-                variant="bordered"
+                variant="light"
+                className="bg-white shadow-2xl"
             >
                 {props.property.name}
                 {props.apiData.loading && <Spinner size="sm" color="default"/>}

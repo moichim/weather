@@ -1,9 +1,9 @@
 import { useWeatherContext } from "@/state/weatherContext";
 import { Badge, Button, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Radio, RadioGroup, useDisclosure } from "@nextui-org/react";
 import { PropertyGraphModes, PropertyGraphWithStateType } from "../useGraph";
-import { SettingsButton } from "./settingsButton";
+import { GraphSettingsButton } from "./graphSettingsButton";
 
-export const PropertyGraphSettings: React.FC<PropertyGraphWithStateType> = props => {
+export const GraphSettings: React.FC<PropertyGraphWithStateType> = props => {
 
 
     const content = useWeatherContext();
@@ -23,9 +23,9 @@ export const PropertyGraphSettings: React.FC<PropertyGraphWithStateType> = props
     return <>
 
         {isDefault
-            ? <SettingsButton onOpen={onOpen} />
+            ? <GraphSettingsButton onOpen={onOpen} />
             : <Badge content="" color="secondary" placement="top-right">
-                <SettingsButton onOpen={onOpen} />
+                <GraphSettingsButton onOpen={onOpen} />
             </Badge>
         }
 

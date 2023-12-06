@@ -18,7 +18,7 @@ export type PropertyGraphWithStateType = PropertyGraphPropsType & ReturnType<typ
 
 export const useGraphInstance = ( prop: AvailableWeatherProperties ) => {
 
-    const { grid: display } = useDisplayContext();
+    const { set: display } = useDisplayContext();
 
     const filter = useFilterContext();
 

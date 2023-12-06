@@ -52,7 +52,7 @@ const Tool: React.FC<ToolPropsType> = props => {
 
 export const Toolbar: React.FC<ToolbarProps> = props => {
 
-    return <div className="shadow-2xl fixed left-5 top-5 bg-gray-100 rounded-lg p-3 flex flex-col gap-3">
+    return <div className="shadow-2xl fixed left-5 top-5 bg-white rounded-lg p-3 flex flex-col gap-3">
         {props.tools.map(tool => <Tool key={tool.name} {...tool} setter={props.setTool} active={props.tool} />)}
     </div>
 
