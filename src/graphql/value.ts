@@ -9,7 +9,7 @@ export type ValueEntryType = {
     note?: string
 }
 
-type ValueindexType = {
+export type ValueindexType = {
     [index:number]: ValueEntryType
 }
 
@@ -52,8 +52,6 @@ export const valueTypeDefs = gql`
 
 `;
 
-const provider = new ValueProvider;
-
 export const valueResolvers = {
 
     Query: {
@@ -62,7 +60,13 @@ export const valueResolvers = {
             args: WeatherProviderRequest, 
         ): Promise<ValueSerieResponseType[]> => {
 
-            return await provider.getAllSeries( args )
+            const provider = new ValueProvider( args.from, args.to );
+
+            await provider.init();
+
+            const property = await provider.get();
+
+            return property;
 
         },
     }
