@@ -130,7 +130,7 @@ export const useGraphInstance = ( prop: AvailableWeatherProperties ) => {
 
         return [...values, ...properties]
 
-    }, [ display.reference ] );
+    }, [ display.reference, data.data, data.dots, data.lines ] );
 
     useEffect( () => {
 
@@ -140,7 +140,7 @@ export const useGraphInstance = ( prop: AvailableWeatherProperties ) => {
 
         return () => clearTimeout( timeout );
 
-    }, [ display.reference ] );
+    }, [ display.reference, calculateRows ] );
 
 
     return {

@@ -25,7 +25,7 @@ export const GraphChart: React.FC<PropertyGraphWithStateType> = props => {
     useEffect( () => {
         if ( isHovering === false && isSelecting === true )
             setIsSelecting( false );
-    }, [ isHovering, isSelecting ] );
+    }, [ isHovering, isSelecting, setIsSelecting ] );
 
     const onMouseMove: CategoricalChartFunc = useCallback( event => {
 
@@ -62,12 +62,12 @@ export const GraphChart: React.FC<PropertyGraphWithStateType> = props => {
             }
         }
 
-    }, [isHovering, setIsHovering, props.display.reference ] );
+    }, [isHovering, setIsHovering, props.display.reference, isSelecting, props.display ] );
 
     const onMouseLeave: CategoricalChartFunc = useCallback( () => {
         setIsHovering( false );
         setIsSelecting( false );
-    }, [ isHovering, isSelecting ] );
+    }, [ isHovering, isSelecting, setIsHovering, setIsSelecting ] );
 
 
     const onDown: CategoricalChartFunc = useCallback( event => {
@@ -90,7 +90,7 @@ export const GraphChart: React.FC<PropertyGraphWithStateType> = props => {
         }
 
 
-    }, [ props.display.reference, isSelecting ] );
+    }, [ props.display.reference, isSelecting, props.display, setIsSelecting ] );
 
     const onUp: CategoricalChartFunc = event => {
 

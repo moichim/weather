@@ -4,16 +4,16 @@ export const useGraphScale = (
     defaultScale:number = 3 
 ) => {
 
-    const heights = [
+    const heights = useMemo(()=>[
         100,
         200,
         350,
         500,
         650,
         800
-    ];
+    ],[]);
 
-    const defaultHeight =  heights[2];
+    const defaultHeight =  useMemo( () => heights[2], [heights]);
 
     const length = heights.length - 1;
 
