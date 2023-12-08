@@ -16,7 +16,8 @@ export enum GraphActions {
     SELECT_TOOL = 8,
 
     SELECTION_START = 9,
-    SELECTION_END = 10
+    SELECTION_END = 10,
+    SELECTION_REMOVE = 11,
 
 }
 
@@ -136,6 +137,12 @@ export type SelectionStartAction = GraphStackAction<SelectionModificationPayload
 
 export type SelectionEndAction = GraphStackAction<SelectionModificationPayload> & {
     type: GraphActions.SELECTION_END
+}
+
+export type SelectionRemovePayload = boolean;
+
+export type SelectionRemoveAction = GraphStackAction<SelectionRemovePayload> & {
+    type: GraphActions.SELECTION_REMOVE
 }
 
 
@@ -262,6 +269,13 @@ export class StackActions {
                 property,
                 timestamp
             }
+        }
+    }
+
+    public static selectionRemove(): SelectionRemoveAction {
+        return {
+            type: GraphActions.SELECTION_REMOVE,
+            payload: true
         }
     }
 

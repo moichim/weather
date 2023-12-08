@@ -4,9 +4,9 @@ import { WeatherProperty } from "@/graphql/weatherSources/properties";
 import { Properties } from "@/graphql/weatherSources/properties";
 
 export enum GraphDomain {
-    DEFAULT,
-    AUTO,
-    MANUAL
+    DEFAULT = "default",
+    AUTO = "auto",
+    MANUAL = "manual"
 }
 
 export const graphInstanceHeights = {
@@ -39,6 +39,7 @@ export type GraphStackState = {
     graphs: {
         [T in AvailableWeatherProperties]?: GraphInstanceState
     }
+    availableGraphs: WeatherProperty[]
 }
 
 export class GraphStateFactory {
@@ -55,7 +56,8 @@ export class GraphStateFactory {
                 return [ property, definition ];
             } ) ),
             selectionStart: undefined,
-            selectionEnd: undefined
+            selectionEnd: undefined,
+            availableGraphs: Properties.all().filter( property => ! properties.includes( property.slug ) )
 
         }
     }

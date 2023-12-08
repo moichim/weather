@@ -89,33 +89,39 @@ export const useGraphStackReducer: Reducer<GraphStackState, GraphStateActionBase
         case GraphActions.SET_INSTANCE_PROPERTY:
             const { fromProperty, toProperty }: SetInstancePropertyPayload = action.payload;
 
+            const newGraphs = Object.fromEntries(Object.entries(state.graphs)
+            .map(([key, entry]) => {
+
+                if (key !== fromProperty)
+                    return [key, entry];
+
+                const definition = Properties.one(toProperty);
+
+                const newProperty = [toProperty, {
+                    ...entry,
+                    property: definition,
+                    domainMin: entry.domain === GraphDomain.DEFAULT
+                        ? definition.min : undefined,
+                    domainMax: entry.domain === GraphDomain.DEFAULT
+                        ? definition.max : undefined,
+                }];
+
+                return newProperty;
+
+            }));
+
+            const newAvailableProperties = Properties.all().filter( property => ! Object.keys(newGraphs).includes( property.slug ) )
+
             return {
                 ...state,
-                graphs: Object.fromEntries(Object.entries(state.graphs)
-                    .map(([key, entry]) => {
-
-                        if (key !== fromProperty)
-                            return [key, entry];
-
-                        const definition = Properties.one(toProperty);
-
-                        return [toProperty, {
-                            ...entry,
-                            property: definition,
-                            domainMin: entry.domain === GraphDomain.DEFAULT
-                                ? definition.min : undefined,
-                            domainMax: entry.domain === GraphDomain.DEFAULT
-                                ? definition.max : undefined,
-                        }]
-
-                    })
-                )
+                availableGraphs: newAvailableProperties,
+                graphs: newGraphs
             }
 
         case GraphActions.SELECT_TOOL:
             return {
                 ...state,
-                tool: action.payload.tool
+                activeTool: action.payload.tool
             }
 
         case GraphActions.SELECTION_START:
@@ -163,6 +169,14 @@ export const useGraphStackReducer: Reducer<GraphStackState, GraphStateActionBase
                         return [key, entry]
                     })
                 )
+            }
+
+        case GraphActions.SELECTION_REMOVE:
+            return {
+                ...state,
+                isSelecting: false,
+                selectionStart: undefined,
+                selectionEnd: undefined
             }
 
 

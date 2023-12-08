@@ -1,61 +1,85 @@
 "use client";
 
-import { ZoomInIcon, ZoomOutIcon } from "@/components/ui/icons";
-import { useDisplayContext } from "@/state/displayContext";
+import { useGraphContext } from "@/state/graphStackContext";
+import { StackActions } from "@/state/useGraphStack/actions";
+import { GraphInstanceScales, graphInstanceHeights } from "@/state/useGraphStack/storage";
 import { Button, ButtonGroup, Tooltip } from "@nextui-org/react";
+
+type GraphSize = {
+    key: GraphInstanceScales,
+    name: string,
+    label: string,
+    height: number
+}
+
+export const graphInstanceSizes: GraphSize[] = [
+    {
+        key: "sm",
+        name: "S",
+        label: "Malé grafy",
+        height: graphInstanceHeights["sm"]
+    },
+    {
+        key: "md",
+        name: "M",
+        label: "Střední grafy",
+        height: graphInstanceHeights["md"]
+    },
+    {
+        key: "lg",
+        name: "L",
+        label:"Velké grafy",
+        height: graphInstanceHeights["lg"]
+    },
+    {
+        key: "xl",
+        name: "XL",
+        label:"Extra velké grafy",
+        height: graphInstanceHeights["xl"]
+    },
+    {
+        key: "2xl",
+        name: "XXL",
+        label:"Obří grafy",
+        height: graphInstanceHeights["2xl"]
+    },
+]
 
 export const GraphStackSettings: React.FC = () => {
 
-    const { set: graph } = useDisplayContext();
+    const { stack } = useGraphContext();
+
+    const activeScale = Object.values( stack.state.graphs ).reduce( (
+        state:undefined|boolean|GraphInstanceScales, current
+    ) => {
+        if ( state === undefined ) return current.scale;
+        if ( state === false ) return false;
+        if ( current.scale === state ) return state;
+        return false;
+    }, undefined );
 
     return <ButtonGroup>
 
+        {graphInstanceSizes.map(size => {
 
-        <Tooltip
-            content="Malé grafy"
-            showArrow={true}
-            color="foreground"
-            placement="top"
-        >
-            <Button
-                isIconOnly
-                variant="bordered"
-                onClick={() => graph.scale.setScale(0)}
+            return <Tooltip
+                content={size.label}
+                showArrow
+                color="foreground"
             >
-                S
-            </Button>
-        </Tooltip>
-        <Tooltip
-            content="Výchozí velikost grafů"
-            showArrow={true}
-            color="foreground"
-            placement="top"
-        >
-            <Button
-                isIconOnly
-                variant="bordered"
-                onClick={() => graph.scale.setScale(2)}
-            >
-                M
-            </Button>
-        </Tooltip>
-        <Tooltip
-            content="Velké grafy"
-            showArrow={true}
-            color="foreground"
-            placement="top"
-        >
-            <Button
-                isIconOnly
-                variant="bordered"
-                onClick={() => graph.scale.setScale(4)}
-            >
-                L
-            </Button>
-        </Tooltip>
 
-        <div>{graph.scale.height}</div>
+                <Button
+                    isIconOnly
+                    variant="bordered"
+                    className={ size.key === activeScale ? "bg-gray-100" : "bg-white" }
+                    onClick={() => stack.dispatch( StackActions.setHeights( size.key ) )}
+                >
+                    {size.name}
+                </Button>
 
+            </Tooltip>
+
+        })}
 
     </ButtonGroup>
 }
