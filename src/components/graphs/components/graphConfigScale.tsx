@@ -17,6 +17,7 @@ export const GraphConfigScale: React.FC<GraphInstanceState> = props => {
             return <Button
                 onClick={ () => stack.dispatch(StackActions.setInstanceHeight( props.property.slug, size.key )) }
                 isIconOnly
+                key={size.key}
                 variant="light"
                 className={stack.state.graphs[props.property.slug]?.scale === size.key ? "bg-gray-100" :"bg-white"}
             >{size.name}</Button>

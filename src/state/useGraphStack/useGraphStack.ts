@@ -7,8 +7,6 @@ export const useGraphStack = () => {
 
     const [state, dispatch] = useReducer( useGraphStackReducer, GraphStateFactory.defaultState() );
 
-    // dispatch( StackActions.resetAll() );
-
     return {
         state,
         dispatch

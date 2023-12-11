@@ -91,7 +91,7 @@ export type SetInstanceHeightAction = GraphStackAction<SetInstanceHeightPayload>
 export type SetInstanceDomainPayload = {
     property: AvailableWeatherProperties,
     domain: GraphDomain,
-    range?: {min:number,max:number}
+    range?: {min:number|"auto",max:number|"auto"}
 }
 
 export type SetInstanceDomainAction = GraphStackAction<SetInstanceDomainPayload> & {
@@ -209,15 +209,23 @@ export class StackActions {
 
     public static setInstanceDomain(
         property: AvailableWeatherProperties,
-        domain: GraphDomain
+        domain: GraphDomain,
+        min?: number|"auto",
+        max?: number|"auto"
     ): SetInstanceDomainAction {
-        return {
+        const action: SetInstanceDomainAction = {
             type: GraphActions.SET_INSTANCE_DOMAIN,
             payload: {
                 property,
                 domain
             }
         }
+
+        if ( min && max ) {
+            action.payload.range = { min: min, max: max };
+        }
+
+        return action;
     }
 
     public static setInstanceProperty(

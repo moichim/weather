@@ -68,12 +68,25 @@ export const GraphCanvas: React.FC<GraphInstanceWithDataPropsType> = props => {
             stack.dispatch(StackActions.selectionStart(props.property.slug, parseInt(event.activeLabel!)));
             setIsSelectingLocal(true);
         } else {
-            stack.dispatch(StackActions.selectionEnd(props.property.slug, parseInt(event.activeLabel!)));
+
+            let from = stack.state.selectionStart!;
+            let to = parseInt( event.activeLabel! );
+
+            if ( from > to ) {
+                let fromTmp = from;
+                from = to;
+                to = fromTmp;
+                stack.dispatch( StackActions.selectionStart( props.property.slug, from ) );
+            }
+
+
+            stack.dispatch(StackActions.selectionEnd(props.property.slug, to));
+
             setIsSelectingLocal(false);
             
             if ( stack.state.activeTool === GraphTools.ZOOM ) {
-                props.data.filter.setFrom( stringFromTimestampFrom( stack.state.selectionStart! ) )
-                props.data.filter.setTo( stringFromTimestampTo( parseInt( event.activeLabel! ) ) )
+                props.data.filter.setFrom( stringFromTimestampFrom( from ) );
+                props.data.filter.setTo( stringFromTimestampTo( to ) );
                 stack.dispatch( StackActions.selectTool( GraphTools.INSPECT ) );
             }
 

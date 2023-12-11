@@ -23,8 +23,8 @@ export type GraphInstanceState = {
     weight: number,
     scale: GraphInstanceScales,
     domain: GraphDomain,
-    domainMin?: number,
-    domainMax?: number,
+    domainMin: number|"auto",
+    domainMax: number|"auto",
     isSelecting: boolean,
     /** @deprecated should be flat, so is is advided this is converted into string */
     property: WeatherProperty
@@ -72,8 +72,8 @@ export class GraphStateFactory {
             property: definition,
             weight: weight,
             domain: GraphDomain.DEFAULT,
-            domainMin: definition.min,
-            domainMax: definition.max,
+            domainMin: definition.min!,
+            domainMax: definition.max!,
             isSelecting: false,
             scale: height
         }

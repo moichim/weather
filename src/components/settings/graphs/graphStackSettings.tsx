@@ -59,6 +59,7 @@ export const GraphStackSettings: React.FC = () => {
                 content={size.label}
                 showArrow
                 color="foreground"
+                key={size.key}
             >
 
                 <Button

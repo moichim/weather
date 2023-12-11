@@ -7,6 +7,7 @@ import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client"
 import { NextUIProvider } from "@nextui-org/react"
 import React from "react"
 import { GraphContextProvider } from "@/state/graphStackContext"
+import { NotificationsContextProvider } from "@/state/useNotifications/useNotifications"
 
 const client = new ApolloClient({
 
@@ -22,15 +23,17 @@ export const Providers: React.FC<React.PropsWithChildren> = props => {
             <main
             //className="dark text-foreground bg-background"
             >
-                <GraphContextProvider>
-                    <FilterContextProvider>
-                        <DataContextProvider>
-                            <DisplayContextProvider>
-                                {props.children}
-                            </DisplayContextProvider>
-                        </DataContextProvider>
-                    </FilterContextProvider>
-                </GraphContextProvider>
+                <NotificationsContextProvider>
+                    <GraphContextProvider>
+                        <FilterContextProvider>
+                            <DataContextProvider>
+                                <DisplayContextProvider>
+                                    {props.children}
+                                </DisplayContextProvider>
+                            </DataContextProvider>
+                        </FilterContextProvider>
+                    </GraphContextProvider>
+                </NotificationsContextProvider>
             </main>
         </NextUIProvider>
     </ApolloProvider>

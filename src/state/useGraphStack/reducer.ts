@@ -15,18 +15,18 @@ export const useGraphStackReducer: Reducer<GraphStackState, GraphStateActionBase
         }));
     }
 
-    const getSharedScale = ( current: GraphStackState ) => {
+    const getSharedScale = (current: GraphStackState) => {
 
-        let shared = Object.values( current.graphs ).reduce( (st:undefined|false|GraphInstanceScales, curr) => {
+        let shared = Object.values(current.graphs).reduce((st: undefined | false | GraphInstanceScales, curr) => {
 
-            if ( st === undefined ) return curr.scale;
-            if ( st === curr.scale ) return st;
+            if (st === undefined) return curr.scale;
+            if (st === curr.scale) return st;
             // if ( st === false ) return st;
             return false;
 
-        }, undefined );
+        }, undefined);
 
-        if ( shared === false ) 
+        if (shared === false)
             return undefined;
 
         return shared;
@@ -39,13 +39,19 @@ export const useGraphStackReducer: Reducer<GraphStackState, GraphStateActionBase
 
             const { property: propertyAdd }: AddGraphPayload = action.payload;
 
-            return {
+            const newState = {
                 ...state,
                 graphs: {
                     ...state.graphs,
                     [propertyAdd]: GraphStateFactory.defaultInstanceState(propertyAdd, state.sharedScale)
                 }
             }
+
+            const newAProps = state.availableGraphs.filter(property => !Object.keys(newState.graphs).includes(property.slug));
+
+            newState.availableGraphs = newAProps;
+
+            return newState;
         case GraphActions.REMOVE_GRAPH:
 
             const { property: propertyRemove }: AddGraphPayload = action.payload;
@@ -75,7 +81,30 @@ export const useGraphStackReducer: Reducer<GraphStackState, GraphStateActionBase
             }
 
         case GraphActions.SET_INSTANCE_DOMAIN:
+
             const { property: propertyDomain, domain, range }: SetInstanceDomainPayload = action.payload;
+
+            const entry = state.graphs[propertyDomain]!;
+
+            let d: Array<number | "auto"> = ["auto", "auto"];
+
+            if (domain === GraphDomain.DEFAULT) {
+                d = [entry.property.min!, entry.property.max!]
+            }
+
+            if (domain === GraphDomain.MANUAL) {
+
+                if (entry.domainMin === "auto" )
+                    d[0] = entry.property.min!;
+                if (entry.domainMax === "auto")
+                    d[1] = entry.property.max!;
+
+                if (range) {
+                    d = [range.min, range.max]
+                } else {
+                    d = [entry.property.min ?? "auto", entry.property.max ?? "auto"]
+                }
+            }
 
             return {
                 ...state,
@@ -84,8 +113,8 @@ export const useGraphStackReducer: Reducer<GraphStackState, GraphStateActionBase
                     [propertyDomain]: {
                         ...state.graphs[propertyDomain],
                         domain,
-                        domainMin: range ? range.min : undefined,
-                        domainMax: range ? range.max : undefined
+                        domainMin: d[0],
+                        domainMax: d[1]
                     }
                 }
             }
@@ -105,7 +134,7 @@ export const useGraphStackReducer: Reducer<GraphStackState, GraphStateActionBase
                 }
             }
 
-            st.sharedScale = getSharedScale( st );
+            st.sharedScale = getSharedScale(st);
 
             return st;
 
@@ -113,27 +142,26 @@ export const useGraphStackReducer: Reducer<GraphStackState, GraphStateActionBase
             const { fromProperty, toProperty }: SetInstancePropertyPayload = action.payload;
 
             const newGraphs = Object.fromEntries(Object.entries(state.graphs)
-            .map(([key, entry]) => {
+                .map(([key, entry]) => {
 
-                if (key !== fromProperty)
-                    return [key, entry];
+                    if (key !== fromProperty)
+                        return [key, entry];
 
-                const definition = Properties.one(toProperty);
+                    const definition = Properties.one(toProperty);
 
-                const newProperty = [toProperty, {
-                    ...entry,
-                    property: definition,
-                    domainMin: entry.domain === GraphDomain.DEFAULT
-                        ? definition.min : undefined,
-                    domainMax: entry.domain === GraphDomain.DEFAULT
-                        ? definition.max : undefined,
-                }];
+                    const newProperty = [toProperty, {
+                        ...entry,
+                        property: definition,
+                        domain: GraphDomain.DEFAULT,
+                        domainMin: definition.min,
+                        domainMax: definition.max,
+                    }];
 
-                return newProperty;
+                    return newProperty;
 
-            }));
+                }));
 
-            const newAvailableProperties = Properties.all().filter( property => ! Object.keys(newGraphs).includes( property.slug ) )
+            const newAvailableProperties = Properties.all().filter(property => !Object.keys(newGraphs).includes(property.slug))
 
             return {
                 ...state,
