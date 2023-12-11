@@ -9,8 +9,7 @@ export const Testing: React.FC = () => {
     const image = useMemo( () => ThermogramDummyDataFactory.generateRandomImage({width:400,height: 350}), [] );
 
     return <>
-    <TemperatureRenderer min={0} max={10} temperatureData={image.pixels} height={image.width} width={image.width}/>
-        <Thermogram {...image} />
+        <TemperatureRenderer min={-20} max={20} imageUrl="https://irt.zcu.cz/wp-content/uploads/2021/08/DSC01951-1024x683.jpg" height={480} width={640}/>
     </>
 
 }
