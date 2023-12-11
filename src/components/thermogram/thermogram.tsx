@@ -40,7 +40,7 @@ export class ThermogramDummyDataFactory {
         const dims = dimensions ?? ThermogramDummyDataFactory.generateDimensions();
         return {
             ...dims,
-            pixels: ThermogramDummyDataFactory.generateImageData(dims.width, dims.height, -1000, 10000)
+            pixels: ThermogramDummyDataFactory.generateImageData(dims.width, dims.height, -10, 10)
         }
     }
 
