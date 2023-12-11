@@ -1,7 +1,7 @@
 import { Properties } from "@/graphql/weatherSources/properties";
 import { Reducer } from "react";
-import { AddGraphPayload, GraphActions, GraphStateActionBase, SetHeightsPayload, SetInstanceDomainPayload, SetInstanceHeightPayload, SetInstancePropertyPayload } from "./actions";
-import { GraphDomain, GraphInstanceState, GraphStackState, GraphStateFactory } from "./storage";
+import { AddGraphPayload, GraphActions, GraphStateActionBase, SetSharedScalePayload, SetInstanceDomainPayload, SetInstanceHeightPayload, SetInstancePropertyPayload } from "./actions";
+import { GraphDomain, GraphInstanceScales, GraphInstanceState, GraphStackState, GraphStateFactory } from "./storage";
 
 export const useGraphStackReducer: Reducer<GraphStackState, GraphStateActionBase> = (state, action) => {
 
@@ -15,6 +15,24 @@ export const useGraphStackReducer: Reducer<GraphStackState, GraphStateActionBase
         }));
     }
 
+    const getSharedScale = ( current: GraphStackState ) => {
+
+        let shared = Object.values( current.graphs ).reduce( (st:undefined|false|GraphInstanceScales, curr) => {
+
+            if ( st === undefined ) return curr.scale;
+            if ( st === curr.scale ) return st;
+            // if ( st === false ) return st;
+            return false;
+
+        }, undefined );
+
+        if ( shared === false ) 
+            return undefined;
+
+        return shared;
+
+    }
+
     switch (action.type) {
 
         case GraphActions.ADD_GRAPH:
@@ -25,7 +43,7 @@ export const useGraphStackReducer: Reducer<GraphStackState, GraphStateActionBase
                 ...state,
                 graphs: {
                     ...state.graphs,
-                    [propertyAdd]: GraphStateFactory.defaultInstanceState(propertyAdd, state.scale)
+                    [propertyAdd]: GraphStateFactory.defaultInstanceState(propertyAdd, state.sharedScale)
                 }
             }
         case GraphActions.REMOVE_GRAPH:
@@ -43,11 +61,11 @@ export const useGraphStackReducer: Reducer<GraphStackState, GraphStateActionBase
             return GraphStateFactory.defaultState();
 
 
-        case GraphActions.SET_HEIGHTS:
-            const { scale: scaleSetAll }: SetHeightsPayload = action.payload;
+        case GraphActions.SET_SHARED_SCALE:
+            const { scale: scaleSetAll }: SetSharedScalePayload = action.payload;
             return {
                 ...state,
-                scale: scaleSetAll,
+                sharedScale: scaleSetAll,
                 graphs: updatedInstances(instance => {
                     return {
                         ...instance,
@@ -73,9 +91,10 @@ export const useGraphStackReducer: Reducer<GraphStackState, GraphStateActionBase
             }
 
         case GraphActions.SET_INSTANCE_HEIGHT:
+
             const { scale, property: propertyHeight }: SetInstanceHeightPayload = action.payload;
 
-            return {
+            const st = {
                 ...state,
                 graphs: {
                     ...state.graphs,
@@ -85,6 +104,10 @@ export const useGraphStackReducer: Reducer<GraphStackState, GraphStateActionBase
                     }
                 }
             }
+
+            st.sharedScale = getSharedScale( st );
+
+            return st;
 
         case GraphActions.SET_INSTANCE_PROPERTY:
             const { fromProperty, toProperty }: SetInstancePropertyPayload = action.payload;

@@ -49,14 +49,7 @@ export const GraphStackSettings: React.FC = () => {
 
     const { stack } = useGraphContext();
 
-    const activeScale = Object.values( stack.state.graphs ).reduce( (
-        state:undefined|boolean|GraphInstanceScales, current
-    ) => {
-        if ( state === undefined ) return current.scale;
-        if ( state === false ) return false;
-        if ( current.scale === state ) return state;
-        return false;
-    }, undefined );
+    const activeScale = stack.state.sharedScale;
 
     return <ButtonGroup>
 
@@ -72,7 +65,7 @@ export const GraphStackSettings: React.FC = () => {
                     isIconOnly
                     variant="bordered"
                     className={ size.key === activeScale ? "bg-gray-100" : "bg-white" }
-                    onClick={() => stack.dispatch( StackActions.setHeights( size.key ) )}
+                    onClick={() => stack.dispatch( StackActions.setSharedScale( size.key ) )}
                 >
                     {size.name}
                 </Button>

@@ -31,7 +31,7 @@ export type GraphInstanceState = {
 }
 
 export type GraphStackState = {
-    scale: GraphInstanceScales,
+    sharedScale?: GraphInstanceScales,
     isSelecting: boolean,
     selectionStart?: number,
     selectionEnd?: number,
@@ -48,7 +48,7 @@ export class GraphStateFactory {
         properties: AvailableWeatherProperties[] = [ "temperature", "radiance", "humidity", "bar" ]
     ): GraphStackState {
         return {
-            scale: "md",
+            sharedScale: "md",
             isSelecting: false,
             activeTool: GraphTools.INSPECT,
             graphs: Object.fromEntries( properties.map( property => {

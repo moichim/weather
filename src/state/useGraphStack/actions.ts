@@ -6,7 +6,7 @@ export enum GraphActions {
     
     ADD_GRAPH = 1,
     REMOVE_GRAPH = 2,
-    SET_HEIGHTS = 3,
+    SET_SHARED_SCALE = 3,
     RESET_ALL = 4,
     
     SET_INSTANCE_HEIGHT = 5,
@@ -57,12 +57,12 @@ export type RemoveGraphAction = GraphStackAction<RemoveGraphPayload> & {
 
 
 
-export type SetHeightsPayload = {
+export type SetSharedScalePayload = {
     scale: GraphInstanceScales
 }
 
-export type SetHeightsAction = GraphStackAction<SetHeightsPayload> & {
-    type: GraphActions.SET_HEIGHTS
+export type SetSharedScaleAction = GraphStackAction<SetSharedScalePayload> & {
+    type: GraphActions.SET_SHARED_SCALE
 }
 
 
@@ -175,11 +175,11 @@ export class StackActions {
         }
     }
 
-    public static setHeights(
+    public static setSharedScale(
         scale: GraphInstanceScales
-    ): SetHeightsAction {
+    ): SetSharedScaleAction {
         return {
-            type: GraphActions.SET_HEIGHTS,
+            type: GraphActions.SET_SHARED_SCALE,
             payload: {
                 scale: scale
             }
