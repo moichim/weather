@@ -6,6 +6,8 @@ import { StackActions } from "@/state/useGraphStack/actions";
 import { GraphSettingsButton } from "@/components/graphCommons/components/graphSettingsButton";
 import { useCallback, useEffect, useState } from "react";
 import { isValid } from "date-fns";
+import { GraphSettingButton } from "./ui/graphSettingButton";
+import { SettingIcon } from "@/components/ui/icons";
 
 export const GraphConfigPopup: React.FC<GraphInstanceState> = props => {
 
@@ -47,7 +49,7 @@ export const GraphConfigPopup: React.FC<GraphInstanceState> = props => {
 
         const parsed = parseFloat(value);
 
-        return isNaN( parsed ) ? null : parsed;
+        return isNaN(parsed) ? null : parsed;
 
     }, []);
 
@@ -74,18 +76,18 @@ export const GraphConfigPopup: React.FC<GraphInstanceState> = props => {
         if (!isValidMin || !isValidMax) {
             if (!isValidMin) {
                 const sanitized = sanitizeValue(minInternal);
-                setMinInternal( sanitized ? sanitized.toString() : props.property.min!.toString() );
+                setMinInternal(sanitized ? sanitized.toString() : props.property.min!.toString());
             }
             if (!isValidMax) {
                 const sanitized = sanitizeValue(maxInternal);
-                setMaxInternal( sanitized ? sanitized.toString() : props.property.max!.toString() );
+                setMaxInternal(sanitized ? sanitized.toString() : props.property.max!.toString());
             }
             return;
         }
 
-        if ( parseFloat( minInternal ) > parseFloat( maxInternal ) ) {
-            setMinInternal( maxInternal );
-            setMaxInternal( minInternal );
+        if (parseFloat(minInternal) > parseFloat(maxInternal)) {
+            setMinInternal(maxInternal);
+            setMaxInternal(minInternal);
             return;
         }
 
@@ -113,12 +115,16 @@ export const GraphConfigPopup: React.FC<GraphInstanceState> = props => {
 
     return <>
 
-        {isDefault
-            ? <GraphSettingsButton onOpen={onOpen} />
-            : <Badge content="" color="secondary" placement="top-right">
-                <GraphSettingsButton onOpen={onOpen} />
-            </Badge>
-        }
+        <GraphSettingButton onClick={onOpen} active={false} tooltip={"Nastavení grafu"}>
+
+            {isDefault
+                ? <SettingIcon />
+                : <Badge content="" color="secondary" placement="top-right">
+                    <SettingIcon />
+                </Badge>
+            }
+
+        </GraphSettingButton>
 
         <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
             <ModalContent>
@@ -161,20 +167,20 @@ export const GraphConfigPopup: React.FC<GraphInstanceState> = props => {
                         </ModalBody>
                         <ModalFooter>
                             <ButtonGroup>
-                            {!isDefault &&
-                                <Button
-                                    variant="bordered"
-                                    onClick={() => {
-                                        setDefault();
-                                        onClose();
-                                    }}
-                                >
-                                    Obnovit výchozí nastavení
+                                {!isDefault &&
+                                    <Button
+                                        variant="bordered"
+                                        onClick={() => {
+                                            setDefault();
+                                            onClose();
+                                        }}
+                                    >
+                                        Obnovit výchozí nastavení
+                                    </Button>
+                                }
+                                <Button color="primary" onPress={onClose}>
+                                    OK
                                 </Button>
-                            }
-                            <Button color="primary" onPress={onClose}>
-                                OK
-                            </Button>
                             </ButtonGroup>
                         </ModalFooter>
                     </>

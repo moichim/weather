@@ -1,6 +1,6 @@
 import { Properties } from "@/graphql/weatherSources/properties";
 import { Reducer } from "react";
-import { AddGraphPayload, GraphActions, GraphStateActionBase, SetSharedScalePayload, SetInstanceDomainPayload, SetInstanceHeightPayload, SetInstancePropertyPayload } from "./actions";
+import { AddGraphPayload, GraphActions, GraphStateActionBase, SetSharedScalePayload, SetInstanceDomainPayload, SetInstanceHeightPayload, SetInstancePropertyPayload, RemoveGraphPayload, RemoveGraphAction } from "./actions";
 import { GraphDomain, GraphInstanceScales, GraphInstanceState, GraphStackState, GraphStateFactory } from "./storage";
 
 export const useGraphStackReducer: Reducer<GraphStackState, GraphStateActionBase> = (state, action) => {
@@ -54,13 +54,19 @@ export const useGraphStackReducer: Reducer<GraphStackState, GraphStateActionBase
             return newState;
         case GraphActions.REMOVE_GRAPH:
 
-            const { property: propertyRemove }: AddGraphPayload = action.payload;
+            const { property: propertyRemove }: RemoveGraphPayload = action.payload;
 
-            return {
+            const updatedState = {
                 ...state,
                 graphs: Object.fromEntries(Object.entries(state.graphs)
                     .filter(([key, graph]) => key !== propertyRemove))
             }
+
+            const updatedAvailableProps = Properties.all().filter(property => !Object.keys(updatedState.graphs).includes(property.slug));
+
+            updatedState.availableGraphs = updatedAvailableProps;
+
+            return updatedState;
 
 
         case GraphActions.RESET_ALL:

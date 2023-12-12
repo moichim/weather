@@ -1,11 +1,10 @@
 "use client";
 
 import { graphInstanceSizes } from "@/components/settings/graphs/graphStackSettings";
-import { ZoomInIcon, ZoomOutIcon } from "@/components/ui/icons";
 import { useGraphContext } from "@/state/graphStackContext";
 import { StackActions } from "@/state/useGraphStack/actions";
 import { GraphInstanceState } from "@/state/useGraphStack/storage";
-import { Button, Tooltip } from "@nextui-org/react";
+import { GraphSettingButton } from "./ui/graphSettingButton";
 
 export const GraphConfigScale: React.FC<GraphInstanceState> = props => {
 
@@ -14,13 +13,14 @@ export const GraphConfigScale: React.FC<GraphInstanceState> = props => {
     return <>
 
         {graphInstanceSizes.map(size => {
-            return <Button
-                onClick={ () => stack.dispatch(StackActions.setInstanceHeight( props.property.slug, size.key )) }
-                isIconOnly
+
+            return <GraphSettingButton 
                 key={size.key}
-                variant="light"
-                className={stack.state.graphs[props.property.slug]?.scale === size.key ? "bg-gray-100" :"bg-white"}
-            >{size.name}</Button>
+                active={ stack.state.graphs[props.property.slug]?.scale === size.key }
+                onClick={()=>stack.dispatch( StackActions.setInstanceHeight( props.property.slug, size.key ) )}
+                tooltip={size.label}
+            >{size.name}</GraphSettingButton>
+
         })}
 
     </>

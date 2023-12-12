@@ -10,6 +10,7 @@ export const Testing: React.FC = () => {
 
     return <>
         <TemperatureRenderer min={-20} max={20} imageUrl="https://irt.zcu.cz/wp-content/uploads/2021/08/DSC01951-1024x683.jpg" height={480} width={640}/>
+        <Thermogram {...image}/>
     </>
 
 }

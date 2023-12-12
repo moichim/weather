@@ -9,6 +9,7 @@ import { GraphTable } from "./components/graphTable"
 import { ButtonGroup } from "@nextui-org/react"
 import { GraphConfigScale } from "./components/graphConfigScale"
 import { GraphConfigPopup } from "./components/graphConfigPopup"
+import { GraphRemoveButton } from "./components/graphRemoveButton"
 
 export type GraphInstanceWithDataPropsType = GraphInstanceState & {
     data: UseGraphStackInstanceType
@@ -25,9 +26,12 @@ export const GraphInstance: React.FC<GraphInstanceState> = props => {
                 <GraphSelector {...props}/>
             </div>
 
-            <ButtonGroup size="sm" className="shadow-xl">
-                <GraphConfigPopup {...props} />
+            <ButtonGroup size="sm">
                 <GraphConfigScale {...props} />
+            </ButtonGroup>
+            <ButtonGroup size="sm">
+                <GraphConfigPopup {...props} />
+                <GraphRemoveButton {...props} />
             </ButtonGroup>
         </div>
         
