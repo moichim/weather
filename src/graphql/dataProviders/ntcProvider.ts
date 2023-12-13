@@ -3,6 +3,7 @@ import { dateFromString } from "@/utils/time";
 import { WeatherSerie, WeatherEntryDataType, WeatherEntryType, WeatherProviderRequest } from "../weather";
 import { Sources, WeatherSourceType } from "../weatherSources/source";
 import { AbstractWeatherProvider, IProvider } from "./abstractProvider";
+import { MeteoRequestType } from "@/state/useMeteoData/data/query";
 
 type NtcResponseEntryType = {
     id: number,
@@ -70,7 +71,7 @@ export class NtcProvider extends AbstractWeatherProvider {
 
     
 
-    public async doRequest ( args: WeatherProviderRequest ) {
+    public async doRequest ( args: MeteoRequestType ) {
 
         const url = this.prepareRequestUrl( args.from, args.to );
 

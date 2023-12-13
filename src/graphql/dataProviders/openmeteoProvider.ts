@@ -2,6 +2,7 @@ import { fetchWeatherApi } from "openmeteo";
 import { WeatherSerie, WeatherEntryType, WeatherProviderRequest } from "../weather";
 import { AbstractWeatherProvider, IProvider } from "./abstractProvider";
 import { Sources, WeatherSourceType } from "../weatherSources/source";
+import { MeteoRequestType } from "@/state/useMeteoData/data/query";
 
 export class OpenmeteoProvider extends AbstractWeatherProvider {
 
@@ -11,7 +12,7 @@ export class OpenmeteoProvider extends AbstractWeatherProvider {
         return Sources.one( "openmeteo" );
     }
 
-    public async doRequest(args: WeatherProviderRequest) {
+    public async doRequest(args: MeteoRequestType) {
 
         const params = {
             "latitude": 49.7245947848106,

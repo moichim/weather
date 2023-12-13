@@ -1,4 +1,4 @@
-export type DataStorageType = {
+export type MeteoStorageType = {
 
     scope: string,
     
@@ -10,7 +10,7 @@ export type DataStorageType = {
     toInternalString: string,
     toHumanReadable: string,
     
-    viewDurationDays: number,
+    viewDurationString: string,
     
     rangeMinTimestamp?: number,
     rangeMinInternalString?: string,
@@ -20,7 +20,7 @@ export type DataStorageType = {
     rangeMaxInternalString?: string,
     rangeMaxMumanReadable?: string,
 
-    rangeDurationHours?: number,
+    rangeDurationString?: string,
 
     hasRange: boolean,
 

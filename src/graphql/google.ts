@@ -27,9 +27,9 @@ export type GoogleColumn = GoogleDataColumnDefinition & {
     
     values: GoogleColumnValue[],
 
-    min: number,
-    max: number,
-    avg: number,
+    min: number|null,
+    max: number|null,
+    avg: number|null,
     count: number
 
 }
@@ -59,10 +59,10 @@ export const googleTypeDefs = gql`
         color: String!
         in: Property
         values: [GoogleColumnValue]
-        min: Float!
-        max: Float!
-        avg: Float!
-        count: Float!
+        min: Float
+        max: Float
+        avg: Float
+        count: Float
     }
 
     type GoogleColumnValue {

@@ -5,6 +5,7 @@ import { Source } from "postcss";
 import { OpenmeteoProvider } from "./dataProviders/openmeteoProvider";
 import { NtcProvider } from "./dataProviders/ntcProvider";
 import { NumberDomain } from "recharts/types/util/types";
+import { MeteoRequestType } from "@/state/useMeteoData/data/query";
 
 export type WeatherEntryMetaType = {
     time: number,
@@ -97,7 +98,7 @@ export const weatherResolvers = {
     Query: {
         weatherRange: async ( 
             parent: any, 
-            args: WeatherProviderRequest, 
+            args: MeteoRequestType, 
         ): Promise<WeatherSerie[]> => {
 
             return Promise.all([

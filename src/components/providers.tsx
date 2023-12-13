@@ -3,6 +3,7 @@
 import { DisplayContextProvider } from "@/state/displayContext"
 import { FilterContextProvider } from "@/state/filterContext"
 import { GraphContextProvider } from "@/state/graphStackContext"
+import { MeteoContextProvider } from "@/state/useMeteoData/meteoDataContext"
 import { NotificationsContextProvider } from "@/state/useNotifications/useNotifications"
 import { DataContextProvider } from "@/state/weatherContext"
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client"
@@ -24,15 +25,17 @@ export const Providers: React.FC<React.PropsWithChildren> = props => {
             //className="dark text-foreground bg-background"
             >
                 <NotificationsContextProvider>
-                    <GraphContextProvider>
-                        <FilterContextProvider>
-                            <DataContextProvider>
-                                <DisplayContextProvider>
-                                    {props.children}
-                                </DisplayContextProvider>
-                            </DataContextProvider>
-                        </FilterContextProvider>
-                    </GraphContextProvider>
+                    <MeteoContextProvider>
+                        <GraphContextProvider>
+                            <FilterContextProvider>
+                                <DataContextProvider>
+                                    <DisplayContextProvider>
+                                        {props.children}
+                                    </DisplayContextProvider>
+                                </DataContextProvider>
+                            </FilterContextProvider>
+                        </GraphContextProvider>
+                    </MeteoContextProvider>
                 </NotificationsContextProvider>
             </main>
         </NextUIProvider>

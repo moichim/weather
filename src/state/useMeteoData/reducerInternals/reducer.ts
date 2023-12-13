@@ -1,8 +1,8 @@
 import { dateFromString } from "@/utils/time";
-import { format } from "date-fns";
+import { format, intervalToDuration } from "date-fns";
 import { Reducer } from "react";
 import { DataAction, DataActions, DataPayloadBase, SetFilterSringPayload, SetFilterTimestampPayload, SetRangeTimestampPayload, SetScopePayload } from "./actions";
-import { DataStorageType } from "./storage";
+import { MeteoStorageType } from "./storage";
 
 const getPayload = <T>(a: DataPayloadBase) => {
     return a.payload as T;
@@ -53,6 +53,11 @@ type FormattedDate = {
     internal: string
 };
 
+export type FormattedDatePair = {
+    from: FormattedDate,
+    to: FormattedDate
+}
+
 const roundFromTimestamp = (from: number): FormattedDate => {
     const d = new Date;
     d.setTime(from);
@@ -84,7 +89,7 @@ const roundToTimestamp = (to: number): FormattedDate => {
 }
 
 
-const formatViewDatesFromTimestamps = (from: number, to: number) => {
+export const formatViewDatesFromTimestamps = (from: number, to: number): FormattedDatePair => {
 
     const [f, t] = orderTimestamps(from, to);
 
@@ -95,7 +100,7 @@ const formatViewDatesFromTimestamps = (from: number, to: number) => {
 
 }
 
-const formatViewDatesFromStrings = (from: string, to: string) => {
+const formatViewDatesFromStrings = (from: string, to: string): FormattedDatePair => {
 
     const [f, t] = orderDateStrings(from, to);
 
@@ -112,12 +117,12 @@ const formatRangeDate = (timestamp: number): FormattedDate => {
     return {
         timestamp: d.getTime(),
         date: d,
-        humanReadable: format(d, "d. M. y. H:m"),
-        internal: format(d, "yyyy-MM-dd H:m:s")
+        humanReadable: format(d, "d. M. y H:m"),
+        internal: format(d, "yyyy-MM-dd HH:mm:ss")
     }
 }
 
-const formatRangeDatesFromTimestamp = (from: number, to: number) => {
+const formatRangeDatesFromTimestamp = (from: number, to: number): FormattedDatePair => {
 
     const [f, t] = orderTimestamps(from, to);
 
@@ -128,10 +133,46 @@ const formatRangeDatesFromTimestamp = (from: number, to: number) => {
 }
 
 
+const getDurationObject = (
+    from: Date,
+    to: Date
+) => {
+    return intervalToDuration({
+        start: from,
+        end: to
+    });
+}
+
+export const getDurationString = (
+    from: Date,
+    to: Date
+) => {
+
+    const object = getDurationObject(from, to);
+
+    const buffer: string[] = [];
+
+    if (object.years)
+        buffer.push(`${object.years} let`);
+
+    if (object.months)
+        buffer.push(`${object.months} měsíců`);
+
+    if (object.days)
+        buffer.push(`${object.days} dnů`);
+
+    if (object.hours)
+        buffer.push(`${object.hours} hodin`);
+
+    return buffer.join( ", " );
+
+}
 
 
 
-export const useDataReducer: Reducer<DataStorageType, DataAction<DataPayloadBase>> = (
+
+
+export const meteoReducer: Reducer<MeteoStorageType, DataAction<DataPayloadBase>> = (
     state,
     action
 ) => {
@@ -152,9 +193,9 @@ export const useDataReducer: Reducer<DataStorageType, DataAction<DataPayloadBase
                 rangeMaxTimestamp: undefined,
                 rangeMaxInternalString: undefined,
                 rangeMaxMumanReadable: undefined,
-                rangeDuration: undefined,
+                rangeDurationString: undefined,
                 hasRange: false
-            } as DataStorageType;
+            } as MeteoStorageType;
 
 
         case DataActions.SET_FILTER_STRING:
@@ -172,7 +213,9 @@ export const useDataReducer: Reducer<DataStorageType, DataAction<DataPayloadBase
 
                 toInternalString: sft.internal,
                 toTimestamp: sft.timestamp,
-                toHumanReadable: sft.humanReadable
+                toHumanReadable: sft.humanReadable,
+
+                viewDurationString: getDurationString( sff.date, sft.date )
 
             };
 
@@ -192,7 +235,9 @@ export const useDataReducer: Reducer<DataStorageType, DataAction<DataPayloadBase
 
                 toInternalString: tft.internal,
                 toTimestamp: tft.timestamp,
-                toHumanReadable: tft.humanReadable
+                toHumanReadable: tft.humanReadable,
+
+                viewDurationString: getDurationString( tff.date, tft.date )
 
             };
 
@@ -213,6 +258,8 @@ export const useDataReducer: Reducer<DataStorageType, DataAction<DataPayloadBase
                 rangeMaxInternalString: setRangeToFormatted.internal,
                 rangeMaxMumanReadable: setRangeToFormatted.humanReadable,
 
+                rangeDurationString: getDurationString( setRangeFromFormatted.date, setRangeToFormatted.date ),
+
                 hasRange: true
 
             };
@@ -230,7 +277,7 @@ export const useDataReducer: Reducer<DataStorageType, DataAction<DataPayloadBase
                 rangeMaxInternalString: undefined,
                 rangeMaxMumanReadable: undefined,
 
-                rangeDuration: undefined,
+                rangeDurationString: undefined,
 
                 hasRange: false
             }

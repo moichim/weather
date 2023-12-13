@@ -242,17 +242,17 @@ export class GoogleSheetsProvider {
             const avg = values.reduce( (state, current) => current.value + state, 0 ) / count;
 
 
+
+
             return {
                 ...column,
                 values,
-                min,
-                max,
-                avg,
+                min: min !== Infinity ? min: null,
+                max: max !== -Infinity ? max : null,
+                avg: count > 0 ? avg : null,
                 count
             }
         } );
-
-        console.log(result);
 
         return result;
 

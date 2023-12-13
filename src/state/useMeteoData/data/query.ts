@@ -1,6 +1,15 @@
+import { GoogleRequest, GoogleScopeData } from "@/graphql/google";
+import { WeatherSerie } from "@/graphql/weather";
 import gql from "graphql-tag";
 
-export const WEATHER_DATA_QUERY = gql`
+export type MeteoRequestType = GoogleRequest;
+
+export type MeteoQueryResponseType = {
+  range: GoogleScopeData,
+  weatherRange: WeatherSerie[]
+}
+
+export const METEO_DATA_QUERY = gql`
 query Query($scope: String, $from: String, $to: String ) {
     range(scope: $scope, from: $from, to: $to) {
       data {
@@ -32,7 +41,6 @@ query Query($scope: String, $from: String, $to: String ) {
     weatherRange(from: $from, to: $to, scope: $scope) {
       entries {
         time
-        is_forecast
         temperature
         wind_dir
         wind_speed
@@ -53,3 +61,4 @@ query Query($scope: String, $from: String, $to: String ) {
     }
   }
 `;
+
