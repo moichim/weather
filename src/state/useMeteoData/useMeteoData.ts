@@ -20,14 +20,17 @@ export const useMeteoData = () => {
         },
 
         onCompleted: data => {
+            console.log( "refetched" );
             const processedResponse = MeteoResponseProcessor.process( data );
-            setProcessedData( processedResponse );
+            // setProcessedData( processedResponse );
             console.log( "fetched data", data, processedResponse );
         },
 
         onError: e => {
             console.error( "error loading data", e );
-        }
+        },
+
+        canonizeResults: false
 
     });
 
