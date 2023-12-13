@@ -1,3 +1,4 @@
+import { googleResolvers, googleTypeDefs } from "@/graphql/google";
 import { placesResolvers, placesTypeDefs } from "@/graphql/places";
 import { valueResolvers, valueTypeDefs } from "@/graphql/value";
 import { weatherResolvers, weatherTypeDefs } from "@/graphql/weather";
@@ -24,6 +25,11 @@ const server = new ApolloServer({
             typeDefs: valueTypeDefs,
             resolvers: valueResolvers,
         },
+
+        {
+            typeDefs: googleTypeDefs,
+            resolvers: googleResolvers
+        }
     
       ]),
 });

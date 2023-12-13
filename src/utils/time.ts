@@ -32,6 +32,28 @@ export function dateFromString(date: string) {
     return new Date(date);
 }
 
+export function timestampFromFromString( date: string ) {
+    const d = dateFromString( date );
+
+    d.setHours( 0 );
+    d.setMinutes( 0 );
+    d.setSeconds( 0 );
+    d.setMilliseconds( 0 );
+
+    return d.getTime();
+}
+
+export function timestampToFromString( date: string ) {
+    const d = dateFromString( date );
+
+    d.setHours( 23 );
+    d.setMinutes( 59 );
+    d.setSeconds( 0 );
+    d.setMilliseconds( 0 );
+
+    return d.getTime();
+}
+
 export const getAddedDate = ( date: string, numDays: number ) => stringFromDate( addDays( dateFromString( date ), numDays ) );
 
 export const getTodayDateString = () => stringFromDate( new Date )

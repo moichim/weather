@@ -1,13 +1,13 @@
 'use client'
 
-import { DataContextProvider } from "@/state/weatherContext"
-import { FilterContextProvider } from "@/state/filterContext"
 import { DisplayContextProvider } from "@/state/displayContext"
+import { FilterContextProvider } from "@/state/filterContext"
+import { GraphContextProvider } from "@/state/graphStackContext"
+import { NotificationsContextProvider } from "@/state/useNotifications/useNotifications"
+import { DataContextProvider } from "@/state/weatherContext"
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client"
 import { NextUIProvider } from "@nextui-org/react"
 import React from "react"
-import { GraphContextProvider } from "@/state/graphStackContext"
-import { NotificationsContextProvider } from "@/state/useNotifications/useNotifications"
 
 const client = new ApolloClient({
 
