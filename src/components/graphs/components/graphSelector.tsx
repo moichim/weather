@@ -2,7 +2,7 @@
 
 import { AvailableWeatherProperties } from "@/graphql/weatherSources/properties";
 import { Sources } from "@/graphql/weatherSources/source";
-import { useGraphContext } from "@/state/graphStackContext";
+import { useGraphContext } from "@/state/useGraphStack/graphStackContext";
 import { StackActions } from "@/state/useGraphStack/actions";
 import { GraphInstanceState } from "@/state/useGraphStack/storage";
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-org/react";

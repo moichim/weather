@@ -1,6 +1,6 @@
 "use client";
 
-import { useGraphContext } from "@/state/graphStackContext";
+import { useGraphContext } from "@/state/useGraphStack/graphStackContext";
 import { GraphDomain, GraphInstanceState, graphInstanceHeights } from "@/state/useGraphStack/storage";
 import { Spinner, cn } from "@nextui-org/react";
 import { format } from "date-fns";

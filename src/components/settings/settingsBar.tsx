@@ -1,4 +1,3 @@
-import { GraphGridSettings } from "./graphs/graphGridSettings"
 import { Filter } from "./filter/filter"
 import { GraphStackSettings } from "./graphs/graphStackSettings"
 

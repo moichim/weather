@@ -1,7 +1,7 @@
 "use client";
 
 import { graphInstanceSizes } from "@/components/settings/graphs/graphStackSettings";
-import { useGraphContext } from "@/state/graphStackContext";
+import { useGraphContext } from "@/state/useGraphStack/graphStackContext";
 import { StackActions } from "@/state/useGraphStack/actions";
 import { GraphInstanceState } from "@/state/useGraphStack/storage";
 import { GraphSettingButton } from "./ui/graphSettingButton";

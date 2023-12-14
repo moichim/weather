@@ -1,22 +1,15 @@
 import { CloseIcon } from "@/components/ui/icons";
-import { useGraphContext } from "@/state/graphStackContext";
+import { useGraphContext } from "@/state/useGraphStack/graphStackContext";
 import { StackActions } from "@/state/useGraphStack/actions";
-import { GraphDomain, GraphInstanceState } from "@/state/useGraphStack/storage";
-import { useWeatherContext } from "@/state/weatherContext";
+import { GraphInstanceState } from "@/state/useGraphStack/storage";
 import { Button, ButtonGroup, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@nextui-org/react";
 import { GraphSettingButton } from "./ui/graphSettingButton";
 
 export const GraphRemoveButton: React.FC<GraphInstanceState> = props => {
-    
-    const content = useWeatherContext();
 
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
     const { stack } = useGraphContext();
-
-
-    if (content.weather.length === 0 || content.loading)
-        return <></>;
 
     return <>
 

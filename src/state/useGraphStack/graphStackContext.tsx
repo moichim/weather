@@ -1,7 +1,7 @@
 
 import { createContext, useContext } from "react";
-import { GraphStateFactory } from "./useGraphStack/storage"
-import { UseGraphStackValues, useGraphStack } from "./useGraphStack/useGraphStack"
+import { GraphStateFactory } from "./storage"
+import { UseGraphStackValues, useGraphStack } from "./useGraphStack"
 
 type GraphContextType = {
     stack: UseGraphStackValues

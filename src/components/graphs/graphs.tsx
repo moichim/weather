@@ -1,6 +1,6 @@
 "use client"
 
-import { useGraphContext } from "@/state/graphStackContext";
+import { useGraphContext } from "@/state/useGraphStack/graphStackContext";
 import { GraphInstance } from "./graphInstance";
 import { Toolbar } from "../ui/toolbar/toolbar";
 import { GraphAdd } from "./components/graphAdd";

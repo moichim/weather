@@ -1,4 +1,4 @@
-import { useGraphContext } from "@/state/graphStackContext"
+import { useGraphContext } from "@/state/useGraphStack/graphStackContext"
 import { StackActions } from "@/state/useGraphStack/actions"
 import { GraphToolType, graphTools } from "@/state/useGraphStack/tools"
 import { Button, Tooltip } from "@nextui-org/react"

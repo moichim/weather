@@ -1,16 +1,12 @@
 import { SettingIcon } from "@/components/ui/icons";
-import { useGraphContext } from "@/state/graphStackContext";
+import { useGraphContext } from "@/state/useGraphStack/graphStackContext";
 import { StackActions } from "@/state/useGraphStack/actions";
 import { GraphDomain, GraphInstanceState } from "@/state/useGraphStack/storage";
-import { useWeatherContext } from "@/state/weatherContext";
 import { Badge, Button, ButtonGroup, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Radio, RadioGroup, useDisclosure } from "@nextui-org/react";
 import { useCallback, useEffect, useState } from "react";
 import { GraphSettingButton } from "./ui/graphSettingButton";
 
 export const GraphConfigPopup: React.FC<GraphInstanceState> = props => {
-
-
-    const content = useWeatherContext();
 
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
@@ -100,10 +96,6 @@ export const GraphConfigPopup: React.FC<GraphInstanceState> = props => {
         }
 
     }, [minInternal, maxInternal, props.domain, props.property.max, props.property.min, props.property.slug]);
-
-
-    if (content.weather.length === 0 || content.loading)
-        return <></>;
 
     const isDefault = props.domain === GraphDomain.DEFAULT;
 
