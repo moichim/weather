@@ -1,10 +1,11 @@
 import { useReducer, useState } from "react"
 import { meteoReducer } from "./reducerInternals/reducer";
 import { MeteoQueryResponseType, MeteoRequestType, METEO_DATA_QUERY } from "./data/query";
-import { useQuery } from "@apollo/client";
-import { MeteoStateFactory } from "./meteoStateFactory";
+import { useApolloClient, useQuery } from "@apollo/client";
+import { MeteoStateFactory } from "./data/meteoStateFactory";
 import { MeteoDataProcessed, MeteoResponseProcessor } from "./data/responseProcessing";
 
+/** Hook used by reducer. DO NOT USE IN COMPONENTS! */
 export const useMeteoData = () => {
 
     const [selection, dispatch] = useReducer( meteoReducer, MeteoStateFactory.defaultState() );
@@ -20,22 +21,21 @@ export const useMeteoData = () => {
         },
 
         onCompleted: data => {
-            console.log( "refetched" );
             const processedResponse = MeteoResponseProcessor.process( data );
-            // setProcessedData( processedResponse );
-            console.log( "fetched data", data, processedResponse );
+            setProcessedData( processedResponse );
         },
 
         onError: e => {
             console.error( "error loading data", e );
         },
 
-        canonizeResults: false
-
     });
+
+    const client = useApolloClient();
 
     const refetch = () => {
         console.log( "refeč" );
+        client.resetStore();
         query.refetch();
     }
 
@@ -44,7 +44,8 @@ export const useMeteoData = () => {
     return {
         selection,
         dispatch,
-        refetch
+        refetch,
+        data: processedData
     }
 
 }
@@ -54,5 +55,6 @@ export type useMeteoDataReturnType = ReturnType<typeof useMeteoData>
 export const useMeteoDataDefaults: useMeteoDataReturnType = {
     selection: MeteoStateFactory.defaultState(),
     dispatch: () => {},
-    refetch: () => {}
+    refetch: () => {},
+    data: {}
 }

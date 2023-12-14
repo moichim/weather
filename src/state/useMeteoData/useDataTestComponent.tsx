@@ -13,8 +13,12 @@ export const UseDataTesting: React.FC = () => {
     return <div>
 
         <Button
-            onClick={() => data.dispatch(DataActionsFactory.setFilterString("2023-11-04", "2023-10-12"))}
+            onClick={() => data.dispatch(DataActionsFactory.setFilterString("2023-12-01", "2023-12-15"))}
         >SetDate</Button>
+
+        <Button
+            onClick={() => data.dispatch(DataActionsFactory.setFilterString("2023-11-01", "2023-11-15"))}
+        >SetDate listopad</Button>
 
         <Button
             onClick={() => data.dispatch(DataActionsFactory.setRangeTimestamp(1699743600000, 1859583099999))}

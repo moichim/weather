@@ -1,6 +1,8 @@
 import { WeatherEntryType, WeatherSerie } from "@/graphql/weather";
 import { MeteoQueryResponseType } from "./query";
 import { Properties } from "@/graphql/weatherSources/properties";
+import { current } from "tailwindcss/colors";
+import { Sources } from "@/graphql/weatherSources/source";
 
 type BufferEntryType = {
     [index:string]: number|undefined
@@ -19,8 +21,6 @@ export class MeteoResponseProcessor {
         response: MeteoQueryResponseType
     ) {
 
-        console.log( "S" );
-
         // Najde nejdelší serii
         const longestSerie = MeteoResponseProcessor.getLongestWeatherSerie(response.weatherRange);
 
@@ -28,56 +28,152 @@ export class MeteoResponseProcessor {
         const googleIndex = MeteoResponseProcessor.dumpGoogleDataToTimeEntries( response.range );
         const weatherIndex = MeteoResponseProcessor.dumpWeatherSerieToTimeEntries( response.weatherRange );
 
-        console.log( googleIndex, weatherIndex );
-
         // Iteruje všechny properties a vrátí index namapovaných dat pro graf
         const properties = Properties.all();
         const graphData = Object.fromEntries( properties.map(property => {
 
-            const lines = response.weatherRange.map( serie => serie.source );
+            // pro každou property najít její zdroje
+            const propertySources = property.in;
 
-            const data = longestSerie.entries.map( leadEntry => {
+            // pro každou property najít sloupce v Googlu, které sem patří
+            const propertyColumns = response.range.data.filter( column => column.in.slug === property.slug );
 
-                const entry: BufferEntryType = {
-                    time: leadEntry.time
+            const propertySourceStatistics = Object.fromEntries( propertySources.map( source => [source, {
+                type: "line",
+                min: Infinity,
+                max: -Infinity,
+                avg: 0,
+                avgBuf: 0,
+                count: 0
+            }] ) );
+
+            const propertyColumnStatistics = Object.fromEntries( propertyColumns.map( column => [ column.slug, {
+                type: "dot",
+                min: Infinity,
+                max: -Infinity,
+                avg: 0,
+                avgBuf: 0,
+                count: 0
+            } ] ) );
+
+            // Pro každou property iterovat nejdelší serii
+            const propertyGraphData = longestSerie.entries.map( leadEntry => {
+
+                // extract leading time
+                const leadTimestamp = leadEntry.time;
+
+                // create graph entry
+                const currentTimeEntry: BufferEntryType = {
+                    time: leadTimestamp,
+                    note: undefined
                 }
 
-                lines.forEach( l => {
+                // extract value for each source of this property
+                for ( let propertySource of propertySources ) {
 
-                    const value = weatherIndex[ l.slug ][leadEntry.time][property.slug];
+                    const indexOfEntriesForThisSource = weatherIndex[ propertySource ];
 
-                    entry[l.slug] = value ?? undefined;
+                    if ( indexOfEntriesForThisSource ) {
 
-                } );
+                        const entryForThisTimestamp = indexOfEntriesForThisSource[ leadTimestamp ];
 
-                response.range.data.forEach( column => {
+                        if ( entryForThisTimestamp ) {
 
-                    const record = googleIndex[ leadEntry.time ];
+                            const currentValue = entryForThisTimestamp[ property.slug ]!;
 
-                    entry[column.slug] = record
-                        ? record[column.slug]
-                        : undefined
+                            currentTimeEntry[ propertySource ] = currentValue;
 
-                } );
+                            const currentStatistics = propertySourceStatistics[propertySource];
 
-                return entry;
+                            currentStatistics.count = currentStatistics.count+1;
 
-            } )
+                            if ( currentValue < currentStatistics.min ) {
+                                currentStatistics.min = currentValue;
+                            }
 
-            // Podívá se pro každou weather serii a najde její data případně undefined
+                            if ( currentValue > currentStatistics.max ) {
+                                currentStatistics.max = currentValue;
+                            }
 
-            // podívá se na kažtý google a najde jeho hodnotu, případně undefined
+                            currentStatistics.avgBuf = currentStatistics.avgBuf + currentValue;
+
+                        } else {
+                            currentTimeEntry[ propertySource ] = undefined;
+                        }
+
+                    } else {
+                        currentTimeEntry[ propertySource ] = undefined;
+                    }
+
+                };
+
+                // Extract value for each google value
+                for ( let propertyColumn of propertyColumns ) {
+
+                    const entryForThisTimestamp = googleIndex[ leadTimestamp ];
+
+                    if ( entryForThisTimestamp ) {
+
+                        const currentValue = entryForThisTimestamp[ propertyColumn.slug ];
+
+                        currentTimeEntry[ propertyColumn.slug ] = entryForThisTimestamp[ propertyColumn.slug ] ?? undefined;
+                        currentTimeEntry["note"] = entryForThisTimestamp["note"];
+
+                        if ( currentValue ) {
+
+                            const currentStatistics = propertyColumnStatistics[ propertyColumn.slug ];
+
+                            currentStatistics.count = currentStatistics.count + 1;
+
+                            if ( currentValue < currentStatistics.min ) {
+                                currentStatistics.min = currentValue;
+                            }
+
+                            if ( currentValue > currentStatistics.max ) {
+                                currentStatistics.max = currentValue;
+                            }
+
+                            currentStatistics.avgBuf = currentStatistics.avgBuf + currentValue;
+
+                        }
+
+                    } else {
+                        currentTimeEntry[ propertyColumn.slug ] = undefined;
+                    }
+
+                }
+
+                return currentTimeEntry;
 
 
-            return [property.slug, data ]
+            } );
+
+            const statisticsRaw = {
+                ...propertySourceStatistics,
+                ...propertyColumnStatistics
+            };
+
+            const statistics = Object.fromEntries( Object.entries( statisticsRaw ).map( ([key,values]) => {
+                const vals = {
+                    ...values,
+                    avg: values.avgBuf / values.count
+                }
+                return [key,vals]
+            } ) );
+
+            const propertyGraphContent = {
+                dots: propertyColumns,
+                lines: propertySources.map( source => Sources.one( source )  ),
+                data: propertyGraphData,
+                statistics
+            }
+
+
+            return [property.slug, propertyGraphContent ]
 
         }));
 
-        console.log( "E", graphData );
-
-        return {
-            graphData
-        }
+        return graphData;
 
 
     }
