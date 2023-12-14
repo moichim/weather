@@ -7,7 +7,7 @@ export const SettingsBar: React.FC<React.PropsWithChildren> = props => {
 
         <Filter />
 
-        {/* <GraphStackSettings /> */}
+        <GraphStackSettings />
 
     </div>
 }

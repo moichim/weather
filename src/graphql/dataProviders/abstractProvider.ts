@@ -1,3 +1,4 @@
+import { MeteoRequestType } from "@/state/useMeteoData/data/query";
 import { WeatherSerie, WeatherEntryType, WeatherProviderRequest, WeatherSerieIndexType } from "../weather";
 import { WeatherSourceType } from "../weatherSources/source";
 
@@ -25,7 +26,7 @@ export abstract class AbstractWeatherProvider {
     protected abstract generateSourceDefinition(): WeatherSourceType;
 
     public async fetch( 
-        args: WeatherProviderRequest 
+        args: MeteoRequestType 
     ): Promise<WeatherSerie> {
 
         return await this.doRequest( args ).then( response => {
@@ -38,7 +39,7 @@ export abstract class AbstractWeatherProvider {
     }
 
     protected abstract doRequest( 
-        args: WeatherProviderRequest 
+        args: MeteoRequestType 
     ): Promise<WeatherEntryType[]>;
 
 }

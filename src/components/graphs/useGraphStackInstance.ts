@@ -1,6 +1,7 @@
-import { AvailableWeatherProperties } from "@/graphql/weatherSources/properties"
+import { AvailableWeatherProperties, Properties } from "@/graphql/weatherSources/properties"
 import { useDisplayContext } from "@/state/displayContext"
 import { useFilterContext } from "@/state/filterContext"
+import { useGraphContext } from "@/state/graphStackContext"
 import { useGraphScale } from "@/state/useGraphScale"
 import { prepareGraphData, useWeatherContext } from "@/state/weatherContext"
 import { useEffect, useMemo, useState, useCallback } from "react"
@@ -16,7 +17,7 @@ export enum PropertyGraphModes {
     NONE = "3"
 }
 
-export type PropertyGraphWithStateType = PropertyGraphPropsType & ReturnType<typeof useGraphInstance>;
+export type PropertyGraphWithStateType = PropertyGraphPropsType & ReturnType<typeof useGraphStackInstance>;
 
 type ReferenceRow = {
     name: string,
@@ -27,50 +28,37 @@ type ReferenceRow = {
     count: number
 }
 
-export const useGraphInstance = ( prop: AvailableWeatherProperties ) => {
+export const useGraphStackInstance = ( prop: AvailableWeatherProperties ) => {
 
-    const { set: display } = useDisplayContext();
+    const {stack} = useGraphContext();
 
     const filter = useFilterContext();
 
     const apiData = useWeatherContext();
 
     const property = useMemo(() => {
-        return display.allProps[prop];
-    }, [prop, display.allProps]);
-
-    const [ min, setMin ] = useState<number|undefined>(property.min);
-    const [ max, setMax ] = useState<number|undefined>(property.max);
-    const [ domain, setDomain ] = useState<PropertyGraphModes>( PropertyGraphModes.RECOMMENDED );
-
-    const scale = useGraphScale();
-
-    useEffect( () => {
-        if ( domain === PropertyGraphModes.RECOMMENDED ) {
-            setMin( property.min );
-            setMax( property.max );
-        }
-    }, [domain, property] );
+        return Properties.one( prop );
+    }, [prop]);
 
     const data = useMemo(()=> prepareGraphData( prop, apiData.data ?? {weatherRange: [], valueRange: []} ), [ prop, apiData.data ]);
 
 
     const [isHovering, setIsHovering] = useState<boolean>( false );
     
-    const {isSelecting, setIsSelecting} = display;
+    const {isSelecting} = stack.state;
 
     const [ rows, setRows ] = useState<ReferenceRow[]>([]);
 
     const calculateRows = useCallback( () => {
 
-        if ( display.reference === undefined )
+        if ( !stack.state.selectionStart && !stack.state.selectionEnd )
             return [];
 
         const values = data.dots.map( dot => {
 
             const selection = dot.values.filter( value => {
-                return value.time >= display.reference!.from
-                    && value.time <= display.reference!.to
+                return value.time >= stack.state.selectionStart!
+                    && value.time <= stack.state.selectionEnd!
             } );
     
             const min = selection.reduce( ( state, current ) => {
@@ -101,8 +89,8 @@ export const useGraphInstance = ( prop: AvailableWeatherProperties ) => {
         const properties = data.lines.map( line => {
     
             const selection = data.data.filter( entry => {
-                return entry["time"] >= display.reference!.from
-                    && entry["time"] <= display.reference!.to
+                return entry["time"] >= stack.state.selectionStart!
+                    && entry["time"] <= stack.state.selectionEnd!
             } ).map( entry => entry[line.slug] );
     
             const min = selection.reduce( ( state, current ) => {
@@ -121,7 +109,7 @@ export const useGraphInstance = ( prop: AvailableWeatherProperties ) => {
     
             return {
                 name: line.name,
-                color: line.color,
+                color: line.stroke,
                 min, max, average,
                 count: selection.length
             } as ReferenceRow
@@ -130,32 +118,30 @@ export const useGraphInstance = ( prop: AvailableWeatherProperties ) => {
 
         return [...values, ...properties]
 
-    }, [ display.reference, data.data, data.dots, data.lines ] );
+    }, [ stack.state.selectionStart, stack.state.selectionEnd, data.data, data.dots, data.lines ] );
 
     useEffect( () => {
 
-        const timeout = setTimeout( () => {
+        // const timeout = setTimeout( () => {
             setRows( calculateRows() )
-        }, 200 );
+        // }, 200 );
 
-        return () => clearTimeout( timeout );
+        // return () => clearTimeout( timeout );
 
-    }, [ display.reference, calculateRows ] );
+    }, [ stack.state.selectionStart, stack.state.selectionEnd, calculateRows ] );
 
 
     return {
-        display: display,
+        //display: display,
         property,
-        min, setMin,
-        max, setMax,
-        domain, setDomain,
         apiData,
         data,
         filter,
-        scale,
         isHovering, setIsHovering,
-        isSelecting, setIsSelecting,
+        isSelecting,
         tableData: rows
     }
 
 }
+
+export type UseGraphStackInstanceType = ReturnType< typeof useGraphStackInstance>;

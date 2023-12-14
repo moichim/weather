@@ -1,4 +1,6 @@
 import { useFilterContext } from "@/state/filterContext"
+import { useMeteoContext } from "@/state/useMeteoData/meteoDataContext";
+import { DataActionsFactory } from "@/state/useMeteoData/reducerInternals/actions";
 import { dateFromString, stringFromDate } from "@/utils/time";
 import { Button, Input } from "@nextui-org/react";
 import { addDays, subDays } from "date-fns";
@@ -6,24 +8,26 @@ import { useEffect, useMemo } from "react";
 
 export const DateFilter: React.FC = () => {
 
-    const filter = useFilterContext();
+    const context = useMeteoContext();
 
-    useEffect(() => {
-        filter.setTo(filter.from)
-    }, [filter]);
+    useEffect( () => {
+        context.dispatch( DataActionsFactory.setFilterString(
+            context.selection.fromInternalString,
+            context.selection.fromInternalString
+        ) );
+    }, [] );
 
     const setDates = (date: string) => {
-        filter.setFrom(date);
-        filter.setTo(date);
+        context.dispatch( DataActionsFactory.setFilterString( date, date ) );
     }
 
     const dayBefore = useMemo(() => {
-        return stringFromDate(subDays(dateFromString(filter.from), 1))
-    }, [filter.from]);
+        return stringFromDate(subDays(dateFromString(context.selection.fromInternalString), 1))
+    }, [context.selection.fromInternalString]);
 
     const dayAfter = useMemo(() => {
-        return stringFromDate(addDays(dateFromString(filter.from), 1))
-    }, [filter.from]);
+        return stringFromDate(addDays(dateFromString(context.selection.toInternalString), 1))
+    }, [context.selection.toInternalString]);
 
     return <>
 
@@ -42,7 +46,7 @@ export const DateFilter: React.FC = () => {
 
         <Input
             type="date"
-            value={filter.from}
+            value={context.selection.fromInternalString}
             onChange={event => setDates(event.target.value)}
             label="Datum"
             size="sm"

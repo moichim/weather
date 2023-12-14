@@ -1,31 +1,31 @@
-import { Button, Tooltip, cn } from "@nextui-org/react"
-import React, { Dispatch, SetStateAction } from "react"
+import { useGraphContext } from "@/state/graphStackContext"
+import { StackActions } from "@/state/useGraphStack/actions"
+import { GraphToolType, graphTools } from "@/state/useGraphStack/tools"
+import { Button, Tooltip } from "@nextui-org/react"
+import React, { useCallback, useMemo } from "react"
 
-export type ToolDefinitionType = {
-    slug: number,
-    name: string,
-    tooltip: React.ReactNode,
-    icon: React.FC,
-    onActivate?: () => void,
-    onDeactivate?: () => void,
-}
 
-type ToolbarProps = {
-    tools: ToolDefinitionType[],
-    tool: number,
-    setTool: Dispatch<SetStateAction<number>>
-}
+const Tool: React.FC<GraphToolType> = props => {
 
-type ToolPropsType = ToolDefinitionType & {
-    setter: ToolbarProps["setTool"],
-    active: ToolbarProps["tool"]
-}
+    const hook = useGraphContext();
 
-const Tool: React.FC<ToolPropsType> = props => {
+    const isActive = useMemo(() => props.slug === hook.stack.state.activeTool, [props.slug, hook.stack.state.activeTool]);
 
-    const isActive = props.active === props.slug;
+    const dispatch = hook.stack.dispatch;
 
-    const Icon = props.icon;
+    const Icon = useMemo(() => props.icon, [props.icon]);
+
+    const onClick = useCallback(() => {
+
+        dispatch(StackActions.selectTool(props.slug));
+
+        if (isActive) {
+            props.onActivate && props.onActivate(hook.stack);
+        } else {
+            props.onDeactivate && props.onDeactivate(hook.stack);
+        }
+
+    }, [dispatch, isActive, props.onActivate, props.onDeactivate, props.slug]);
 
     return <Tooltip
         showArrow={true}
@@ -34,26 +34,22 @@ const Tool: React.FC<ToolPropsType> = props => {
         color="foreground"
     >
         <Button
-            variant={props.active === props.slug ? "solid" : "bordered"}
-            // color="foreground"
+            variant={isActive ? "solid" : "bordered"}
             isIconOnly
-            onClick={() => {
-                props.setter(props.slug);
-                if (isActive)
-                    props.onActivate && props.onActivate();
-                else
-                    props.onDeactivate && props.onDeactivate();
-            }}
+            onClick={onClick}
         >
             <Icon />
         </Button>
     </Tooltip>
 }
 
-export const Toolbar: React.FC<ToolbarProps> = props => {
+export const Toolbar: React.FC = () => {
 
     return <div className="shadow-2xl fixed left-5 top-5 bg-white rounded-lg p-3 flex flex-col gap-3">
-        {props.tools.map(tool => <Tool key={tool.name} {...tool} setter={props.setTool} active={props.tool} />)}
+        {Object.values(graphTools).map(tool => <Tool
+            key={tool.name}
+            {...tool}
+        />)}
     </div>
 
 }
