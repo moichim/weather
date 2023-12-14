@@ -7,8 +7,7 @@ import { Button, ButtonGroup, Modal, ModalBody, ModalContent, ModalFooter, Modal
 import { GraphSettingButton } from "./ui/graphSettingButton";
 
 export const GraphRemoveButton: React.FC<GraphInstanceState> = props => {
-
-
+    
     const content = useWeatherContext();
 
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -18,8 +17,6 @@ export const GraphRemoveButton: React.FC<GraphInstanceState> = props => {
 
     if (content.weather.length === 0 || content.loading)
         return <></>;
-
-    const isDefault = props.domain === GraphDomain.DEFAULT;
 
     return <>
 

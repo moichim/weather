@@ -25,8 +25,8 @@ export const useMeteoData = () => {
             setProcessedData( processedResponse );
         },
 
-        onError: e => {
-            console.error( "error loading data", e );
+        onError: (e) => {
+            console.error( "error loading data", e.graphQLErrors, e.message);
         },
 
     });
@@ -39,13 +39,12 @@ export const useMeteoData = () => {
         query.refetch();
     }
 
-    console.log( query.data );
-
     return {
         selection,
         dispatch,
         refetch,
-        data: processedData
+        data: processedData,
+        isLoading: query.loading
     }
 
 }
@@ -56,5 +55,6 @@ export const useMeteoDataDefaults: useMeteoDataReturnType = {
     selection: MeteoStateFactory.defaultState(),
     dispatch: () => {},
     refetch: () => {},
-    data: {}
+    data: {},
+    isLoading: false
 }

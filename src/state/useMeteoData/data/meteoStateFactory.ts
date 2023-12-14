@@ -4,7 +4,7 @@ import { FormattedDatePair, formatViewDatesFromTimestamps, getDurationString } f
 
 export class MeteoStateFactory {
 
-    protected static buildRelativeSelectionDates(
+    public static buildRelativeSelectionDates(
         fromDaysModification: number,
         toDayModification: number
     ): FormattedDatePair {

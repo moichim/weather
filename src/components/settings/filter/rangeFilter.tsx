@@ -1,7 +1,10 @@
 import { getTimeMax, getTimeMin, useFilterContext } from "@/state/filterContext";
+import { MeteoStateFactory } from "@/state/useMeteoData/data/meteoStateFactory";
+import { useMeteoContext } from "@/state/useMeteoData/meteoDataContext";
+import { DataActionsFactory } from "@/state/useMeteoData/reducerInternals/actions";
 import { getTodayDateString, getAddedDate, stringFromDate } from "@/utils/time";
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input } from "@nextui-org/react";
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 enum RangePreset {
     LAST_3 = 0,
@@ -12,10 +15,21 @@ enum RangePreset {
 
 export const RangeFilter: React.FC = () => {
 
-    const filter = useFilterContext();
+    const context = useMeteoContext();
+
+    const [fromInternal, setFromInternal] = useState<string>( context.selection.fromInternalString );
+
+    const [toInternal, setToInternal] = useState<string>( context.selection.toInternalString );
 
     const min = useMemo(() => getTimeMin(), []);
     const max = useMemo(() => getTimeMax(), []);
+
+
+    useEffect( () => {
+        context.dispatch( DataActionsFactory.setFilterString( fromInternal, toInternal ) );
+    }, [toInternal, fromInternal]);
+
+
 
     const applyPreset = ( preset: RangePreset ) => {
 
@@ -23,29 +37,37 @@ export const RangeFilter: React.FC = () => {
 
         if ( preset == RangePreset.LAST_3 ) {
 
-            filter.setFrom( getAddedDate( today , -3 ) );
-            filter.setTo( today );
+            const dates = MeteoStateFactory.buildRelativeSelectionDates( - 3, 0);
+
+            setFromInternal( dates.from.internal );
+            setToInternal( dates.to.internal );
 
         }
 
         if ( preset == RangePreset.LAST_7 ) {
 
-            filter.setFrom( getAddedDate( today , -7 ) );
-            filter.setTo( today );
+            const dates = MeteoStateFactory.buildRelativeSelectionDates( - 7, 0);
+
+            setFromInternal( dates.from.internal );
+            setToInternal( dates.to.internal );
 
         }
 
         if ( preset == RangePreset.LAST_14 ) {
 
-            filter.setFrom( getAddedDate( today , -14 ) );
-            filter.setTo( today );
+            const dates = MeteoStateFactory.buildRelativeSelectionDates( - 14, 0);
+
+            setFromInternal( dates.from.internal );
+            setToInternal( dates.to.internal );
 
         }
 
         if ( preset == RangePreset.SINCE_EVER ) {
 
-            filter.setFrom( stringFromDate( new Date( "2023-10-01" ) ) );
-            filter.setTo( today );
+            const dates = MeteoStateFactory.buildRelativeSelectionDates( - 90, 0);
+
+            setFromInternal( dates.from.internal );
+            setToInternal( dates.to.internal );
 
         }
 
@@ -56,19 +78,19 @@ export const RangeFilter: React.FC = () => {
             type="date"
             label="Od"
             size="sm"
-            onChange={event => filter.setFrom(event.target.value)}
-            value={filter.from}
+            onChange={event => setFromInternal(event.target.value)}
+            value={fromInternal}
             min={min}
-            max={filter.to}
+            // max={filter.to}
         />
 
         <Input
             type="date"
             label="Do"
             size="sm"
-            onChange={event => filter.setTo(event.target.value)}
-            value={filter.to}
-            min={filter.from}
+            onChange={event => setToInternal(event.target.value)}
+            value={toInternal}
+            // min={filter.from}
             max={max}
         />
         <div>
@@ -97,4 +119,8 @@ export const RangeFilter: React.FC = () => {
             </Dropdown>
         </div>
     </>;
+}
+
+function buildRelativeSelectionDates() {
+    throw new Error("Function not implemented.");
 }

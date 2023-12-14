@@ -10,6 +10,11 @@ import { ButtonGroup } from "@nextui-org/react"
 import { GraphConfigScale } from "./components/graphConfigScale"
 import { GraphConfigPopup } from "./components/graphConfigPopup"
 import { GraphRemoveButton } from "./components/graphRemoveButton"
+import { useMeteoContext } from "@/state/useMeteoData/meteoDataContext"
+import { useMemo } from "react"
+import { useGraphInstanceMeteo } from "./useGraphinstanceMeteo"
+import { GraphStatistics } from "./components/graphStatistics"
+import { GraphView } from "./components/graphView"
 
 export type GraphInstanceWithDataPropsType = GraphInstanceState & {
     data: UseGraphStackInstanceType
@@ -19,6 +24,7 @@ export const GraphInstance: React.FC<GraphInstanceState> = props => {
 
     const data = useGraphStackInstance( props.property.slug );
     const {stack} = useGraphContext();
+
 
     return <div className="flex w-full gap-2 p-3">
         <div className="w-1/6 flex items-end justify-start flex-col gap-3">
@@ -36,10 +42,10 @@ export const GraphInstance: React.FC<GraphInstanceState> = props => {
         </div>
         
         <div className="w-2/3">
-            <GraphCanvas {...props} data={data}/>
+            <GraphView {...props}/>
         </div>
         <div className="w-1/3">
-            {( !stack.state.isSelecting && stack.state.selectionStart && stack.state.selectionEnd, !data.apiData.loading ) && <GraphTable {...props} data={data}/> }
+            <GraphStatistics {...props} />
         </div>
     </div>
 

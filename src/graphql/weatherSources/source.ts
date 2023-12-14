@@ -3,7 +3,7 @@ import { Properties, WeatherPropertyDefinitionType } from "./properties"
 
 type WeatherSourceBaseType = {
     name: string,
-    color: "default" | "primary" | "secondary" | "success" | "warning" | "danger",
+    color: string|"default" | "primary" | "secondary" | "success" | "warning" | "danger",
     stroke: string,
     props: Array<keyof WeatherEntryDataType>
 }
@@ -19,7 +19,7 @@ const sources: {
 } = {
     ntc: {
         name: "NTC",
-        color: "danger",
+        color: "red",
         stroke: "red",
         props: [
             "temperature",
@@ -35,7 +35,7 @@ const sources: {
     },
     openmeteo: {
         name: "Open Meteo",
-        color: "success",
+        color: "green",
         stroke: "green",
         props: [
             "temperature",

@@ -21,7 +21,7 @@ export const NotificationListing: React.FC = () => {
                     return <div className={cn([
                         "px-6 py-3 rounded-lg shadow-lg flex gap-3",
                         notification.classes
-                    ])}>
+                    ])} key={notification.id}>
                         {Icon && <div><Icon /></div>}
                         <div>{notification.message}</div>
                         <div onClick={notification.onRemove} className="cursor-pointer">

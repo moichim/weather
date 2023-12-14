@@ -32,10 +32,6 @@ query Query($scope: String, $from: String, $to: String ) {
           time
           value
         }
-        max
-        min
-        count
-        avg
       }
     }
     weatherRange(from: $from, to: $to, scope: $scope) {

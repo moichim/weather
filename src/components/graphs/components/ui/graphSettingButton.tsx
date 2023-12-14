@@ -8,18 +8,18 @@ type GraphSettingButtonProps = React.PropsWithChildren & {
     ref?: ForwardedRef<HTMLButtonElement>
 }
 
-const GraphSettingButtonWithTooltip: React.FC<GraphSettingButtonProps> = forwardRef<HTMLButtonElement, GraphSettingButtonProps>((props, ref) => {
+const GraphSettingButtonWithTooltip: React.FC<GraphSettingButtonProps> = (props) => {
 
     return <Tooltip
         showArrow
         content={props.tooltip}
         color="foreground"
     >
-        <GraphSettingButtonCore {...props} ref={ref}/>
+        <GraphSettingButtonCore {...props}/>
     </Tooltip>
-})
+}
 
-const GraphSettingButtonCore: React.FC<GraphSettingButtonProps> = forwardRef<HTMLButtonElement, GraphSettingButtonProps>((props, ref) => {
+const GraphSettingButtonCore: React.FC<GraphSettingButtonProps> = (props) => {
 
     const className = props.active ? "bg-gray-100" : "bg-transparent hover:bg-white text-gray-500 hover:text-black";
 
@@ -31,19 +31,18 @@ const GraphSettingButtonCore: React.FC<GraphSettingButtonProps> = forwardRef<HTM
             "ease-in-out duration-300 transition-all"
         ])}
         onClick={props.onClick}
-        ref={ref}
     >
             {props.children}
     </Button>
-})
+}
 
 export const GraphSettingButton: React.FC<GraphSettingButtonProps> = ({
     tooltip = undefined,
     ...props
 }) => {
 
-    if (tooltip !== undefined)
-        return <GraphSettingButtonWithTooltip {...props} tooltip={tooltip} />
+    // if (tooltip !== undefined)
+        // return <GraphSettingButtonWithTooltip {...props} tooltip={tooltip} />
 
     return <GraphSettingButtonCore {...props} />
 

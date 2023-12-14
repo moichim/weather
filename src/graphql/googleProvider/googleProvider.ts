@@ -171,17 +171,27 @@ export class GoogleSheetsProvider {
 
         const columnIndex = index + 2;
 
-        const valueRows = data.filter( (_,i) => i > 6 );
+        const valueRows = data.filter((_, i) => i > 6);
 
-        const relevantRows = valueRows.filter( ( row, i ) => {
-            return row[columnIndex] !== "";
-        } );
+        const relevantRows = valueRows.filter((row, i) => {
+            return row[columnIndex] !== "" && row[columnIndex] !== undefined;
+        });
 
-        return relevantRows.map( row => ({
-            time: GoogleSheetsProvider.inputDateToTimestamp( row[0] as string ),
-            value: parseFloat( row[columnIndex] ),
-            note: row[1]
-        }) );
+        return relevantRows.map(row => {
+
+            let valueRaw = row[columnIndex];
+            if (typeof valueRaw === "string") {
+                valueRaw = valueRaw.replace(",", ".");
+            }
+
+            const value = parseFloat(valueRaw);
+
+            return {
+                time: GoogleSheetsProvider.inputDateToTimestamp(row[0] as string),
+                value: value,
+                note: row[1]
+            }
+        });
 
     }
 
@@ -218,28 +228,30 @@ export class GoogleSheetsProvider {
 
         const definitions = GoogleSheetsProvider.extractColumnDefinitions(response.data.values);
 
-        const from = timestampFromFromString( args.from );
-        const to = timestampToFromString( args.to );
+        const from = timestampFromFromString(args.from);
+        const to = timestampToFromString(args.to);
 
-        const result: GoogleColumn[] = definitions.map( ( column, index ) => {
+        const result: GoogleColumn[] = definitions.map((column, index) => {
 
-            const values = GoogleSheetsProvider.extractColumnValues( response.data.values, index ).filter( entry => {
+            const values = GoogleSheetsProvider.extractColumnValues(response.data.values, index).filter(entry => {
                 return entry.time >= from && entry.time <= to;
-            } );
+            });
 
-            const min = values.reduce( (state,current) => {
-                if ( current.value < state ) return current.value;
-                return state;
-            }, Infinity );
+            console.log(values);
 
-            const max = values.reduce( (state,current) => {
-                if ( current.value > state ) return current.value;
+            const min = values.reduce((state, current) => {
+                if (current.value < state) return current.value;
                 return state;
-            }, -Infinity );
+            }, Infinity);
+
+            const max = values.reduce((state, current) => {
+                if (current.value > state) return current.value;
+                return state;
+            }, -Infinity);
 
             const count = values.length;
 
-            const avg = values.reduce( (state, current) => current.value + state, 0 ) / count;
+            const avg = values.reduce((state, current) => current.value + state, 0) / count;
 
 
 
@@ -247,12 +259,12 @@ export class GoogleSheetsProvider {
             return {
                 ...column,
                 values,
-                min: min !== Infinity ? min: null,
+                min: min !== Infinity ? min : null,
                 max: max !== -Infinity ? max : null,
                 avg: count > 0 ? avg : null,
                 count
             }
-        } );
+        });
 
         return result;
 
