@@ -25,6 +25,27 @@ export type WeatherEntryDataType = {
     evapotranspiration?: number
 }
 
+export type WeatherStatistic = {
+    min?: number,
+    max?: number,
+    avg?: number,
+    count: number
+}
+
+export type WeatherStatistics = {
+    temperature?: WeatherStatistic,
+    wind_dir?: WeatherStatistic,
+    wind_speed?: WeatherStatistic,
+    bar?: WeatherStatistic,
+    rain?: WeatherStatistic,
+    clouds?: WeatherStatistic,
+    humidity?: WeatherStatistic,
+    uv?: WeatherStatistic,
+    radiance?: WeatherStatistic,
+    snow_depth?: WeatherStatistic,
+    evapotranspiration?: WeatherStatistic
+}
+
 export type WeatherEntryType = WeatherEntryMetaType & WeatherEntryDataType;
 
 export type WeatherSerieIndexType = {
@@ -33,7 +54,8 @@ export type WeatherSerieIndexType = {
 
 export type WeatherSerie = {
     source: WeatherSourceType,
-    entries: WeatherEntryType[]
+    entries: WeatherEntryType[],
+    statistics: WeatherStatistics
 }
 
 export type WeatherProviderRequest = {
@@ -49,14 +71,36 @@ export const weatherTypeDefs = gql`
         properties: [Property]
     }
 
+    type Statistic {
+        min: Float
+        max: Float
+        avg: Float
+        count: Float!
+    }
+
+    type Statistics {
+        time: Statistic
+        temperature: Statistic
+        wind_dir: Statistic
+        wind_speed: Statistic
+        bar: Statistic
+        rain: Statistic
+        clouds: Statistic
+        humidity: Statistic
+        uv: Statistic
+        radiance: Statistic
+        evapotranspiration: Statistic
+        snow_depth: Statistic
+    }
+
     type Serie {
         source: Source!
         entries:[Entry]
+        statistics: Statistics
     }
 
     type Entry {
         time: Float!
-        is_forecast: Boolean!
         temperature: Float!
         wind_dir: Float
         wind_speed: Float
@@ -66,6 +110,8 @@ export const weatherTypeDefs = gql`
         humidity: Float
         uv: Float
         radiance: Float
+        evapotranspiration: Float
+        snow_depth: Float
     }
 
     type Property {

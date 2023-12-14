@@ -1,7 +1,7 @@
 import { google } from "googleapis";
 import { ValueSerieDefinition } from "../value";
 import { AvailableWeatherProperties, Properties, WeatherProperty } from "../weatherSources/properties";
-import { GoogleColumn, GoogleColumnValue, GoogleDataColumnDefinition, GoogleRequest, GoogleScopeData } from "../google";
+import { GoogleColumn, GoogleColumnValue, GoogleDataColumnDefinition, GoogleRequest, GoogleScope, GoogleScopeData } from "../google";
 import { ApolloError } from "@apollo/client";
 import { dateFromString, timestampFromFromString, timestampToFromString } from "@/utils/time";
 
@@ -101,6 +101,71 @@ export class GoogleSheetsProvider {
 
     protected static inputDateToTimestamp(input: string): number {
         return GoogleSheetsProvider.inputDateToDate(input).getTime();
+    }
+
+    protected static isValidScopeString( item: any ) {
+        const result = typeof item === "string"
+            && item !== "";
+
+        return result;
+    }
+
+    protected static isValidScopeNumber( item: any ) {
+
+        const isString = GoogleSheetsProvider.isValidScopeString( item );
+
+        const isNumber = parseFloat( item );
+
+        if ( isNaN( isNumber ) ) return false;
+
+        return isString;
+
+    }
+
+    protected static isValidScope( slug: string, row:any[] ) {
+        return GoogleSheetsProvider.isValidScopeString( row[0], )
+            && GoogleSheetsProvider.isValidScopeString( row[1] )
+            && GoogleSheetsProvider.isValidScopeString( row[2] )
+            && GoogleSheetsProvider.isValidScopeNumber( row[4] )
+            && GoogleSheetsProvider.isValidScopeNumber( row[5] )
+            && GoogleSheetsProvider.isValidScopeString( row[6] )
+    }
+
+    protected static formatScope( row: any[] ): GoogleScope {
+
+        const lat = parseFloat( row[4].replace(",",".") );
+        const lon = parseFloat( row[5].replace(",",".") );
+
+        return {
+            name: row[0],
+            slug: row[1],
+            sheetId: row[2],
+            lat,
+            lon,
+            hasNtc: row[6] === "1"
+        }
+    }
+
+
+    public static async getScope( scope: string ) {
+        const scopes = await GoogleSheetsProvider.getAllScopes();
+
+        return scopes.find( row => row.slug === scope );
+
+    }
+
+    public static async getAllScopes(): Promise<GoogleScope[]> {
+
+        const api = await GoogleSheetsProvider.getClient();
+        const response = await api.spreadsheets.values.get({
+            spreadsheetId: GoogleSheetsProvider.CONFIG_SHEET_ID,
+            range: GoogleSheetsProvider.formatQueryRange("A2:G", "Config")
+        });
+
+        const correctRows = response.data.values!.filter( row => GoogleSheetsProvider.isValidScope( row[1], row ) );
+
+        return correctRows.map( row => GoogleSheetsProvider.formatScope( row ) )
+
     }
 
 
@@ -213,8 +278,6 @@ export class GoogleSheetsProvider {
         return defs;
 
     }
-
-
 
     public static async range(args: GoogleRequest): Promise<any> {
 
