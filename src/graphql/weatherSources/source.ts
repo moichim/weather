@@ -3,7 +3,7 @@ import { Properties, WeatherPropertyDefinitionType } from "./properties"
 
 type WeatherSourceBaseType = {
     name: string,
-    color: string|"default" | "primary" | "secondary" | "success" | "warning" | "danger",
+    color: string,
     stroke: string,
     props: Array<keyof WeatherEntryDataType>
 }

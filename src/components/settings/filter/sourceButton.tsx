@@ -14,7 +14,6 @@ export const SourceButton: React.FC<WeatherSourceType> = (props) => {
 
     return <Switch 
         isSelected={isEnabled} 
-        color={color}
         onValueChange={value => filter.toggleSource( props.slug )}
         className="pr-5"
     >{props.name}</Switch>
