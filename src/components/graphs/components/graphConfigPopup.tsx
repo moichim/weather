@@ -132,7 +132,7 @@ export const GraphConfigPopup: React.FC<GraphInstanceState> = props => {
                             >
                                 <Radio value={GraphDomain.DEFAULT.toString()} description="Doporučeno.">{props.property.min} - {props.property.max} {props.property.unit}</Radio>
                                 <Radio value={GraphDomain.AUTO.toString()} description="Rozsah se upraví dle nejvyšší a nejnižší zobrazené hodnoty.">Automaticky</Radio>
-                                <Radio value={GraphDomain.MANUAL.toString()} description="Zadejte minimální a maximální hodnotu na ose Y.">Vlastní rozsah</Radio>
+                                {/*<Radio value={GraphDomain.MANUAL.toString()} description="Zadejte minimální a maximální hodnotu na ose Y.">Vlastní rozsah</Radio> */}
                             </RadioGroup>
 
                             {props.domain === GraphDomain.MANUAL &&

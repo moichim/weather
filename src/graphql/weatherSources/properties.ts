@@ -112,7 +112,7 @@ const properties: {
         field: "evapotranspiration",
         color: "bg-pink-400",
         min: 0,
-        max: 255
+        max: 1
     }
 }
 
