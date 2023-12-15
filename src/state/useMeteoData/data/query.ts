@@ -10,51 +10,131 @@ export type MeteoQueryResponseType = {
 }
 
 export const METEO_DATA_QUERY = gql`
-query Query($scope: String, $from: String, $to: String ) {
-    range(scope: $scope, from: $from, to: $to) {
-      data {
-        name
-        slug
-        color
-        in {
-          type
-          unit
-          name
-          field
-          in
-          color
-          slug
-          min
-          max
-        }
-        values {
-          note
-          time
-          value
-        }
-      }
+query Entries($from: Float, $to: Float, $scope: String ) {
+  weatherRange(from: $from, to: $to, scope: $scope) {
+    entries {
+      time
+      temperature
+      wind_dir
+      wind_speed
+      bar
+      rain
+      clouds
+      humidity
+      uv
+      radiance
+      evapotranspiration
+      snow_depth
     }
-    weatherRange(from: $from, to: $to, scope: $scope) {
-      entries {
-        time
-        temperature
-        wind_dir
-        wind_speed
-        bar
-        rain
-        clouds
-        humidity
-        uv
-        radiance
+    source {
+      name
+      color
+      stroke
+      slug
+      props
+    }
+    statistics {
+      time {
+        min
+        max
+        avg
+        count
       }
-      source {
-        name
-        color
-        stroke
-        slug
-        props
+      temperature {
+        min
+        max
+        avg
+        count
+      }
+      wind_dir {
+        min
+        max
+        avg
+        count
+      }
+      wind_speed {
+        min
+        max
+        avg
+        count
+      }
+      bar {
+        min
+        max
+        avg
+        count
+      }
+      rain {
+        min
+        max
+        avg
+        count
+      }
+      clouds {
+        min
+        max
+        avg
+        count
+      }
+      humidity {
+        min
+        max
+        avg
+        count
+      }
+      uv {
+        min
+        max
+        avg
+        count
+      }
+      radiance {
+        min
+        max
+        avg
+        count
+      }
+      evapotranspiration {
+        min
+        max
+        avg
+        count
+      }
+      snow_depth {
+        min
+        max
+        avg
+        count
       }
     }
   }
+  range(from: $from, to: $to, scope: $scope) {
+    data {
+      name
+      slug
+      color
+      in {
+        type
+        unit
+        name
+        field
+        in
+        color
+        slug
+        min
+        max
+      }
+      values {
+        time
+        value
+        note
+      }
+      min
+      max
+      avg
+      count
+    }
+  }
+}
 `;
 

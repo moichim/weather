@@ -3,6 +3,7 @@ import { WeatherSerie, WeatherEntryType, WeatherProviderRequest } from "../weath
 import { AbstractWeatherProvider, IProvider } from "./abstractProvider";
 import { Sources, WeatherSourceType } from "../weatherSources/source";
 import { MeteoRequestType } from "@/state/useMeteoData/data/query";
+import { stringFromTimestamp } from "@/utils/time";
 
 export class OpenmeteoProvider extends AbstractWeatherProvider {
 
@@ -14,12 +15,15 @@ export class OpenmeteoProvider extends AbstractWeatherProvider {
 
     public async doRequest(args: MeteoRequestType) {
 
+        const from = stringFromTimestamp( args.from - ( 60 * 60 * 1000 ) );
+        const to = stringFromTimestamp( args.to );
+
         const params = {
             "latitude": 49.7245947848106,
             "longitude": 13.327946050435685,
             "hourly": this.fields,
-            "start_date": args.from,
-            "end_date": args.to
+            "start_date": from,
+            "end_date": to
         };
         const url = "https://api.open-meteo.com/v1/forecast";
         const responses = await fetchWeatherApi(url, params);
@@ -73,7 +77,9 @@ export class OpenmeteoProvider extends AbstractWeatherProvider {
             return weatherData.hourly[key][index] as T;
         }
 
-        return weatherData.hourly.time.map( ( date, index ) => {
+        return weatherData.hourly.time
+            .filter( date => date.getTime() >= args.from && date.getTime() <= args.to )
+            .map( ( date, index ) => {
                 return {
                     time: date.getTime(),
                     temperature: getValue( "temperature2m", index ),

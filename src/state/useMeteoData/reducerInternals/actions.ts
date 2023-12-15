@@ -4,7 +4,10 @@ export enum DataActions {
     SET_FILTER_STRING = 2,
     SET_FILTER_TIMESTAMP = 3,
     SET_RANGE_TIMESTAMP = 4,
-    REMOVE_RANGE = 5
+    REMOVE_RANGE = 5,
+
+    START_SELECTING_RANGE = 6,
+    END_SELECTING_RANGE = 7
 
 }
 
@@ -89,6 +92,29 @@ export interface RemoveRangeAction extends DataAction<RemoveRangePayload> {
 
 
 
+export interface StartSelectingRangePayload extends DataPayloadBase {
+    timestamp: number
+}
+
+export interface StartSelectingRangeAction extends DataAction<StartSelectingRangePayload> {
+    type: DataActions.START_SELECTING_RANGE
+}
+
+
+
+
+export interface EndSelectingRangePayload extends DataPayloadBase {
+    timestamp: number
+}
+
+export interface EndSelectingRangeAction extends DataAction<EndSelectingRangePayload> {
+    type: DataActions.END_SELECTING_RANGE
+}
+
+
+
+
+
 
 
 export class DataActionsFactory {
@@ -146,6 +172,26 @@ export class DataActionsFactory {
             type: DataActions.REMOVE_RANGE,
             payload: {
                 do: true
+            }
+        }
+    }
+
+
+    public static startSelectingRange( timestamp: number ): StartSelectingRangeAction {
+        return {
+            type: DataActions.START_SELECTING_RANGE,
+            payload: {
+                timestamp
+            }
+        }
+    }
+
+
+    public static endSelectingRange( timestamp: number ): EndSelectingRangeAction {
+        return {
+            type: DataActions.END_SELECTING_RANGE,
+            payload: {
+                timestamp
             }
         }
     }

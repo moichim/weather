@@ -1,3 +1,4 @@
+import { RangeDisplay } from "../graphs/rangeDisplay"
 import { Filter } from "./filter/filter"
 import { GraphStackSettings } from "./graphs/graphStackSettings"
 
@@ -7,6 +8,8 @@ export const SettingsBar: React.FC<React.PropsWithChildren> = props => {
         <Filter />
 
         <GraphStackSettings />
+
+        <RangeDisplay />
 
     </div>
 }

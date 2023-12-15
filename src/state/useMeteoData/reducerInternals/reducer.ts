@@ -1,7 +1,7 @@
 import { dateFromString } from "@/utils/time";
 import { format, intervalToDuration } from "date-fns";
 import { Reducer } from "react";
-import { DataAction, DataActions, DataPayloadBase, SetFilterSringPayload, SetFilterTimestampPayload, SetRangeTimestampPayload, SetScopePayload } from "./actions";
+import { DataAction, DataActions, DataPayloadBase, SetFilterSringPayload, SetFilterTimestampPayload, SetRangeTimestampPayload, SetScopePayload, StartSelectingRangePayload } from "./actions";
 import { MeteoStorageType } from "./storage";
 
 const getPayload = <T>(a: DataPayloadBase) => {
@@ -76,10 +76,10 @@ const roundFromTimestamp = (from: number): FormattedDate => {
 const roundToTimestamp = (to: number): FormattedDate => {
     const d = new Date;
     d.setTime(to);
-    d.setHours(23);
-    d.setMinutes(59);
-    d.setSeconds(59);
-    d.setMilliseconds(999);
+    d.setHours(24);
+    d.setMinutes(0);
+    d.setSeconds(0);
+    d.setMilliseconds(0);
     return {
         timestamp: d.getTime(),
         date: d,
@@ -117,7 +117,7 @@ const formatRangeDate = (timestamp: number): FormattedDate => {
     return {
         timestamp: d.getTime(),
         date: d,
-        humanReadable: format(d, "d. M. y H:m"),
+        humanReadable: format(d, "d. M. y H:mm"),
         internal: format(d, "yyyy-MM-dd HH:mm:ss")
     }
 }
@@ -164,7 +164,7 @@ export const getDurationString = (
     if (object.hours)
         buffer.push(`${object.hours} hodin`);
 
-    return buffer.join( ", " );
+    return buffer.join(", ");
 
 }
 
@@ -187,6 +187,9 @@ export const meteoReducer: Reducer<MeteoStorageType, DataAction<DataPayloadBase>
             return {
                 ...state,
                 scope: setScopeScope,
+                rangeTempFromTimestamp: undefined,
+                rangeTempToTimestamp: undefined,
+                isSelectingRange: false,
                 rangeMinTimestamp: undefined,
                 rangeMinInternalString: undefined,
                 rangeMinHumanReadable: undefined,
@@ -204,6 +207,23 @@ export const meteoReducer: Reducer<MeteoStorageType, DataAction<DataPayloadBase>
 
             const { from: sff, to: sft } = formatViewDatesFromStrings(setFilterFrom, setFilterTo);
 
+            const resetRange = sff.timestamp < state.rangeMinTimestamp!
+                || sft.timestamp > state.rangeMaxTimestamp!
+                ? {
+                    rangeTempFromTimestamp: undefined,
+                    rangeTempToTimestamp: undefined,
+                    isSelectingRange: false,
+                    rangeMinTimestamp: undefined,
+                    rangeMinInternalString: undefined,
+                    rangeMinHumanReadable: undefined,
+                    rangeMaxTimestamp: undefined,
+                    rangeMaxInternalString: undefined,
+                    rangeMaxMumanReadable: undefined,
+                    rangeDurationString: undefined,
+                    hasRange: false
+                }
+                : {};
+
             return {
                 ...state,
 
@@ -215,7 +235,9 @@ export const meteoReducer: Reducer<MeteoStorageType, DataAction<DataPayloadBase>
                 toTimestamp: sft.timestamp,
                 toHumanReadable: sft.humanReadable,
 
-                viewDurationString: getDurationString( sff.date, sft.date )
+                viewDurationString: getDurationString(sff.date, sft.date),
+
+                ...resetRange
 
             };
 
@@ -225,6 +247,23 @@ export const meteoReducer: Reducer<MeteoStorageType, DataAction<DataPayloadBase>
             const { from: setFilterFromTimestamp, to: setFilterToTimestamp } = getPayload<SetFilterTimestampPayload>(action);
 
             const { from: tff, to: tft } = formatViewDatesFromTimestamps(setFilterFromTimestamp, setFilterToTimestamp);
+
+            const resetRanger = tff.timestamp < state.rangeMinTimestamp!
+                || tft.timestamp > state.rangeMaxTimestamp!
+                ? {
+                    rangeTempFromTimestamp: undefined,
+                    rangeTempToTimestamp: undefined,
+                    isSelectingRange: false,
+                    rangeMinTimestamp: undefined,
+                    rangeMinInternalString: undefined,
+                    rangeMinHumanReadable: undefined,
+                    rangeMaxTimestamp: undefined,
+                    rangeMaxInternalString: undefined,
+                    rangeMaxMumanReadable: undefined,
+                    rangeDurationString: undefined,
+                    hasRange: false
+                }
+                : {};
 
             return {
                 ...state,
@@ -237,7 +276,9 @@ export const meteoReducer: Reducer<MeteoStorageType, DataAction<DataPayloadBase>
                 toTimestamp: tft.timestamp,
                 toHumanReadable: tft.humanReadable,
 
-                viewDurationString: getDurationString( tff.date, tft.date )
+                viewDurationString: getDurationString(tff.date, tft.date),
+
+                ...resetRanger
 
             };
 
@@ -250,6 +291,11 @@ export const meteoReducer: Reducer<MeteoStorageType, DataAction<DataPayloadBase>
             return {
                 ...state,
 
+                rangeTempFromTimestamp: undefined,
+                rangeTempToTimestamp: undefined,
+
+                isSelectingRange: false,
+
                 rangeMinTimestamp: setRangeFromFormatted.timestamp,
                 rangeMinInternalString: setRangeFromFormatted.internal,
                 rangeMinHumanReadable: setRangeFromFormatted.humanReadable,
@@ -258,7 +304,7 @@ export const meteoReducer: Reducer<MeteoStorageType, DataAction<DataPayloadBase>
                 rangeMaxInternalString: setRangeToFormatted.internal,
                 rangeMaxMumanReadable: setRangeToFormatted.humanReadable,
 
-                rangeDurationString: getDurationString( setRangeFromFormatted.date, setRangeToFormatted.date ),
+                rangeDurationString: getDurationString(setRangeFromFormatted.date, setRangeToFormatted.date),
 
                 hasRange: true
 
@@ -268,6 +314,11 @@ export const meteoReducer: Reducer<MeteoStorageType, DataAction<DataPayloadBase>
         case DataActions.REMOVE_RANGE:
             return {
                 ...state,
+
+                rangeTempFromTimestamp: undefined,
+                rangeTempToTimestamp: undefined,
+
+                isSelectingRange: false,
 
                 rangeMinTimestamp: undefined,
                 rangeMinInternalString: undefined,
@@ -280,6 +331,56 @@ export const meteoReducer: Reducer<MeteoStorageType, DataAction<DataPayloadBase>
                 rangeDurationString: undefined,
 
                 hasRange: false
+            }
+
+        case DataActions.START_SELECTING_RANGE:
+
+            const { timestamp: startRangeTimestamp } = getPayload<StartSelectingRangePayload>(action);
+
+            return {
+                ...state,
+                rangeTempFromTimestamp: startRangeTimestamp,
+                rangeTempToTimestamp: undefined,
+
+                isSelectingRange: true,
+
+                rangeMinTimestamp: undefined,
+                rangeMinInternalString: undefined,
+                rangeMinHumanReadable: undefined,
+
+                rangeMaxTimestamp: undefined,
+                rangeMaxInternalString: undefined,
+                rangeMaxMumanReadable: undefined,
+
+                rangeDurationString: undefined,
+
+                hasRange: false
+            }
+
+        case DataActions.END_SELECTING_RANGE:
+
+            const { timestamp: endRangeTimestamp } = getPayload<StartSelectingRangePayload>(action);
+
+            const { from: finishFromFormatted, to: finishToFormatted } = formatRangeDatesFromTimestamp(state.rangeTempFromTimestamp!, endRangeTimestamp);
+
+            return {
+                ...state,
+                rangeTempFromTimestamp: undefined,
+                rangeTempToTimestamp: undefined,
+
+                isSelectingRange: false,
+
+                rangeMinTimestamp: finishFromFormatted.timestamp,
+                rangeMinInternalString: finishFromFormatted.internal,
+                rangeMinHumanReadable: finishFromFormatted.humanReadable,
+
+                rangeMaxTimestamp: finishToFormatted.timestamp,
+                rangeMaxInternalString: finishToFormatted.internal,
+                rangeMaxMumanReadable: finishToFormatted.humanReadable,
+
+                rangeDurationString: getDurationString(finishFromFormatted.date, finishToFormatted.date),
+
+                hasRange: true
             }
 
 

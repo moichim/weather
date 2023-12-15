@@ -11,7 +11,7 @@ export enum GraphDomain {
 
 export const graphInstanceHeights = {
     sm: 100, 
-    md: 250, 
+    md: 230, 
     lg: 500, 
     xl: 750, 
     "2xl": 1000
@@ -45,7 +45,7 @@ export type GraphStackState = {
 export class GraphStateFactory {
 
     public static defaultState(
-        properties: AvailableWeatherProperties[] = [ "temperature", "radiance", "humidity", "bar" ]
+        properties: AvailableWeatherProperties[] = [ "temperature", "radiance", "humidity" ]
     ): GraphStackState {
         return {
             sharedScale: "md",

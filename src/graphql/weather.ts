@@ -66,7 +66,7 @@ export type WeatherProviderRequest = {
 export const weatherTypeDefs = gql`
 
     extend type Query {
-        weatherRange(scope: String, from:String,to:String): [Serie]
+        weatherRange(scope: String, from:Float,to:Float): [Serie]
         sources: [Source]
         properties: [Property]
     }

@@ -16,8 +16,8 @@ export const useMeteoData = () => {
 
         variables: {
             scope: selection.scope,
-            from: selection.fromInternalString,
-            to: selection.toInternalString
+            from: selection.fromTimestamp,
+            to: selection.toTimestamp
         },
 
         onCompleted: data => {
@@ -26,7 +26,7 @@ export const useMeteoData = () => {
         },
 
         onError: (e) => {
-            console.error( "error loading data", e.graphQLErrors, e.message);
+            console.error( "error loading data", e, e.graphQLErrors, e.message);
         },
 
     });

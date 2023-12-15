@@ -291,16 +291,14 @@ export class GoogleSheetsProvider {
 
         const definitions = GoogleSheetsProvider.extractColumnDefinitions(response.data.values);
 
-        const from = timestampFromFromString(args.from);
-        const to = timestampToFromString(args.to);
+        const from = args.from;
+        const to = args.to;
 
         const result: GoogleColumn[] = definitions.map((column, index) => {
 
             const values = GoogleSheetsProvider.extractColumnValues(response.data.values, index).filter(entry => {
                 return entry.time >= from && entry.time <= to;
             });
-
-            console.log(values);
 
             const min = values.reduce((state, current) => {
                 if (current.value < state) return current.value;

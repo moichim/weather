@@ -17,57 +17,57 @@ export const RangeFilter: React.FC = () => {
 
     const context = useMeteoContext();
 
-    const [fromInternal, setFromInternal] = useState<string>( context.selection.fromInternalString );
+    const [fromInternal, setFromInternal] = useState<string>(context.selection.fromInternalString);
 
-    const [toInternal, setToInternal] = useState<string>( context.selection.toInternalString );
+    const [toInternal, setToInternal] = useState<string>(context.selection.toInternalString);
 
     const min = useMemo(() => getTimeMin(), []);
     const max = useMemo(() => getTimeMax(), []);
 
 
-    useEffect( () => {
-        context.dispatch( DataActionsFactory.setFilterString( fromInternal, toInternal ) );
+    useEffect(() => {
+        context.dispatch(DataActionsFactory.setFilterString(fromInternal, toInternal));
     }, [toInternal, fromInternal]);
 
 
 
-    const applyPreset = ( preset: RangePreset ) => {
+    const applyPreset = (preset: RangePreset) => {
 
         const today = getTodayDateString();
 
-        if ( preset == RangePreset.LAST_3 ) {
+        if (preset == RangePreset.LAST_3) {
 
-            const dates = MeteoStateFactory.buildRelativeSelectionDates( - 3, 0);
+            const dates = MeteoStateFactory.buildRelativeSelectionDates(- 3, 0);
 
-            setFromInternal( dates.from.internal );
-            setToInternal( dates.to.internal );
-
-        }
-
-        if ( preset == RangePreset.LAST_7 ) {
-
-            const dates = MeteoStateFactory.buildRelativeSelectionDates( - 7, 0);
-
-            setFromInternal( dates.from.internal );
-            setToInternal( dates.to.internal );
+            setFromInternal(dates.from.internal);
+            setToInternal(dates.to.internal);
 
         }
 
-        if ( preset == RangePreset.LAST_14 ) {
+        if (preset == RangePreset.LAST_7) {
 
-            const dates = MeteoStateFactory.buildRelativeSelectionDates( - 14, 0);
+            const dates = MeteoStateFactory.buildRelativeSelectionDates(- 7, 0);
 
-            setFromInternal( dates.from.internal );
-            setToInternal( dates.to.internal );
+            setFromInternal(dates.from.internal);
+            setToInternal(dates.to.internal);
 
         }
 
-        if ( preset == RangePreset.SINCE_EVER ) {
+        if (preset == RangePreset.LAST_14) {
 
-            const dates = MeteoStateFactory.buildRelativeSelectionDates( - 90, 0);
+            const dates = MeteoStateFactory.buildRelativeSelectionDates(- 14, 0);
 
-            setFromInternal( dates.from.internal );
-            setToInternal( dates.to.internal );
+            setFromInternal(dates.from.internal);
+            setToInternal(dates.to.internal);
+
+        }
+
+        if (preset == RangePreset.SINCE_EVER) {
+
+            const dates = MeteoStateFactory.buildRelativeSelectionDates(- 90, 0);
+
+            setFromInternal(dates.from.internal);
+            setToInternal(dates.to.internal);
 
         }
 
@@ -81,7 +81,7 @@ export const RangeFilter: React.FC = () => {
             onChange={event => setFromInternal(event.target.value)}
             value={fromInternal}
             min={min}
-            // max={filter.to}
+        // max={filter.to}
         />
 
         <Input
@@ -107,9 +107,9 @@ export const RangeFilter: React.FC = () => {
                     </Button>
 
                 </DropdownTrigger>
-                <DropdownMenu 
+                <DropdownMenu
                     aria-label="Přednastavené datumy"
-                    onAction={ key => applyPreset( key as RangePreset ) }
+                    onAction={key => applyPreset(key as RangePreset)}
                 >
                     <DropdownItem key={RangePreset.LAST_3}>Poslední 3 dny</DropdownItem>
                     <DropdownItem key={RangePreset.LAST_7}>Posledních 7 dní</DropdownItem>

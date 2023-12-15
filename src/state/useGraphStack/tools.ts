@@ -1,4 +1,4 @@
-import { SelectIcon, ZoomInIcon, ZoomOutIcon } from "@/components/ui/icons";
+import { InfoIcon, SelectIcon, ZoomInIcon, ZoomOutIcon } from "@/components/ui/icons";
 import { UseGraphStackValues } from "./useGraphStack"
 
 export enum GraphTools {
@@ -23,7 +23,7 @@ export const graphTools: {
         name: "Inspekce",
         tooltip: "Prohlížejte jednotlivé hodnoty",
         slug: GraphTools.INSPECT,
-        icon: ZoomOutIcon
+        icon: InfoIcon
     },
     [GraphTools.SELECT]: {
         name: "Vyznačení",

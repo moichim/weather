@@ -33,20 +33,10 @@ export class NtcProvider extends AbstractWeatherProvider {
         return Sources.one( "ntc" );
     }
 
-    protected prepareRequestUrl( from: string, to: string ) {
+    protected prepareRequestUrl( from: number, to: number ) {
 
-        const fromDate = dateFromString( from );
-        fromDate.setHours( 0 );
-        fromDate.setMinutes( 5 );
-
-        const toDate = dateFromString( to );
-        toDate.setHours( 24 );
-        toDate.setMinutes( 0 );
-        toDate.setMilliseconds(0);
-        toDate.setSeconds(0);
-
-        const f = fromDate.getTime() / 1000;
-        const t = toDate.getTime() / 1000;
+        const f = ( from / 1000 ) - ( 60 * 60 * 2 );
+        const t = (to / 1000) - ( 60 * 60 * 2 );
 
         return `https://irt.zcu.cz/info/data.php?from=${f}&to=${t}`;
 
