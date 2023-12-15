@@ -38,24 +38,6 @@ export class MeteoResponseProcessor {
             // pro každou property najít sloupce v Googlu, které sem patří
             const propertyColumns = response.range.data.filter( column => column.in.slug === property.slug );
 
-            const propertySourceStatistics = Object.fromEntries( propertySources.map( source => [source, {
-                type: "line",
-                min: Infinity,
-                max: -Infinity,
-                avg: 0,
-                avgBuf: 0,
-                count: 0
-            }] ) );
-
-            const propertyColumnStatistics = Object.fromEntries( propertyColumns.map( column => [ column.slug, {
-                type: "dot",
-                min: Infinity,
-                max: -Infinity,
-                avg: 0,
-                avgBuf: 0,
-                count: 0
-            } ] ) );
-
             // Pro každou property iterovat nejdelší serii
             const propertyGraphData = longestSerie.entries.map( leadEntry => {
 
@@ -83,20 +65,6 @@ export class MeteoResponseProcessor {
 
                             currentTimeEntry[ propertySource ] = currentValue;
 
-                            const currentStatistics = propertySourceStatistics[propertySource];
-
-                            currentStatistics.count = currentStatistics.count+1;
-
-                            if ( currentValue < currentStatistics.min ) {
-                                currentStatistics.min = currentValue;
-                            }
-
-                            if ( currentValue > currentStatistics.max ) {
-                                currentStatistics.max = currentValue;
-                            }
-
-                            currentStatistics.avgBuf = currentStatistics.avgBuf + currentValue;
-
                         } else {
                             currentTimeEntry[ propertySource ] = undefined;
                         }
@@ -119,23 +87,6 @@ export class MeteoResponseProcessor {
                         currentTimeEntry[ propertyColumn.slug ] = entryForThisTimestamp[ propertyColumn.slug ] ?? undefined;
                         currentTimeEntry["note"] = entryForThisTimestamp["note"];
 
-                        if ( currentValue ) {
-
-                            const currentStatistics = propertyColumnStatistics[ propertyColumn.slug ];
-
-                            currentStatistics.count = currentStatistics.count + 1;
-
-                            if ( currentValue < currentStatistics.min ) {
-                                currentStatistics.min = currentValue;
-                            }
-
-                            if ( currentValue > currentStatistics.max ) {
-                                currentStatistics.max = currentValue;
-                            }
-
-                            currentStatistics.avgBuf = currentStatistics.avgBuf + currentValue;
-
-                        }
 
                     } else {
                         currentTimeEntry[ propertyColumn.slug ] = undefined;
@@ -148,24 +99,11 @@ export class MeteoResponseProcessor {
 
             } );
 
-            const statisticsRaw = {
-                ...propertySourceStatistics,
-                ...propertyColumnStatistics
-            };
-
-            const statistics = Object.fromEntries( Object.entries( statisticsRaw ).map( ([key,values]) => {
-                const vals = {
-                    ...values,
-                    avg: values.avgBuf / values.count
-                }
-                return [key,vals]
-            } ) );
 
             const propertyGraphContent = {
                 dots: propertyColumns,
                 lines: propertySources.map( source => Sources.one( source )  ),
-                data: propertyGraphData,
-                statistics
+                data: propertyGraphData
             }
 
 

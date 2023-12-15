@@ -10,7 +10,7 @@ import { format } from "date-fns";
 import { useEffect, useState } from "react";
 import { CartesianGrid, ComposedChart, Line, ReferenceArea, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { CategoricalChartFunc } from "recharts/types/chart/generateCategoricalChart";
-import { useGraphInstanceMeteo } from "../useGraphinstanceMeteo";
+import { useGraphInstanceMeteo } from "../useGraphInstancData";
 
 export const GraphView: React.FC<GraphInstanceState> = props => {
 

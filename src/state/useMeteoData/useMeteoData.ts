@@ -4,6 +4,7 @@ import { MeteoQueryResponseType, MeteoRequestType, METEO_DATA_QUERY } from "./da
 import { useApolloClient, useQuery } from "@apollo/client";
 import { MeteoStateFactory } from "./data/meteoStateFactory";
 import { MeteoDataProcessed, MeteoResponseProcessor } from "./data/responseProcessing";
+import { GraphStatisticsDataType, StatisticsProcessing } from "./data/statisticsProcessing";
 
 /** Hook used by reducer. DO NOT USE IN COMPONENTS! */
 export const useMeteoData = () => {
@@ -11,6 +12,11 @@ export const useMeteoData = () => {
     const [selection, dispatch] = useReducer( meteoReducer, MeteoStateFactory.defaultState() );
 
     const [ processedData, setProcessedData ] = useState<MeteoDataProcessed>();
+
+    const [ viewStatistics, setViewStatistics ] = useState<GraphStatisticsDataType>({
+        lines: {},
+        dots: {}
+    });
 
     const query = useQuery<MeteoQueryResponseType, MeteoRequestType>(METEO_DATA_QUERY, {
 
@@ -21,8 +27,14 @@ export const useMeteoData = () => {
         },
 
         onCompleted: data => {
+
+            // Process the graph data
             const processedResponse = MeteoResponseProcessor.process( data );
             setProcessedData( processedResponse );
+
+            // Process the view statistics
+            const vs = StatisticsProcessing.extractAllFromQuery( data );
+            setViewStatistics( vs );
         },
 
         onError: (e) => {
@@ -44,7 +56,8 @@ export const useMeteoData = () => {
         dispatch,
         refetch,
         data: processedData,
-        isLoading: query.loading
+        isLoading: query.loading,
+        viewStatistics
     }
 
 }
@@ -56,5 +69,9 @@ export const useMeteoDataDefaults: useMeteoDataReturnType = {
     dispatch: () => {},
     refetch: () => {},
     data: {},
-    isLoading: false
+    isLoading: false,
+    viewStatistics: {
+        lines: {},
+        dots: {}
+    }
 }

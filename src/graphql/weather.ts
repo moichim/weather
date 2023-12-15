@@ -26,10 +26,15 @@ export type WeatherEntryDataType = {
 }
 
 export type WeatherStatistic = {
+    slug: string,
     min?: number,
     max?: number,
     avg?: number,
-    count: number
+    count: number,
+    type: "line"|"dot",
+    in?: string,
+    name: string,
+    color: string
 }
 
 export type WeatherStatistics = {

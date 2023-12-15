@@ -50,7 +50,7 @@ const properties: {
         type: "Float",
         name: "Tlak",
         field: "bar",
-        unit: "pascal",
+        unit: "hPa",
         color: "bg-yellow-700",
         min: 0,
         max: 1200

@@ -75,8 +75,13 @@ export abstract class AbstractWeatherProvider {
             min = min === Infinity ? undefined : isNaN(min) ? undefined : min;
             max = max === -Infinity ? undefined : isNaN(max) ? undefined : max;
 
+            const property = Properties.one( propertySlug )!;
 
             const statistics: WeatherStatistic = {
+                type: "line",
+                name: property.name!,
+                color: property.color!,
+                slug: propertySlug,
                 min: min,
                 max: max,
                 avg: isNaN(avg) ? undefined : avg, 

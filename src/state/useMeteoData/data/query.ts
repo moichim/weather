@@ -138,3 +138,113 @@ query Entries($from: Float, $to: Float, $scope: String ) {
 }
 `;
 
+export const METEO_RANGE_QUIERY = gql`
+
+query Entries($from: Float, $to: Float, $scope: String ) {
+  weatherRange(from: $from, to: $to, scope: $scope) {
+    source {
+      name
+      color
+      stroke
+      slug
+      props
+    }
+    statistics {
+      time {
+        min
+        max
+        avg
+        count
+      }
+      temperature {
+        min
+        max
+        avg
+        count
+      }
+      wind_dir {
+        min
+        max
+        avg
+        count
+      }
+      wind_speed {
+        min
+        max
+        avg
+        count
+      }
+      bar {
+        min
+        max
+        avg
+        count
+      }
+      rain {
+        min
+        max
+        avg
+        count
+      }
+      clouds {
+        min
+        max
+        avg
+        count
+      }
+      humidity {
+        min
+        max
+        avg
+        count
+      }
+      uv {
+        min
+        max
+        avg
+        count
+      }
+      radiance {
+        min
+        max
+        avg
+        count
+      }
+      evapotranspiration {
+        min
+        max
+        avg
+        count
+      }
+      snow_depth {
+        min
+        max
+        avg
+        count
+      }
+    }
+  }
+  range(from: $from, to: $to, scope: $scope) {
+    data {
+      name
+      slug
+      color
+      in {
+        type
+        unit
+        name
+        field
+        in
+        color
+        slug
+      }
+      min
+      max
+      avg
+      count
+    }
+  }
+}
+
+`;
+

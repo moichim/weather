@@ -9,12 +9,16 @@ import { GraphSelector } from "./components/graphSelector"
 import { GraphStatistics } from "./components/graphStatistics"
 import { GraphView } from "./components/graphView"
 import { UseGraphStackInstanceType } from "./useGraphStackInstance"
+import { GraphTable } from "./components/ui/graphTable"
+import { useGraphInstanceMeteo } from "./useGraphInstancData"
 
 export type GraphInstanceWithDataPropsType = GraphInstanceState & {
     data: UseGraphStackInstanceType
 }
 
 export const GraphInstance: React.FC<GraphInstanceState> = props => {
+
+    const { viewStatistics } = useGraphInstanceMeteo( props.property.slug );
 
     return <div className="flex w-full gap-2 p-3">
         <div className="w-1/6 flex items-end justify-start flex-col gap-3">
