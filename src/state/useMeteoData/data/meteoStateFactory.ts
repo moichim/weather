@@ -1,6 +1,6 @@
 import { addDays } from "date-fns";
 import { MeteoStorageType } from "../reducerInternals/storage";
-import { FormattedDatePair, formatViewDatesFromTimestamps, getDurationString } from "../reducerInternals/reducer";
+import { FormattedDatePair, formatViewDatesFromTimestamps, getDurationString, getSelectionRange } from "../reducerInternals/reducer";
 
 export class MeteoStateFactory {
 
@@ -55,7 +55,9 @@ export class MeteoStateFactory {
             toTimestamp: to.timestamp,
             toHumanReadable: to.humanReadable,
             
-            viewDurationString: getDurationString(from.date,to.date)
+            viewDurationString: getDurationString(from.date,to.date),
+
+            ...getSelectionRange()
         }
 
     }

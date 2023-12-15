@@ -7,16 +7,17 @@ import { GraphTools } from "@/state/useGraphStack/tools";
 import { DataActionsFactory } from "@/state/useMeteoData/reducerInternals/actions";
 import { Spinner } from "@nextui-org/react";
 import { format } from "date-fns";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CartesianGrid, ComposedChart, Line, ReferenceArea, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { CategoricalChartFunc } from "recharts/types/chart/generateCategoricalChart";
 import { useGraphInstanceMeteo } from "../useGraphInstancData";
+
 
 export const GraphView: React.FC<GraphInstanceState> = props => {
 
     const { stack } = useGraphContext();
 
-    const { data: graphData, selection, dispatch, isLoading } = useGraphInstanceMeteo(props.property.slug);
+    const { data: graphData, selection, dispatch, isLoadingData } = useGraphInstanceMeteo(props.property.slug);
 
     const domain = props.domain === GraphDomain.DEFAULT || props.domain === GraphDomain.MANUAL
         ? [props.domainMin ?? "auto", props.domainMax ?? "auto"]
@@ -55,12 +56,14 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
         if (stack.state.activeTool === GraphTools.INSPECT) return;
 
         if (!isHovering) {
-            dispatch( DataActionsFactory.removeRange() );
+            dispatch(DataActionsFactory.removeRange());
             if (isSelectingLocal) {
                 setIsSelectingLocal(false);
             }
             return;
         };
+
+        /*
 
         if (selection.hasRange) {
             dispatch(DataActionsFactory.removeRange());
@@ -68,8 +71,10 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
             return;
         }
 
+        */
+
         if (!selection.isSelectingRange) {
-            dispatch( DataActionsFactory.startSelectingRange( parseInt( event.activeLabel! ) ) );
+            dispatch(DataActionsFactory.startSelectingRange(parseInt(event.activeLabel!)));
             setIsSelectingLocal(true);
             return;
         } else {
@@ -77,7 +82,7 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
             let from = selection.rangeTempFromTimestamp!;
             let to = parseInt(event.activeLabel!);
 
-            dispatch( DataActionsFactory.endSelectingRange( parseInt( event.activeLabel! ) ) );
+            dispatch(DataActionsFactory.endSelectingRange(parseInt(event.activeLabel!)));
 
             setIsSelectingLocal(false);
 
@@ -99,6 +104,52 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
                 ? "crosshair"
                 : "crosshair"
         : "auto";
+
+    const ticks = useMemo( () => {
+
+        let durationInHours = graphData ? graphData.data.length : 0;
+
+        let times = (durationInHours > 0 && graphData) ? Object.values(graphData.data)
+            .map(entry => entry.time) : [];
+
+        let formatter: ((value: any, index: number) => string) | undefined = name => {
+            return format(new Date(name), "H");
+        };
+
+        if (durationInHours >= 26 && durationInHours < 24 * 10) {
+            times = times.filter(timestamp => {
+                const hour = timestamp / 1000 / 60 / 60 % 24;
+                const minute = timestamp / 1000 / 60 % 60;
+                const second = timestamp / 1000 % 60;
+                const result = (hour === 23 || hour === 11) && minute === 0 && second === 0;
+                return result;
+            });
+            formatter = name => {
+                return format(new Date(name), "H:mm");
+            };
+        }
+
+        if (durationInHours >= 24 * 10) {
+            times = times.filter(timestamp => {
+                const hour = timestamp / 1000 / 60 / 60 % 24;
+                const minute = timestamp / 1000 / 60 % 60;
+                const second = timestamp / 1000 % 60;
+                const result = (hour === 23) && minute === 0 && second === 0;
+                console.log(hour, minute, second, result);
+                return result;
+            });
+            formatter = name => {
+                return format(new Date(name), "d.M.");
+            };
+        }
+
+        return {
+            times,
+            formatter
+        }
+
+    }, [graphData, graphData?.data, graphData?.data.length] );
+
 
 
     return <div className="relative">
@@ -150,17 +201,16 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
                         stroke={dot.color}
                         dataKey={dot.slug}
                         isAnimationActive={false}
-                    // unit={cnt.property.unit ?? ""}
+                        unit={dot.in.unit ?? ""}
                     />
                 })}
 
 
                 <XAxis
                     dataKey="time"
-                    tickFormatter={name => {
-                        return format(new Date(name), "H")
-                    }}
+                    tickFormatter={ticks.formatter}
                     onMouseDown={console.log}
+                    ticks={ticks.times}
                 />
 
 
@@ -182,7 +232,7 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
 
         </ResponsiveContainer>
 
-        {isLoading && <div className="absolute w-full h-full top-0 height-0 bg-gray-200 bg-opacity-50 flex items-center justify-center">
+        {isLoadingData && <div className="absolute w-full h-full top-0 height-0 bg-gray-200 bg-opacity-50 flex items-center justify-center">
             <Spinner size="lg" />
         </div>}
 

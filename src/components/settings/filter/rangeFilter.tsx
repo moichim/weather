@@ -1,3 +1,5 @@
+"use client"
+
 import { getTimeMax, getTimeMin, useFilterContext } from "@/state/filterContext";
 import { MeteoStateFactory } from "@/state/useMeteoData/data/meteoStateFactory";
 import { useMeteoContext } from "@/state/useMeteoData/meteoDataContext";
@@ -10,7 +12,7 @@ enum RangePreset {
     LAST_3 = 0,
     LAST_7 = 1,
     LAST_14 = 2,
-    SINCE_EVER = 5
+    LAST_3_MONTHS = 5
 }
 
 export const RangeFilter: React.FC = () => {
@@ -21,13 +23,28 @@ export const RangeFilter: React.FC = () => {
 
     const [toInternal, setToInternal] = useState<string>(context.selection.toInternalString);
 
-    const min = useMemo(() => getTimeMin(), []);
-    const max = useMemo(() => getTimeMax(), []);
+    const min = context.selection.fromSelectionMin;
+    const max = context.selection.toSelectionMin;
 
 
     useEffect(() => {
         context.dispatch(DataActionsFactory.setFilterString(fromInternal, toInternal));
     }, [toInternal, fromInternal]);
+
+    console.log( toInternal );
+
+    /*
+    useEffect(() => {
+
+        if (context.selection.fromInternalString !== fromInternal)
+            setFromInternal(context.selection.fromInternalString);
+
+        if (context.selection.toInternalString !== toInternal)
+            setFromInternal(context.selection.toInternalString);
+
+    }, [context.selection.fromInternalString, context.selection.toInternalString]);
+
+    */
 
 
 
@@ -62,7 +79,7 @@ export const RangeFilter: React.FC = () => {
 
         }
 
-        if (preset == RangePreset.SINCE_EVER) {
+        if (preset == RangePreset.LAST_3_MONTHS) {
 
             const dates = MeteoStateFactory.buildRelativeSelectionDates(- 90, 0);
 
@@ -81,7 +98,7 @@ export const RangeFilter: React.FC = () => {
             onChange={event => setFromInternal(event.target.value)}
             value={fromInternal}
             min={min}
-        // max={filter.to}
+            max={max}
         />
 
         <Input
@@ -90,7 +107,7 @@ export const RangeFilter: React.FC = () => {
             size="sm"
             onChange={event => setToInternal(event.target.value)}
             value={toInternal}
-            // min={filter.from}
+            min={min}
             max={max}
         />
         <div>
@@ -114,7 +131,7 @@ export const RangeFilter: React.FC = () => {
                     <DropdownItem key={RangePreset.LAST_3}>Poslední 3 dny</DropdownItem>
                     <DropdownItem key={RangePreset.LAST_7}>Posledních 7 dní</DropdownItem>
                     <DropdownItem key={RangePreset.LAST_14}>Posledních 14 dní</DropdownItem>
-                    <DropdownItem key={RangePreset.SINCE_EVER}>Od začátku měření</DropdownItem>
+                    <DropdownItem key={RangePreset.LAST_3_MONTHS}>Poslední 3 měsíce</DropdownItem>
                 </DropdownMenu>
             </Dropdown>
         </div>

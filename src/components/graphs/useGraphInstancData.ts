@@ -13,34 +13,38 @@ export const useGraphInstanceMeteo = (
     propertySlug: AvailableWeatherProperties
 ) => {
 
-    const { data, dispatch, selection, isLoading, viewStatistics } = useMeteoContext();
+    const { data, dispatch, selection, isLoadingData, isLoadingRange, viewStatistics, rangeStatistics } = useMeteoContext();
 
-    const property = useMemo( () => {
-        return Properties.one( propertySlug );
-    }, [propertySlug] );
+    const property = useMemo(() => {
+        return Properties.one(propertySlug);
+    }, [propertySlug]);
 
-    const graphData = useMemo( () => {
+    const graphData = useMemo(() => {
 
-        if ( data ) {
+        if (data) {
 
-            if ( propertySlug in data )
+            if (propertySlug in data)
                 return data[propertySlug];
 
         }
 
         return undefined;
 
-    }, [propertySlug, data] );
+    }, [propertySlug, data]);
 
-    const viewInstanceStatistics = StatisticsProcessing.extractForOneProperty( viewStatistics, property );
+    const viewInstanceStatistics = StatisticsProcessing.extractForOneProperty(viewStatistics, property);
+
+    const rangeInstanceStatistics = rangeStatistics ? StatisticsProcessing.extractForOneProperty(rangeStatistics, property) : undefined;
 
     return {
         data: graphData,
         dispatch,
         selection,
-        isLoading,
+        isLoadingData,
+        isLoadingRange,
         viewStatistics: viewInstanceStatistics,
-        property
+        property,
+        rangeStatistics: rangeInstanceStatistics
     }
 
 

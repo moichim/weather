@@ -1,5 +1,5 @@
 import { dateFromString } from "@/utils/time";
-import { format, intervalToDuration } from "date-fns";
+import { addDays, format, intervalToDuration, subDays, subMonths } from "date-fns";
 import { Reducer } from "react";
 import { DataAction, DataActions, DataPayloadBase, SetFilterSringPayload, SetFilterTimestampPayload, SetRangeTimestampPayload, SetScopePayload, StartSelectingRangePayload } from "./actions";
 import { MeteoStorageType } from "./storage";
@@ -52,6 +52,24 @@ type FormattedDate = {
     humanReadable: string,
     internal: string
 };
+
+export const getSelectionRange = () => {
+    let min = new Date();
+    min = subMonths(min, 3);
+    min.setHours(0);
+    min.setMinutes(0);
+    min.setSeconds(0);
+    min.setMilliseconds(0);
+
+    let max = new Date();
+    max = subDays( max, 1 );
+
+    return {
+        fromSelectionMin: roundFromTimestamp(min.getTime()).internal,
+        toSelectionMin: roundToTimestamp(max.getTime()).internal
+    }
+
+}
 
 export type FormattedDatePair = {
     from: FormattedDate,
@@ -197,7 +215,8 @@ export const meteoReducer: Reducer<MeteoStorageType, DataAction<DataPayloadBase>
                 rangeMaxInternalString: undefined,
                 rangeMaxMumanReadable: undefined,
                 rangeDurationString: undefined,
-                hasRange: false
+                hasRange: false,
+                ...getSelectionRange()
             } as MeteoStorageType;
 
 
@@ -237,7 +256,8 @@ export const meteoReducer: Reducer<MeteoStorageType, DataAction<DataPayloadBase>
 
                 viewDurationString: getDurationString(sff.date, sft.date),
 
-                ...resetRange
+                ...resetRange,
+                ...getSelectionRange()
 
             };
 
@@ -278,7 +298,8 @@ export const meteoReducer: Reducer<MeteoStorageType, DataAction<DataPayloadBase>
 
                 viewDurationString: getDurationString(tff.date, tft.date),
 
-                ...resetRanger
+                ...resetRanger,
+                ...getSelectionRange()
 
             };
 
@@ -330,7 +351,8 @@ export const meteoReducer: Reducer<MeteoStorageType, DataAction<DataPayloadBase>
 
                 rangeDurationString: undefined,
 
-                hasRange: false
+                hasRange: false,
+                ...getSelectionRange()
             }
 
         case DataActions.START_SELECTING_RANGE:
@@ -354,7 +376,8 @@ export const meteoReducer: Reducer<MeteoStorageType, DataAction<DataPayloadBase>
 
                 rangeDurationString: undefined,
 
-                hasRange: false
+                hasRange: false,
+                ...getSelectionRange()
             }
 
         case DataActions.END_SELECTING_RANGE:
@@ -380,7 +403,8 @@ export const meteoReducer: Reducer<MeteoStorageType, DataAction<DataPayloadBase>
 
                 rangeDurationString: getDurationString(finishFromFormatted.date, finishToFormatted.date),
 
-                hasRange: true
+                hasRange: true,
+                ...getSelectionRange()
             }
 
 

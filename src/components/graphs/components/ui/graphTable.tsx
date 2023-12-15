@@ -1,10 +1,9 @@
 "use client";
 
-import { GraphInstanceState } from "@/state/useGraphStack/storage";
-import { ViewInstanceStatisticsType, useGraphInstanceMeteo } from "../../useGraphInstancData";
-import { AvailableWeatherProperties, WeatherProperty } from "@/graphql/weatherSources/properties";
+import { WeatherProperty } from "@/graphql/weatherSources/properties";
 import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, getKeyValue } from "@nextui-org/react";
 import { useCallback, useMemo } from "react";
+import { ViewInstanceStatisticsType, useGraphInstanceMeteo } from "../../useGraphInstancData";
 
 type GraphTablePropsType = {
     statisticsData: ViewInstanceStatisticsType,
@@ -13,23 +12,21 @@ type GraphTablePropsType = {
 
 export const GraphTable: React.FC<GraphTablePropsType> = props => {
 
-    const rows = useMemo( () => Object.values(props.statisticsData), [props.statisticsData, props.property.slug] );
+    const rows = useMemo(() => Object.values(props.statisticsData), [props.statisticsData, props.property.slug]);
 
-    const { data } = useGraphInstanceMeteo( props.property.slug );
+    const { data } = useGraphInstanceMeteo(props.property.slug);
 
-    
-
-    const columns = useMemo( () => [
-        { key: "name", label: "Měřená vlastnost" },
+    const columns = useMemo(() => [
+        { key: "name", label: "Zdroj dat" },
         { key: "avg", label: "Průměr" },
         { key: "min", label: "Minimum" },
         { key: "max", label: "Maximum" },
         // { key: "count", label: "Počet záznamů" },
-    ], [] );
+    ], []);
 
     const formatOutputValue = useCallback((value?: number) => value && `${value.toFixed(2)} ${props.property.unit ?? ""}`, [props.property.unit])
 
-    const tableRows = rows.map(row => {
+    const tableRows = useMemo(() => rows.map(row => {
 
         return {
             key: row.slug,
@@ -37,11 +34,10 @@ export const GraphTable: React.FC<GraphTablePropsType> = props => {
             avg: formatOutputValue(row.avg),
             min: formatOutputValue(row.min),
             max: formatOutputValue(row.max),
-            color: row.color
+            color: row.color,
+            count: row.count
         }
-    });
-
-    console.log( tableRows );
+    }), [formatOutputValue, rows]);
 
     if (rows.length === 0 || data === undefined) {
         return <></>;
@@ -49,7 +45,8 @@ export const GraphTable: React.FC<GraphTablePropsType> = props => {
 
     return <>
         <Table
-            aria-label="Nějaká hlavitka"
+            aria-label={`Statistiky pro veličinu '${props.property.name}'`}
+            removeWrapper
         >
             <TableHeader
                 columns={columns}
@@ -60,7 +57,7 @@ export const GraphTable: React.FC<GraphTablePropsType> = props => {
                 items={tableRows}
             >
                 {(item) => (
-                    <TableRow key={item.key} style={{color: item.color}}>
+                    <TableRow key={item.key} style={{ color: item.color }}>
                         {(columnKey) => <TableCell>{getKeyValue(item, columnKey)}</TableCell>}
                     </TableRow>
                 )}

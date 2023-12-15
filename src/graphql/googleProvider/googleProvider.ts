@@ -1,9 +1,15 @@
-import { google } from "googleapis";
-import { ValueSerieDefinition } from "../value";
-import { AvailableWeatherProperties, Properties, WeatherProperty } from "../weatherSources/properties";
-import { GoogleColumn, GoogleColumnValue, GoogleDataColumnDefinition, GoogleRequest, GoogleScope, GoogleScopeData } from "../google";
 import { ApolloError } from "@apollo/client";
-import { dateFromString, timestampFromFromString, timestampToFromString } from "@/utils/time";
+import { google } from "googleapis";
+import { GoogleColumn, GoogleColumnValue, GoogleDataColumnDefinition, GoogleRequest, GoogleScope } from "../google";
+import { AvailableWeatherProperties, Properties, WeatherProperty } from "../weatherSources/properties";
+
+export type ValueSerieDefinition = {
+    name: string,
+    slug: string,
+    id: number,
+    color: string,
+    in: WeatherProperty[]
+}
 
 export type GoogleSheetsDefinitionType = {
     name: string,
@@ -103,38 +109,38 @@ export class GoogleSheetsProvider {
         return GoogleSheetsProvider.inputDateToDate(input).getTime();
     }
 
-    protected static isValidScopeString( item: any ) {
+    protected static isValidScopeString(item: any) {
         const result = typeof item === "string"
             && item !== "";
 
         return result;
     }
 
-    protected static isValidScopeNumber( item: any ) {
+    protected static isValidScopeNumber(item: any) {
 
-        const isString = GoogleSheetsProvider.isValidScopeString( item );
+        const isString = GoogleSheetsProvider.isValidScopeString(item);
 
-        const isNumber = parseFloat( item );
+        const isNumber = parseFloat(item);
 
-        if ( isNaN( isNumber ) ) return false;
+        if (isNaN(isNumber)) return false;
 
         return isString;
 
     }
 
-    protected static isValidScope( slug: string, row:any[] ) {
-        return GoogleSheetsProvider.isValidScopeString( row[0], )
-            && GoogleSheetsProvider.isValidScopeString( row[1] )
-            && GoogleSheetsProvider.isValidScopeString( row[2] )
-            && GoogleSheetsProvider.isValidScopeNumber( row[4] )
-            && GoogleSheetsProvider.isValidScopeNumber( row[5] )
-            && GoogleSheetsProvider.isValidScopeString( row[6] )
+    protected static isValidScope(slug: string, row: any[]) {
+        return GoogleSheetsProvider.isValidScopeString(row[0],)
+            && GoogleSheetsProvider.isValidScopeString(row[1])
+            && GoogleSheetsProvider.isValidScopeString(row[2])
+            && GoogleSheetsProvider.isValidScopeNumber(row[4])
+            && GoogleSheetsProvider.isValidScopeNumber(row[5])
+            && GoogleSheetsProvider.isValidScopeString(row[6])
     }
 
-    protected static formatScope( row: any[] ): GoogleScope {
+    protected static formatScope(row: any[]): GoogleScope {
 
-        const lat = parseFloat( row[4].replace(",",".") );
-        const lon = parseFloat( row[5].replace(",",".") );
+        const lat = parseFloat(row[4].replace(",", "."));
+        const lon = parseFloat(row[5].replace(",", "."));
 
         return {
             name: row[0],
@@ -147,10 +153,10 @@ export class GoogleSheetsProvider {
     }
 
 
-    public static async getScope( scope: string ) {
+    public static async getScope(scope: string) {
         const scopes = await GoogleSheetsProvider.getAllScopes();
 
-        return scopes.find( row => row.slug === scope );
+        return scopes.find(row => row.slug === scope);
 
     }
 
@@ -162,9 +168,9 @@ export class GoogleSheetsProvider {
             range: GoogleSheetsProvider.formatQueryRange("A2:G", "Config")
         });
 
-        const correctRows = response.data.values!.filter( row => GoogleSheetsProvider.isValidScope( row[1], row ) );
+        const correctRows = response.data.values!.filter(row => GoogleSheetsProvider.isValidScope(row[1], row));
 
-        return correctRows.map( row => GoogleSheetsProvider.formatScope( row ) )
+        return correctRows.map(row => GoogleSheetsProvider.formatScope(row))
 
     }
 

@@ -1,7 +1,7 @@
 import { useFilterContext } from "@/state/filterContext"
 import { useMeteoContext } from "@/state/useMeteoData/meteoDataContext";
 import { DataActionsFactory } from "@/state/useMeteoData/reducerInternals/actions";
-import { dateFromString, stringFromDate } from "@/utils/time";
+import { dateFromString, stringFromDate, timestampFromFromString, timestampToFromString } from "@/utils/time";
 import { Button, Input } from "@nextui-org/react";
 import { addDays, subDays } from "date-fns";
 import { useEffect, useMemo } from "react";
@@ -26,17 +26,26 @@ export const DateFilter: React.FC = () => {
     }, [context.selection.fromInternalString]);
 
     const dayAfter = useMemo(() => {
-        return stringFromDate(addDays(dateFromString(context.selection.toInternalString), 1))
+        return stringFromDate(addDays(dateFromString(context.selection.toInternalString), 0))
     }, [context.selection.toInternalString]);
+
+    const min = context.selection.fromSelectionMin;
+    const max = context.selection.toSelectionMin;
+
+    const hasMin = timestampFromFromString( context.selection.fromSelectionMin ) < context.selection.fromTimestamp;
+
+    const hasMax = timestampToFromString( context.selection.toSelectionMin ) > context.selection.toTimestamp;
 
     return <>
 
         <Button
             isIconOnly
             size="lg"
-            variant="light"
+            variant={hasMin ? "bordered" : "light"}
+            className={!hasMin ? "cursor-not-allowed" : ""}
             title="Předchozí den"
             onClick={() => setDates(dayBefore)}
+            disabled={!hasMin}
         >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
@@ -50,14 +59,18 @@ export const DateFilter: React.FC = () => {
             onChange={event => setDates(event.target.value)}
             label="Datum"
             size="sm"
+            min={min}
+            max={max}
         />
 
         <Button
             isIconOnly
             size="lg"
-            variant="light"
+            variant={hasMax ? "bordered" : "light"}
+            className={!hasMax ? "cursor-not-allowed" : ""}
             title="Následující den"
             onClick={() => setDates(dayAfter)}
+            disabled={!hasMax}
         >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />

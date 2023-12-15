@@ -138,7 +138,7 @@ query Entries($from: Float, $to: Float, $scope: String ) {
 }
 `;
 
-export const METEO_RANGE_QUIERY = gql`
+export const METEO_RANGE_QUERY = gql`
 
 query Entries($from: Float, $to: Float, $scope: String ) {
   weatherRange(from: $from, to: $to, scope: $scope) {

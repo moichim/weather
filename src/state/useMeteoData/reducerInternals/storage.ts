@@ -9,6 +9,9 @@ export type MeteoStorageType = {
     toTimestamp: number,
     toInternalString: string,
     toHumanReadable: string,
+
+    fromSelectionMin: string,
+    toSelectionMin: string,
     
     viewDurationString: string,
 

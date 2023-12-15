@@ -18,7 +18,7 @@ const sources: {
     [index: string]: WeatherSourceInternalType
 } = {
     ntc: {
-        name: "NTC",
+        name: "Meteostanice Teslova",
         color: "red",
         stroke: "red",
         props: [

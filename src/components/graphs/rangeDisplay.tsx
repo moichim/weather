@@ -10,13 +10,13 @@ export const RangeDisplay: React.FC = () => {
 
     if (!selection.hasRange) return <></>
 
-    return <div className="absolute right-[8rem] bottom-10 rounded-lg shadow-xl bg-gray-300 px-6 py-4">
-        <h1 className="text-sm text-gray-500 mb-2">Vybráno {selection.rangeDurationString}</h1>
+    return <div className="absolute right-[4rem] bottom-10 rounded-lg shadow-xl bg-foreground  text-background px-6 py-4">
+        <h1 className="text-sm text-gray-400 mb-2">Vybráno {selection.rangeDurationString}</h1>
         <p className="mb-2">{selection.rangeMinHumanReadable} - {selection.rangeMaxMumanReadable}</p>
 
         <ButtonGroup
-            variant="faded"
-            color="primary"
+            variant="solid"
+            color="default"
         >
             <Button
                 onClick={() => dispatch(DataActionsFactory.removeRange())}

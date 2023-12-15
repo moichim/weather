@@ -14,7 +14,8 @@ export type WeatherPropertyDefinitionType = {
     field: keyof WeatherEntryDataType,
     color: string,
     min: number,
-    max: number
+    max: number,
+    description?: string
 }
 
 const properties: {
@@ -27,7 +28,7 @@ const properties: {
         field: "temperature",
         color: "bg-red-500",
         min: -10,
-        max: 40,
+        max: 40
     },
     wind_dir: {
         type: "Float",
@@ -88,7 +89,8 @@ const properties: {
         unit: "W/m2",
         color: "bg-teal-300",
         min: 0,
-        max: 1000
+        max: 1000,
+        description: "Sluneční svit je měřen dvakrát. (1) Položený přístroj mířící senzorem kolmo k zemi. (2) Přístroj manířený na aktuální polohu Slunce."
     },
     uv: {
         type: "Float",
@@ -123,30 +125,30 @@ export type AvailableWeatherProperties = keyof typeof properties;
 export class Properties {
 
     public static pickRandomPropertySlug(): AvailableWeatherProperties {
-        return Object.keys( properties )
-            .sort( () => ( Math.random() * 2 ) - 1 )
-            [0] as AvailableWeatherProperties;
+        return Object.keys(properties)
+            .sort(() => (Math.random() * 2) - 1)
+        [0] as AvailableWeatherProperties;
     }
 
     public static pickRandomProperty(): WeatherProperty {
-        return Properties.formatOne( Properties.pickRandomPropertySlug() );
+        return Properties.formatOne(Properties.pickRandomPropertySlug());
     }
-    
+
 
     protected static keys() {
-        return Object.keys( properties ) as AvailableWeatherProperties[];
+        return Object.keys(properties) as AvailableWeatherProperties[];
     }
 
     public static skeleton() {
         return Object.fromEntries(
-            Object.entries( properties )
-                .map( ([key,]) => [key as AvailableWeatherProperties,[] as number[]] )
+            Object.entries(properties)
+                .map(([key,]) => [key as AvailableWeatherProperties, [] as number[]])
         ) as {
-            [K in AvailableWeatherProperties]: number[]
-        };
+                [K in AvailableWeatherProperties]: number[]
+            };
     }
 
-    protected static formatOne( slug: keyof WeatherEntryDataType ) {
+    protected static formatOne(slug: keyof WeatherEntryDataType) {
         return {
             ...properties[slug],
             in: Sources.ofProperty(slug).map(source => source.slug),
@@ -155,19 +157,21 @@ export class Properties {
     }
 
     public static all() {
-        return Object.keys( properties ).map( slug => Properties.formatOne(slug as keyof WeatherEntryDataType) );
+        return Object.keys(properties).map(slug => Properties.formatOne(slug as keyof WeatherEntryDataType));
     }
 
-    public static index() { return Object.fromEntries(
-        Object.entries( properties )
-            .map( ([slug,prop]) => [slug,Properties.formatOne(slug as AvailableWeatherProperties)] )
-    ) }
+    public static index() {
+        return Object.fromEntries(
+            Object.entries(properties)
+                .map(([slug, prop]) => [slug, Properties.formatOne(slug as AvailableWeatherProperties)])
+        )
+    }
 
-    public static one( slug: keyof WeatherEntryDataType ) {
+    public static one(slug: keyof WeatherEntryDataType) {
         return Properties.formatOne(slug);
     }
 
-    public static ofSource( source: AvailableSources ) {
-        return Sources.one( source ).props.map( key => properties[key] );
+    public static ofSource(source: AvailableSources) {
+        return Sources.one(source).props.map(key => properties[key]);
     }
 }
