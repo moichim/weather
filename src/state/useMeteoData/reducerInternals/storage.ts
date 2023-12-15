@@ -11,6 +11,9 @@ export type MeteoStorageType = {
     toHumanReadable: string,
     
     viewDurationString: string,
+
+    rangeTempFromTimestamp?: number,
+    rangeTempToTimestamp?: number,
     
     rangeMinTimestamp?: number,
     rangeMinInternalString?: string,
@@ -23,5 +26,6 @@ export type MeteoStorageType = {
     rangeDurationString?: string,
 
     hasRange: boolean,
+    isSelectingRange: boolean,
 
 }

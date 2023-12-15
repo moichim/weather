@@ -41,11 +41,5 @@ export const Filter: React.FC = () => {
 
         {isRange ? <RangeFilter /> : <DateFilter />}
 
-        <ButtonGroup>
-
-            {sources.map(s => <SourceButton {...s} key={s.name} />)}
-
-        </ButtonGroup>
-
     </div>
 }

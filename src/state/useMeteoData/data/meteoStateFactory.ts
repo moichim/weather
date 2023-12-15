@@ -21,6 +21,9 @@ export class MeteoStateFactory {
 
             viewDurationDays: 0,
 
+            rangeTempFromTimestamp: undefined,
+            rangeTempToTimestamp: undefined,
+
             rangeMinTimestamp: undefined,
             rangeMinInternalString: undefined,
             rangeMinHumanReadable: undefined,
@@ -32,6 +35,7 @@ export class MeteoStateFactory {
             rangeDurationHours: undefined,
 
             hasRange: false,
+            isSelectingRange: false
 
         }
     }

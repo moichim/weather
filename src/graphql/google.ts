@@ -5,8 +5,12 @@ import { GoogleSheetsProvider } from "./googleProvider/googleProvider"
 export type GoogleScope = {
     /** Name of the scope */
     name: string,
+    slug: string,
     /** ID of the scope's data sheet */
-    sheetId: string
+    sheetId: string,
+    lat: number,
+    lon: number,
+    hasNtc: boolean
 }
 
 export type GoogleDataColumnDefinition = {
@@ -41,12 +45,18 @@ export type GoogleScopeData = {
 export const googleTypeDefs = gql`
 
     extend type Query {
-        range( scope: String, from:String, to:String ): GoogleScopeData
+        range( scope: String, from:Float, to:Float ): GoogleScopeData
+        googleScope( scope: String! ): GoogleScope
+        googleScopes: [GoogleScope]
     }
 
     type GoogleScope {
         name: String!
+        slug: String!
         sheetId: String!
+        lat: Float!
+        lon: Float!
+        hasNtc: Boolean!
     }
 
     type GoogleScopeData {
@@ -75,8 +85,8 @@ export const googleTypeDefs = gql`
 
 export type GoogleRequest = {
     scope: string,
-    from: string,
-    to: string
+    from: number,
+    to: number
 }
 
 export const googleResolvers = {
@@ -93,6 +103,17 @@ export const googleResolvers = {
                 data
             }
 
+        },
+        googleScope: async (
+            parent: any,
+            args: {
+                scope: string
+            }
+        ) => {
+            return await GoogleSheetsProvider.getScope( args.scope );
+        },
+        googleScopes: async () => {
+            return await GoogleSheetsProvider.getAllScopes();
         }
     }
 

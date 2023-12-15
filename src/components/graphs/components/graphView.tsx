@@ -1,25 +1,22 @@
 "use client";
 
+import { StackActions } from "@/state/useGraphStack/actions";
 import { useGraphContext } from "@/state/useGraphStack/graphStackContext";
 import { GraphDomain, GraphInstanceState, graphInstanceHeights } from "@/state/useGraphStack/storage";
-import { Spinner, cn } from "@nextui-org/react";
-import { format } from "date-fns";
-import { CartesianGrid, ComposedChart, Line, ReferenceArea, ReferenceLine, ResponsiveContainer, Scatter, Tooltip, XAxis, YAxis } from "recharts";
-import { GraphInstanceWithDataPropsType } from "../graphInstance";
-import { CategoricalChartFunc } from "recharts/types/chart/generateCategoricalChart";
-import { StackActions } from "@/state/useGraphStack/actions";
-import { useEffect, useState } from "react";
 import { GraphTools } from "@/state/useGraphStack/tools";
-import { stringFromTimestampFrom, stringFromTimestampTo } from "@/utils/time";
+import { DataActionsFactory } from "@/state/useMeteoData/reducerInternals/actions";
+import { Spinner } from "@nextui-org/react";
+import { format } from "date-fns";
+import { useEffect, useState } from "react";
+import { CartesianGrid, ComposedChart, Line, ReferenceArea, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { CategoricalChartFunc } from "recharts/types/chart/generateCategoricalChart";
 import { useGraphInstanceMeteo } from "../useGraphinstanceMeteo";
-import { DataActions, DataActionsFactory } from "@/state/useMeteoData/reducerInternals/actions";
-import { useMeteoContext } from "@/state/useMeteoData/meteoDataContext";
 
 export const GraphView: React.FC<GraphInstanceState> = props => {
 
     const { stack } = useGraphContext();
 
-    const { data: graphData, selection, dispatch, isLoading } = useGraphInstanceMeteo( props.property.slug );
+    const { data: graphData, selection, dispatch, isLoading } = useGraphInstanceMeteo(props.property.slug);
 
     const domain = props.domain === GraphDomain.DEFAULT || props.domain === GraphDomain.MANUAL
         ? [props.domainMin ?? "auto", props.domainMax ?? "auto"]
@@ -43,9 +40,8 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
             else setCursor(parseInt(event.activeLabel!));
         } else {
             if (isHovering) setIsHovering(false);
-            if (stack.state.isSelecting) {
-                //stack.dispatch(StackActions.selectionRemove());
-                dispatch( DataActionsFactory.removeRange() );
+            if (selection.isSelectingRange) {
+                dispatch(DataActionsFactory.removeRange());
             }
             if (isSelectingLocal) {
                 setIsSelectingLocal(false);
@@ -56,48 +52,40 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
 
     const onClick: CategoricalChartFunc = event => {
 
-        if ( stack.state.activeTool === GraphTools.INSPECT ) return;
+        if (stack.state.activeTool === GraphTools.INSPECT) return;
 
         if (!isHovering) {
-            stack.dispatch(StackActions.selectionRemove());
+            dispatch( DataActionsFactory.removeRange() );
             if (isSelectingLocal) {
                 setIsSelectingLocal(false);
             }
+            return;
         };
 
-        if (stack.state.selectionStart && stack.state.selectionEnd) {
-            // stack.dispatch(StackActions.selectionRemove());
-            dispatch( DataActionsFactory.removeRange() );
+        if (selection.hasRange) {
+            dispatch(DataActionsFactory.removeRange());
             setIsSelectingLocal(false);
+            return;
         }
 
-        if (!stack.state.isSelecting) {
-            stack.dispatch(StackActions.selectionStart(props.property.slug, parseInt(event.activeLabel!)));
+        if (!selection.isSelectingRange) {
+            dispatch( DataActionsFactory.startSelectingRange( parseInt( event.activeLabel! ) ) );
             setIsSelectingLocal(true);
+            return;
         } else {
 
-            let from = stack.state.selectionStart!;
-            let to = parseInt( event.activeLabel! );
+            let from = selection.rangeTempFromTimestamp!;
+            let to = parseInt(event.activeLabel!);
 
-            if ( from > to ) {
-                let fromTmp = from;
-                from = to;
-                to = fromTmp;
-                stack.dispatch( StackActions.selectionStart( props.property.slug, from ) );
-            }
-
-
-            stack.dispatch(StackActions.selectionEnd(props.property.slug, to));
+            dispatch( DataActionsFactory.endSelectingRange( parseInt( event.activeLabel! ) ) );
 
             setIsSelectingLocal(false);
-            
-            if ( stack.state.activeTool === GraphTools.ZOOM ) {
-                // props.data.filter.setFrom( stringFromTimestampFrom( from ) );
-                // props.data.filter.setTo( stringFromTimestampTo( to ) );
 
-                dispatch( DataActionsFactory.setFilterTimestamp( from, to ) );
+            if (stack.state.activeTool === GraphTools.ZOOM) {
 
-                stack.dispatch( StackActions.selectTool( GraphTools.INSPECT ) );
+                dispatch(DataActionsFactory.setFilterTimestamp(from, to));
+
+                stack.dispatch(StackActions.selectTool(GraphTools.INSPECT));
             }
 
         }
@@ -127,11 +115,24 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
                 style={{ cursor: mouse }}
             >
 
+                {selection.isSelectingRange ?
+                    selection.rangeTempFromTimestamp && <ReferenceLine
+                        x={selection.rangeTempFromTimestamp}
+                        stroke="black"
+                    />
+                    : (selection.rangeMinTimestamp && selection.rangeMaxTimestamp) && <ReferenceArea x1={selection.rangeMinTimestamp} x2={selection.rangeMaxTimestamp} />
+                }
+
+                {(isSelectingLocal && selection.rangeTempFromTimestamp) && <ReferenceArea
+                    x1={selection.rangeTempFromTimestamp}
+                    x2={cursor}
+                />}
+
                 <CartesianGrid strokeDasharray={"2 2"} />
 
-                {graphData && graphData.lines.map( source => {
+                {graphData && graphData.lines.map(source => {
 
-                    return <Line 
+                    return <Line
                         key={source.slug}
                         dataKey={source.slug}
                         dot={false}
@@ -140,18 +141,18 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
                         isAnimationActive={false}
                     />
 
-                } )}
+                })}
 
-                {graphData && graphData.dots.map( dot => {
+                {graphData && graphData.dots.map(dot => {
                     return <Line
-                    key={dot.slug}
-                    fill={dot.color}
-                    stroke={dot.color}
-                    dataKey={dot.slug}
-                    isAnimationActive={false}
-                // unit={cnt.property.unit ?? ""}
-                /> 
-                } )}
+                        key={dot.slug}
+                        fill={dot.color}
+                        stroke={dot.color}
+                        dataKey={dot.slug}
+                        isAnimationActive={false}
+                    // unit={cnt.property.unit ?? ""}
+                    />
+                })}
 
 
                 <XAxis
@@ -175,18 +176,7 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
                     isAnimationActive={false}
                 />
 
-                {stack.state.isSelecting ?
-                    stack.state.selectionStart && <ReferenceLine
-                        x={stack.state.selectionStart}
-                        stroke="black"
-                    />
-                    : (stack.state.selectionStart && stack.state.selectionEnd) && <ReferenceArea x1={stack.state.selectionStart} x2={stack.state.selectionEnd} />
-                }
 
-                {(isSelectingLocal && stack.state.selectionStart) && <ReferenceArea
-                    x1={stack.state.selectionStart}
-                    x2={cursor}
-                />}
 
             </ComposedChart>
 
