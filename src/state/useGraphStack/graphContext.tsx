@@ -1,7 +1,7 @@
 
 import { createContext, useContext } from "react";
 import { GraphStateFactory } from "./storage"
-import { UseGraphStackValues, useGraphStack } from "./useGraphStack"
+import { UseGraphStackValues, useGraphStack } from "./useGraphInternal"
 
 type GraphContextType = {
     stack: UseGraphStackValues
@@ -30,6 +30,7 @@ export const GraphContextProvider: React.FC<React.PropsWithChildren> = props => 
 
 }
 
+/** Use graph display settings stored  in global context. */
 export const useGraphContext = () => {
     return useContext( GraphContext );
 }

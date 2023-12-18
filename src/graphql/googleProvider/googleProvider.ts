@@ -129,12 +129,15 @@ export class GoogleSheetsProvider {
     }
 
     protected static isValidScope(slug: string, row: any[]) {
-        return GoogleSheetsProvider.isValidScopeString(row[0],)
+        return GoogleSheetsProvider.isValidScopeString(row[0])
             && GoogleSheetsProvider.isValidScopeString(row[1])
             && GoogleSheetsProvider.isValidScopeString(row[2])
             && GoogleSheetsProvider.isValidScopeNumber(row[4])
             && GoogleSheetsProvider.isValidScopeNumber(row[5])
             && GoogleSheetsProvider.isValidScopeString(row[6])
+            && GoogleSheetsProvider.isValidScopeString(row[7])
+            && GoogleSheetsProvider.isValidScopeString(row[8])
+            && GoogleSheetsProvider.isValidScopeString(row[9])
     }
 
     protected static formatScope(row: any[]): GoogleScope {
@@ -148,7 +151,11 @@ export class GoogleSheetsProvider {
             sheetId: row[2],
             lat,
             lon,
-            hasNtc: row[6] === "1"
+            hasNtc: row[6] === "1",
+            isDefault: row[7] === "1",
+            team: row[8],
+            locality: row[9],
+            description: row[10]
         }
     }
 
@@ -165,7 +172,7 @@ export class GoogleSheetsProvider {
         const api = await GoogleSheetsProvider.getClient();
         const response = await api.spreadsheets.values.get({
             spreadsheetId: GoogleSheetsProvider.CONFIG_SHEET_ID,
-            range: GoogleSheetsProvider.formatQueryRange("A2:G", "Config")
+            range: GoogleSheetsProvider.formatQueryRange("A2:Z", "Config")
         });
 
         const correctRows = response.data.values!.filter(row => GoogleSheetsProvider.isValidScope(row[1], row));

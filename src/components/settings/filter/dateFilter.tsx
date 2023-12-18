@@ -1,5 +1,5 @@
 import { useFilterContext } from "@/state/filterContext"
-import { useMeteoContext } from "@/state/useMeteoData/meteoDataContext";
+import { useMeteoContext } from "@/state/useMeteoData/meteoContext";
 import { DataActionsFactory } from "@/state/useMeteoData/reducerInternals/actions";
 import { dateFromString, stringFromDate, timestampFromFromString, timestampToFromString } from "@/utils/time";
 import { Button, Input } from "@nextui-org/react";

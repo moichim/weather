@@ -2,8 +2,9 @@
 
 import { DisplayContextProvider } from "@/state/displayContext"
 import { FilterContextProvider } from "@/state/filterContext"
-import { GraphContextProvider } from "@/state/useGraphStack/graphStackContext"
-import { MeteoContextProvider } from "@/state/useMeteoData/meteoDataContext"
+import { ScopeContextProvider } from "@/state/scope/scopeContext"
+import { GraphContextProvider } from "@/state/useGraphStack/graphContext"
+import { MeteoContextProvider } from "@/state/useMeteoData/meteoContext"
 import { NotificationsContextProvider } from "@/state/useNotifications/useNotifications"
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client"
 import { NextUIProvider } from "@nextui-org/react"
@@ -23,16 +24,9 @@ export const Providers: React.FC<React.PropsWithChildren> = props => {
             <main
             //className="dark text-foreground bg-background"
             >
+
                 <NotificationsContextProvider>
-                    <MeteoContextProvider>
-                        <GraphContextProvider>
-                            <FilterContextProvider>
-                                    <DisplayContextProvider>
-                                        {props.children}
-                                    </DisplayContextProvider>
-                            </FilterContextProvider>
-                        </GraphContextProvider>
-                    </MeteoContextProvider>
+                    {props.children}
                 </NotificationsContextProvider>
             </main>
         </NextUIProvider>

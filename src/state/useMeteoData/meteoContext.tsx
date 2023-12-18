@@ -1,14 +1,14 @@
 "use client";
 
 import { PropsWithChildren, createContext, useContext } from "react";
-import { useMeteoDataReturnType, useMeteoData, useMeteoDataDefaults } from "./useMeteoData";
+import { useMeteoDataReturnType, useMeteoInternal, useMeteoDataDefaults } from "./useMeteoInternal";
 
 
 const MeteoContext = createContext<useMeteoDataReturnType>(useMeteoDataDefaults);
 
 export const MeteoContextProvider: React.FC<PropsWithChildren> = props => {
 
-    const value = useMeteoData();
+    const value = useMeteoInternal();
 
     return <MeteoContext.Provider value={value}>
         {props.children}

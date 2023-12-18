@@ -23,11 +23,13 @@ type NotificationType = {
     onRemove: () => void
 }
 
+const DEFAULT_DURATION = 2000;
+
 export class NotificationFactory {
 
     public static success(
         message: React.ReactNode,
-        duration: undefined | number = undefined
+        duration: undefined | number = DEFAULT_DURATION
     ): NotificationType {
         const notification = {
             id: uuidv4(),
@@ -44,7 +46,7 @@ export class NotificationFactory {
 
     public static error(
         message: React.ReactNode,
-        duration: undefined | number = undefined
+        duration: undefined | number = DEFAULT_DURATION
     ): NotificationType {
         const notification = {
             id: uuidv4(),
@@ -61,7 +63,7 @@ export class NotificationFactory {
 
     public static info(
         message: React.ReactNode,
-        duration: undefined | number = undefined
+        duration: undefined | number = DEFAULT_DURATION
     ): NotificationType {
         const notification = {
             id: uuidv4(),
@@ -78,7 +80,7 @@ export class NotificationFactory {
 
     public static help(
         message: React.ReactNode,
-        duration: undefined | number = undefined
+        duration: undefined | number = DEFAULT_DURATION
     ): NotificationType {
         const notification = {
             id: uuidv4(),

@@ -2,7 +2,7 @@
 
 import { getTimeMax, getTimeMin, useFilterContext } from "@/state/filterContext";
 import { MeteoStateFactory } from "@/state/useMeteoData/data/meteoStateFactory";
-import { useMeteoContext } from "@/state/useMeteoData/meteoDataContext";
+import { useMeteoContext } from "@/state/useMeteoData/meteoContext";
 import { DataActionsFactory } from "@/state/useMeteoData/reducerInternals/actions";
 import { getTodayDateString, getAddedDate, stringFromDate } from "@/utils/time";
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input } from "@nextui-org/react";

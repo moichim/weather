@@ -10,7 +10,11 @@ export type GoogleScope = {
     sheetId: string,
     lat: number,
     lon: number,
-    hasNtc: boolean
+    hasNtc: boolean,
+    isDefault: boolean,
+    team: string,
+    locality: string,
+    description: string,
 }
 
 export type GoogleDataColumnDefinition = {
@@ -57,6 +61,10 @@ export const googleTypeDefs = gql`
         lat: Float!
         lon: Float!
         hasNtc: Boolean!
+        isDefault: Boolean!
+        team: String!
+        locality: String!
+        description: String!
     }
 
     type GoogleScopeData {

@@ -1,6 +1,6 @@
 import { AvailableWeatherProperties, Properties } from "@/graphql/weatherSources/properties"
 import { useFilterContext } from "@/state/filterContext"
-import { useGraphContext } from "@/state/useGraphStack/graphStackContext"
+import { useGraphContext } from "@/state/useGraphStack/graphContext"
 import { useMemo, useState } from "react"
 
 export type PropertyGraphPropsType = {

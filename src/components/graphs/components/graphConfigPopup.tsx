@@ -1,5 +1,5 @@
 import { SettingIcon } from "@/components/ui/icons";
-import { useGraphContext } from "@/state/useGraphStack/graphStackContext";
+import { useGraphContext } from "@/state/useGraphStack/graphContext";
 import { StackActions } from "@/state/useGraphStack/actions";
 import { GraphDomain, GraphInstanceState } from "@/state/useGraphStack/storage";
 import { Badge, Button, ButtonGroup, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Radio, RadioGroup, useDisclosure } from "@nextui-org/react";

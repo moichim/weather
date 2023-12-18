@@ -1,7 +1,7 @@
 "use client";
 
 import { StackActions } from "@/state/useGraphStack/actions";
-import { useGraphContext } from "@/state/useGraphStack/graphStackContext";
+import { useGraphContext } from "@/state/useGraphStack/graphContext";
 import { GraphDomain, GraphInstanceState, graphInstanceHeights } from "@/state/useGraphStack/storage";
 import { GraphTools } from "@/state/useGraphStack/tools";
 import { DataActionsFactory } from "@/state/useMeteoData/reducerInternals/actions";

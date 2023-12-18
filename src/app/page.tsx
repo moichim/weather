@@ -1,6 +1,7 @@
 
 import { Graphs } from '@/components/graphs/graphs';
 import { SettingsContainer } from '@/components/settings/settingsContainer';
+import { ScopeSelectScreen } from '@/state/scope/components/scopeSelectScreen';
 
 export default function Home() {
 
@@ -8,10 +9,8 @@ export default function Home() {
 
     <div className="flex">
 
-      <Graphs />
+      <ScopeSelectScreen />
 
     </div>
-
-    <SettingsContainer>Ahoj</SettingsContainer>
   </>
 }

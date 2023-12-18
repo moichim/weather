@@ -7,7 +7,7 @@ import { GraphStatisticsDataType, StatisticsProcessing } from "./data/statistics
 import { meteoReducer } from "./reducerInternals/reducer";
 
 /** Hook used by reducer. DO NOT USE IN COMPONENTS! */
-export const useMeteoData = () => {
+export const useMeteoInternal = () => {
 
     const [selection, dispatch] = useReducer(meteoReducer, MeteoStateFactory.defaultState());
 
@@ -94,7 +94,7 @@ export const useMeteoData = () => {
 
 }
 
-export type useMeteoDataReturnType = ReturnType<typeof useMeteoData>
+export type useMeteoDataReturnType = ReturnType<typeof useMeteoInternal>
 
 export const useMeteoDataDefaults: useMeteoDataReturnType = {
     selection: MeteoStateFactory.defaultState(),

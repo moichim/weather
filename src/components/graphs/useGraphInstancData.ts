@@ -1,7 +1,7 @@
 import { WeatherStatistic } from "@/graphql/weather";
 import { AvailableWeatherProperties, Properties } from "@/graphql/weatherSources/properties";
 import { StatisticsProcessing } from "@/state/useMeteoData/data/statisticsProcessing";
-import { useMeteoContext } from "@/state/useMeteoData/meteoDataContext";
+import { useMeteoContext } from "@/state/useMeteoData/meteoContext";
 import { useMemo } from "react";
 
 export type ViewInstanceStatisticsType = {

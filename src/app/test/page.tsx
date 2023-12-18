@@ -1,4 +1,5 @@
-import { UseDataTesting } from "@/state/useMeteoData/useDataTestComponent";
+import { ScopeSelectDwopdown } from "@/state/scope/components/scopeSelectDropdown";
+import { ScopeSelectScreen } from "@/state/scope/components/scopeSelectScreen";
 
 export default function Home() {
 
@@ -6,10 +7,12 @@ export default function Home() {
   
       <div className="flex">
   
-        <UseDataTesting />
-
+        <ScopeSelectDwopdown />
+        
 
       </div>
+
+      <ScopeSelectScreen />
   
     </>
   }

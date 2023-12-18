@@ -1,6 +1,6 @@
 "use client";
 
-import { useGraphContext } from "@/state/useGraphStack/graphStackContext"
+import { useGraphContext } from "@/state/useGraphStack/graphContext"
 import { StackActions } from "@/state/useGraphStack/actions";
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@nextui-org/react";
 

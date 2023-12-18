@@ -1,5 +1,5 @@
 import { InfoIcon, SelectIcon, ZoomInIcon, ZoomOutIcon } from "@/components/ui/icons";
-import { UseGraphStackValues } from "./useGraphStack"
+import { UseGraphStackValues } from "./useGraphInternal"
 
 export enum GraphTools {
     INSPECT = "inspect",

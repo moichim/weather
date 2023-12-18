@@ -1,6 +1,6 @@
 "use client";
 
-import { useGraphContext } from "@/state/useGraphStack/graphStackContext";
+import { useGraphContext } from "@/state/useGraphStack/graphContext";
 import { StackActions } from "@/state/useGraphStack/actions";
 import { GraphInstanceScales, graphInstanceHeights } from "@/state/useGraphStack/storage";
 import { Button, ButtonGroup, Tooltip } from "@nextui-org/react";

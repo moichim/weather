@@ -1,6 +1,6 @@
 "use client"
 
-import { useMeteoContext } from "@/state/useMeteoData/meteoDataContext";
+import { useMeteoContext } from "@/state/useMeteoData/meteoContext";
 import { DataActionsFactory } from "@/state/useMeteoData/reducerInternals/actions";
 import { Button, ButtonGroup } from "@nextui-org/react";
 

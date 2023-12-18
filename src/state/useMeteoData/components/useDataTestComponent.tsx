@@ -1,10 +1,10 @@
 "use client"
 
 import { Button } from "@nextui-org/react";
-import { useMeteoContext } from "./meteoDataContext"
-import { DataActions, DataActionsFactory } from "./reducerInternals/actions";
+import { useMeteoContext } from "../meteoContext"
+import { DataActions, DataActionsFactory } from "../reducerInternals/actions";
 
-export const UseDataTesting: React.FC = () => {
+export const UseDataTest: React.FC = () => {
 
     const data = useMeteoContext();
 
