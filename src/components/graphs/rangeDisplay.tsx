@@ -1,7 +1,7 @@
 "use client"
 
-import { useMeteoContext } from "@/state/useMeteoData/meteoContext";
-import { DataActionsFactory } from "@/state/useMeteoData/reducerInternals/actions";
+import { useMeteoContext } from "@/state/meteo/meteoContext";
+import { DataActionsFactory } from "@/state/meteo/reducerInternals/actions";
 import { Button, ButtonGroup } from "@nextui-org/react";
 
 export const RangeDisplay: React.FC = () => {

@@ -1,7 +1,7 @@
 import { Graphs } from '@/components/graphs/graphs';
-import { SettingsContainer } from '@/components/settings/settingsContainer';
-import { GoogleScope } from '@/graphql/google';
-import { GoogleSheetsProvider } from '@/graphql/googleProvider/googleProvider';
+import { Bar } from '@/state/graph/components/bar/bar';
+import { GoogleScope } from '@/graphql/google/google';
+import { GoogleSheetsProvider } from '@/graphql/google/googleProvider/googleProvider';
 import { ScopeHeader } from '@/state/scope/components/scopeHeader';
 import { NextPage } from 'next';
 
@@ -12,7 +12,7 @@ export const generateStaticParams = async () => {
 
 }
 
-export const dynamicParams = false
+export const dynamicParams = true
 
 const getScope = async ( slug: string ) => {
     return (await GoogleSheetsProvider.getAllScopes()).find( s => s.slug === slug )!
@@ -36,7 +36,7 @@ const ScopePage: NextPage<ScopePageProps> = async (props) => {
 
                 <Graphs />
 
-                <SettingsContainer />
+                <Bar />
 
             </div>
 

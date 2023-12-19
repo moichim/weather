@@ -2,7 +2,7 @@
 
 import {createContext, useContext} from "react";
 import { UseScopeHookType, getContextDefaults, useScopeInternal } from "./useScopeInternal";
-import { GoogleScope } from "@/graphql/google";
+import { GoogleScope } from "@/graphql/google/google";
 
 const def = getContextDefaults();
 

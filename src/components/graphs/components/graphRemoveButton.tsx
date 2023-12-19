@@ -1,7 +1,7 @@
 import { CloseIcon } from "@/components/ui/icons";
-import { useGraphContext } from "@/state/useGraphStack/graphContext";
-import { StackActions } from "@/state/useGraphStack/actions";
-import { GraphInstanceState } from "@/state/useGraphStack/storage";
+import { useGraphContext } from "@/state/graph/graphContext";
+import { StackActions } from "@/state/graph/reducerInternals/actions";
+import { GraphInstanceState } from "@/state/graph/reducerInternals/storage";
 import { Button, ButtonGroup, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@nextui-org/react";
 import { GraphSettingButton } from "./ui/graphSettingButton";
 
@@ -9,7 +9,7 @@ export const GraphRemoveButton: React.FC<GraphInstanceState> = props => {
 
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-    const { stack } = useGraphContext();
+    const { graphDispatch } = useGraphContext();
 
     return <>
 
@@ -32,7 +32,7 @@ export const GraphRemoveButton: React.FC<GraphInstanceState> = props => {
                         <ModalFooter>
                             <ButtonGroup>
                                 <Button color="primary" onPress={() => {
-                                    stack.dispatch(StackActions.removeGraph(props.property.slug))
+                                    graphDispatch(StackActions.removeGraph(props.property.slug))
                                     onClose();
                                 }}>
                                     Ano

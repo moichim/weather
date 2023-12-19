@@ -1,7 +1,7 @@
 import { SettingIcon } from "@/components/ui/icons";
-import { useGraphContext } from "@/state/useGraphStack/graphContext";
-import { StackActions } from "@/state/useGraphStack/actions";
-import { GraphDomain, GraphInstanceState } from "@/state/useGraphStack/storage";
+import { useGraphContext } from "@/state/graph/graphContext";
+import { StackActions } from "@/state/graph/reducerInternals/actions";
+import { GraphDomain, GraphInstanceState } from "@/state/graph/reducerInternals/storage";
 import { Badge, Button, ButtonGroup, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Radio, RadioGroup, useDisclosure } from "@nextui-org/react";
 import { useCallback, useEffect, useState } from "react";
 import { GraphSettingButton } from "./ui/graphSettingButton";
@@ -10,7 +10,7 @@ export const GraphConfigPopup: React.FC<GraphInstanceState> = props => {
 
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-    const { stack } = useGraphContext();
+    const { graphDispatch } = useGraphContext();
 
     const [minInternal, setMinInternal] = useState<string>(props.property.min!.toString());
     const [maxInternal, setMaxInternal] = useState<string>(props.property.max!.toString());
@@ -87,7 +87,7 @@ export const GraphConfigPopup: React.FC<GraphInstanceState> = props => {
 
 
         if (props.domain === GraphDomain.MANUAL) {
-            stack.dispatch(StackActions.setInstanceDomain(
+            graphDispatch(StackActions.setInstanceDomain(
                 props.property.slug,
                 GraphDomain.MANUAL,
                 translateRangeValue(minInternal),
@@ -100,7 +100,7 @@ export const GraphConfigPopup: React.FC<GraphInstanceState> = props => {
     const isDefault = props.domain === GraphDomain.DEFAULT;
 
     const setDefault = () => {
-        stack.dispatch(StackActions.setInstanceDomain(props.property.slug, GraphDomain.DEFAULT));
+        graphDispatch(StackActions.setInstanceDomain(props.property.slug, GraphDomain.DEFAULT));
     }
 
     return <>
@@ -126,7 +126,7 @@ export const GraphConfigPopup: React.FC<GraphInstanceState> = props => {
                             <RadioGroup
                                 label="Rozsah hodnot na ose Y"
                                 onValueChange={value => {
-                                    stack.dispatch(StackActions.setInstanceDomain(props.property.slug, value as any));
+                                    graphDispatch(StackActions.setInstanceDomain(props.property.slug, value as any));
                                 }}
                                 value={props.domain.toString()}
                             >

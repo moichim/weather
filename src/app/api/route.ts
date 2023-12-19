@@ -1,6 +1,5 @@
-import { googleResolvers, googleTypeDefs } from "@/graphql/google";
-import { placesResolvers, placesTypeDefs } from "@/graphql/places";
-import { weatherResolvers, weatherTypeDefs } from "@/graphql/weather";
+import { googleResolvers, googleTypeDefs } from "@/graphql/google/google";
+import { weatherResolvers, weatherTypeDefs } from "@/graphql/weather/weather";
 import { ApolloServer } from "@apollo/server";
 import { buildSubgraphSchema } from "@apollo/subgraph";
 import { startServerAndCreateNextHandler } from "@as-integrations/next";
@@ -11,11 +10,6 @@ const server = new ApolloServer({
     schema: buildSubgraphSchema([
 
         {
-            typeDefs: placesTypeDefs,
-            resolvers: placesResolvers,
-        },
-
-        {
             typeDefs: weatherTypeDefs,
             resolvers: weatherResolvers,
         },
@@ -24,8 +18,8 @@ const server = new ApolloServer({
             typeDefs: googleTypeDefs,
             resolvers: googleResolvers
         }
-    
-      ]),
+
+    ]),
 });
 
 // Typescript: req has the type NextRequest

@@ -1,8 +1,8 @@
 "use client";
 
-import { GraphInstanceState } from "@/state/useGraphStack/storage";
+import { GraphInstanceState } from "@/state/graph/reducerInternals/storage";
 import { Card, CardBody, Spinner, Tab, Tabs } from "@nextui-org/react";
-import { useGraphInstanceMeteo } from "../useGraphInstancData";
+import { useGraphInstanceMeteo } from "../utils/useGraphInstancData";
 import { GraphTable } from "./ui/graphTable";
 import { useEffect, useState } from "react";
 

@@ -1,4 +1,4 @@
-import { GoogleScope } from "@/graphql/google";
+import { GoogleScope } from "@/graphql/google/google";
 import gql from "graphql-tag";
 
 export type GoogleScopeQueryRequest = {};

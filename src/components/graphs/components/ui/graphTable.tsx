@@ -1,9 +1,9 @@
 "use client";
 
-import { WeatherProperty } from "@/graphql/weatherSources/properties";
+import { WeatherProperty } from "@/graphql/weather/definitions/properties";
 import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, getKeyValue } from "@nextui-org/react";
 import { useCallback, useMemo } from "react";
-import { ViewInstanceStatisticsType, useGraphInstanceMeteo } from "../../useGraphInstancData";
+import { ViewInstanceStatisticsType, useGraphInstanceMeteo } from "../../utils/useGraphInstancData";
 
 type GraphTablePropsType = {
     statisticsData: ViewInstanceStatisticsType,

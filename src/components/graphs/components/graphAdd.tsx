@@ -1,17 +1,17 @@
 "use client";
 
-import { useGraphContext } from "@/state/useGraphStack/graphContext"
-import { StackActions } from "@/state/useGraphStack/actions";
+import { useGraphContext } from "@/state/graph/graphContext"
+import { StackActions } from "@/state/graph/reducerInternals/actions";
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@nextui-org/react";
 
 export const GraphAdd: React.FC = () => {
 
-    const { stack } = useGraphContext();
+    const { graphState, graphDispatch } = useGraphContext();
 
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
 
-    if (stack.state.availableGraphs.length === 0)
+    if (graphState.availableGraphs.length === 0)
         return <></>
 
     return <><div className="flex w-full gap-2 p-3 mt-10">
@@ -35,11 +35,11 @@ export const GraphAdd: React.FC = () => {
                         <ModalHeader className="flex flex-col gap-1">Přidat graf</ModalHeader>
                         <ModalBody>
 
-                            {stack.state.availableGraphs.map( state => {
+                            {graphState.availableGraphs.map( state => {
                                 return <Button
                                     key={state.slug}
                                     onClick={() => {
-                                        stack.dispatch( StackActions.addGraph( state.slug ) );
+                                        graphDispatch( StackActions.addGraph( state.slug ) );
                                         onClose();
                                     }}
                                 >{state.name}</Button>

@@ -1,21 +1,21 @@
 "use client";
 
-import { StackActions } from "@/state/useGraphStack/actions";
-import { useGraphContext } from "@/state/useGraphStack/graphContext";
-import { GraphDomain, GraphInstanceState, graphInstanceHeights } from "@/state/useGraphStack/storage";
-import { GraphTools } from "@/state/useGraphStack/tools";
-import { DataActionsFactory } from "@/state/useMeteoData/reducerInternals/actions";
+import { StackActions } from "@/state/graph/reducerInternals/actions";
+import { useGraphContext } from "@/state/graph/graphContext";
+import { GraphDomain, GraphInstanceState, graphInstanceHeights } from "@/state/graph/reducerInternals/storage";
+import { GraphTools } from "@/state/graph/data/tools";
+import { DataActionsFactory } from "@/state/meteo/reducerInternals/actions";
 import { Spinner } from "@nextui-org/react";
 import { format } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
 import { CartesianGrid, ComposedChart, Line, ReferenceArea, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { CategoricalChartFunc } from "recharts/types/chart/generateCategoricalChart";
-import { useGraphInstanceMeteo } from "../useGraphInstancData";
+import { useGraphInstanceMeteo } from "../utils/useGraphInstancData";
 
 
 export const GraphView: React.FC<GraphInstanceState> = props => {
 
-    const { stack } = useGraphContext();
+    const { graphState, graphDispatch } = useGraphContext();
 
     const { data: graphData, selection, dispatch, isLoadingData } = useGraphInstanceMeteo(props.property.slug);
 
@@ -53,7 +53,7 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
 
     const onClick: CategoricalChartFunc = event => {
 
-        if (stack.state.activeTool === GraphTools.INSPECT) return;
+        if (graphState.activeTool === GraphTools.INSPECT) return;
 
         if (!isHovering) {
             dispatch(DataActionsFactory.removeRange());
@@ -86,11 +86,11 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
 
             setIsSelectingLocal(false);
 
-            if (stack.state.activeTool === GraphTools.ZOOM) {
+            if (graphState.activeTool === GraphTools.ZOOM) {
 
                 dispatch(DataActionsFactory.setFilterTimestamp(from, to));
 
-                stack.dispatch(StackActions.selectTool(GraphTools.INSPECT));
+                graphDispatch(StackActions.selectTool(GraphTools.INSPECT));
             }
 
         }
@@ -98,9 +98,9 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
     };
 
     let mouse = isHovering ?
-        stack.state.activeTool === GraphTools.INSPECT
+        graphState.activeTool === GraphTools.INSPECT
             ? "help"
-            : stack.state.activeTool === GraphTools.SELECT
+            : graphState.activeTool === GraphTools.SELECT
                 ? "crosshair"
                 : "crosshair"
         : "auto";

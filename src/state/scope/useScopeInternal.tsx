@@ -1,4 +1,4 @@
-import { GoogleScope } from "@/graphql/google";
+import { GoogleScope } from "@/graphql/google/google";
 import { useQuery } from "@apollo/client";
 import { useReducer } from "react";
 import { GOOGLE_SCOPES_QUERY, GoogleScopeQueryRequest, GoogleScopesQueryResponse } from "./data/query";

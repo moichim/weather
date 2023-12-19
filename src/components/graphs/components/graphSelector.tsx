@@ -1,10 +1,10 @@
 "use client";
 
-import { AvailableWeatherProperties } from "@/graphql/weatherSources/properties";
-import { Sources } from "@/graphql/weatherSources/source";
-import { useGraphContext } from "@/state/useGraphStack/graphContext";
-import { StackActions } from "@/state/useGraphStack/actions";
-import { GraphInstanceState } from "@/state/useGraphStack/storage";
+import { AvailableWeatherProperties } from "@/graphql/weather/definitions/properties";
+import { Sources } from "@/graphql/weather/definitions/source";
+import { useGraphContext } from "@/state/graph/graphContext";
+import { StackActions } from "@/state/graph/reducerInternals/actions";
+import { GraphInstanceState } from "@/state/graph/reducerInternals/storage";
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-org/react";
 
 const itemBargeDimension = 10;
@@ -12,7 +12,7 @@ const badgeWidth = Sources.all().length * itemBargeDimension;
 
 export const GraphSelector: React.FC<GraphInstanceState> = props => {
 
-    const {stack} = useGraphContext();
+    const {graphState, graphDispatch} = useGraphContext();
 
     return <Dropdown>
         <DropdownTrigger>
@@ -30,10 +30,10 @@ export const GraphSelector: React.FC<GraphInstanceState> = props => {
         <DropdownMenu
             aria-label="Přepnout vlastnost"
             onAction={(selection) => {
-                stack.dispatch( StackActions.setInstanceProperty( props.property.slug, selection as AvailableWeatherProperties ) );
+                graphDispatch( StackActions.setInstanceProperty( props.property.slug, selection as AvailableWeatherProperties ) );
             }}
         >
-            {stack.state.availableGraphs.map(prop => {
+            {graphState.availableGraphs.map(prop => {
                 return <DropdownItem key={prop.slug}>
                     <div className="flex w-full">
                         <div 
