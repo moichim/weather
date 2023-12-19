@@ -161,6 +161,7 @@ export class GoogleSheetsProvider {
 
 
     public static async getScope(scope: string) {
+        
         const scopes = await GoogleSheetsProvider.getAllScopes();
 
         return scopes.find(row => row.slug === scope);

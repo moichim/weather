@@ -1,35 +1,36 @@
-"use client";
 
-import { Graphs } from "@/components/graphs/graphs";
-import { SettingsContainer } from "@/components/settings/settingsContainer";
+
 import { DisplayContextProvider } from "@/state/displayContext";
 import { FilterContextProvider } from "@/state/filterContext";
-import { ScopeHeader } from "@/state/scope/components/scopeHeader";
 import { ScopeContextProvider } from "@/state/scope/scopeContext";
 import { GraphContextProvider } from "@/state/useGraphStack/graphContext";
 import { MeteoContextProvider } from "@/state/useMeteoData/meteoContext";
-import { usePathname, useSelectedLayoutSegment, useSelectedLayoutSegments } from "next/navigation";
 import { PropsWithChildren } from "react";
 import { ScopePageProps } from "./page";
+import { GoogleSheetsProvider } from "@/graphql/googleProvider/googleProvider";
+import { ScopeHeader } from "@/state/scope/components/scopeHeader";
 
-type ScopeLayoutProps = PropsWithChildren & {
-    pageMeta: ScopePageProps
-}
+type ScopeLayoutProps = PropsWithChildren & ScopePageProps;
 
-const ScopeLayout: React.FC<ScopeLayoutProps> = ({ pageMeta, ...props }) => {
+const ScopeLayout: React.FC<ScopeLayoutProps> = async ({ ...props }) => {
 
-    console.log( "pm", pageMeta );
+    const scope = await GoogleSheetsProvider.getScope( props.params.slug )!;
 
-    console.log( "segment", useSelectedLayoutSegment() );
-
-    const path = usePathname().replace( "/", "" );
-
-    return <ScopeContextProvider scope={path} >
+    return <ScopeContextProvider scope={scope!} >
         <MeteoContextProvider>
             <GraphContextProvider>
                 <FilterContextProvider>
                     <DisplayContextProvider>
-                        {props.children}
+
+                        <main className="">
+
+                            <header className="fixed w-0 h-0 top-5 left-5 z-[100]">
+                                <ScopeHeader />
+                            </header>
+
+                            {props.children}
+                        </main>
+
                     </DisplayContextProvider>
                 </FilterContextProvider>
             </GraphContextProvider>

@@ -34,9 +34,10 @@ const Tool: React.FC<GraphToolType> = props => {
         color="foreground"
     >
         <Button
-            variant={isActive ? "solid" : "bordered"}
+            variant={"shadow"}
             isIconOnly
             onClick={onClick}
+            className={isActive ? "bg-primary text-white" : "bg-foreground text-white"}
         >
             <Icon />
         </Button>
@@ -45,7 +46,7 @@ const Tool: React.FC<GraphToolType> = props => {
 
 export const Toolbar: React.FC = () => {
 
-    return <div className="shadow-2xl fixed left-5 top-5 bg-white rounded-lg p-3 flex flex-col gap-3">
+    return <div className="fixed left-5 top-[4.5rem] flex flex-col gap-3">
         {Object.values(graphTools).map(tool => <Tool
             key={tool.name}
             {...tool}

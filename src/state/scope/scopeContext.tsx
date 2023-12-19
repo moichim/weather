@@ -1,12 +1,15 @@
 "use client";
 
 import {createContext, useContext} from "react";
-import { useScopeInternal, useScopeDefaults } from "./useScopeInternal";
+import { UseScopeHookType, getContextDefaults, useScopeInternal } from "./useScopeInternal";
+import { GoogleScope } from "@/graphql/google";
 
-const ScopeContext = createContext( useScopeDefaults );
+const def = getContextDefaults();
+
+const ScopeContext = createContext(def);
 
 type ScopeContextProviderProps = React.PropsWithChildren & {
-    scope: string
+    scope: GoogleScope
 }
 
 export const ScopeContextProvider: React.FC<ScopeContextProviderProps> = props => {

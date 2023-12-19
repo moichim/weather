@@ -114,7 +114,7 @@ export const RangeFilter: React.FC = () => {
             <Dropdown>
                 <DropdownTrigger>
                     <Button
-                        variant="bordered"
+                        variant="solid"
                         size="lg"
                         isIconOnly
                     >

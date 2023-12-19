@@ -1,47 +1,56 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
-import { useScopeContext } from "../scopeContext"
-import { ScopeActionsFactory } from "../reducerInternals/actions";
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-org/react";
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner } from "@nextui-org/react";
+import { useRouter } from "next/navigation";
 import { useMemo } from "react";
+import { useScopeContext } from "../scopeContext";
 
 export const ScopeHeader: React.FC = () => {
 
-    const path = usePathname().replace( "/","" );
-    const navigation = useRouter();
+    const context = useScopeContext();
 
-    const {activeScope, dispatch, availableScopes} = useScopeContext();
+    const router = useRouter();
 
-    if ( activeScope === undefined ) {
-        dispatch( ScopeActionsFactory.setScope( path ) );
-    }
+    const items = useMemo(() => context.availableScopes.map(s => ({
+        key: s.slug,
+        label: s.name
+    })), [context.availableScopes]);
 
-    const items = useMemo(() => availableScopes.map(scope => ({
-        key: scope.slug,
-        label: scope.name
-    })), [availableScopes]);
+    return <div className="gap-3 flex">
 
-    return <div className="fixed top-3 left-3 text-center bg-background shadow-lg rounded-xl p-3">
-
-        <Button
-            href="/"
-        >
-            Zpět
-        </Button>
-
-        <Dropdown>
-            <DropdownTrigger>
-                <Button>{activeScope!.name}</Button>
-            </DropdownTrigger>
-            <DropdownMenu 
-                items={items}
+        <div>
+            <Button
+                onClick={()=>router.push("/")}
+                isIconOnly
+                color="default"
+                variant="shadow"
+                className="bg-foreground text-background"
             >
-                {(item) => <DropdownItem href={`/${item.key}`} key={item.key}>{item.label}</DropdownItem> }
-            </DropdownMenu>
-        </Dropdown>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                </svg>
+            </Button>
+        </div>
 
-        {activeScope?.name}
+        <div>
+            <Dropdown>
+                <DropdownTrigger>
+                    <Button color="primary" variant="shadow">
+                        {context.activeScope!.name}
+                        {context.isLoading && <Spinner size="sm" color="default" />}
+                        {context.availableScopes.length > 0 &&
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                            </svg>}
+                    </Button>
+                </DropdownTrigger>
+                <DropdownMenu
+                    items={items}
+                >
+                    {(item) => <DropdownItem href={`/${item.key}`} key={item.key}>{item.label}</DropdownItem>}
+                </DropdownMenu>
+            </Dropdown>
+        </div>
 
     </div>
 }

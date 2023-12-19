@@ -41,7 +41,7 @@ export const DateFilter: React.FC = () => {
         <Button
             isIconOnly
             size="lg"
-            variant={hasMin ? "bordered" : "light"}
+            variant={hasMin ? "solid" : "flat"}
             className={!hasMin ? "cursor-not-allowed" : ""}
             title="Předchozí den"
             onClick={() => setDates(dayBefore)}
@@ -66,7 +66,7 @@ export const DateFilter: React.FC = () => {
         <Button
             isIconOnly
             size="lg"
-            variant={hasMax ? "bordered" : "light"}
+            variant={hasMax ? "solid" : "flat"}
             className={!hasMax ? "cursor-not-allowed" : ""}
             title="Následující den"
             onClick={() => setDates(dayAfter)}

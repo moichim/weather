@@ -5,31 +5,34 @@ import { GoogleSheetsProvider } from '@/graphql/googleProvider/googleProvider';
 import { ScopeHeader } from '@/state/scope/components/scopeHeader';
 import { NextPage } from 'next';
 
-
 export const generateStaticParams = async () => {
 
     const scopes = await GoogleSheetsProvider.getAllScopes();
     return scopes;
 
-
 }
 
 export const dynamicParams = false
 
+const getScope = async ( slug: string ) => {
+    return (await GoogleSheetsProvider.getAllScopes()).find( s => s.slug === slug )!
+}
 
 export type ScopePageProps = {
-    params: GoogleScope
+    params: {
+        slug: string
+    }
 };
 
-const ScopePage: NextPage<ScopePageProps> = (props) => {
+const ScopePage: NextPage<ScopePageProps> = async (props) => {
+
+    const scope = await GoogleSheetsProvider.getScope( props.params.slug );
 
     return <>
 
         <div className="flex">
 
-            {props.params.slug}
-
-            <div className="w-full">
+            <div className="w-full pt-20 bg-gray-200">
 
                 <Graphs />
 

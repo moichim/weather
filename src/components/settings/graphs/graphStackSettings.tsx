@@ -58,14 +58,14 @@ export const GraphStackSettings: React.FC = () => {
             return <Tooltip
                 content={size.label}
                 showArrow
-                color="foreground"
+                // color="foreground"
                 key={size.key}
             >
 
                 <Button
                     isIconOnly
-                    variant="bordered"
-                    className={ size.key === activeScale ? "bg-gray-100" : "bg-white" }
+                    variant="solid"
+                    color={ size.key === activeScale ? "primary" : "default" }
                     onClick={() => stack.dispatch( StackActions.setSharedScale( size.key ) )}
                 >
                     {size.name}
