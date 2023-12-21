@@ -6,6 +6,7 @@ import { OpenmeteoProvider } from "./weatherProviders/openmeteoProvider";
 import { NtcProvider } from "./weatherProviders/ntcProvider";
 import { NumberDomain } from "recharts/types/util/types";
 import { MeteoRequestType } from "@/state/meteo/data/query";
+import { GoogleRequest } from "../google/google";
 
 export type WeatherEntryMetaType = {
     time: number,
@@ -63,15 +64,12 @@ export type WeatherSerie = {
     statistics: WeatherStatistics
 }
 
-export type WeatherProviderRequest = {
-    from: string,
-    to: string
-}
+export type WeatherProviderRequest = GoogleRequest
 
 export const weatherTypeDefs = gql`
 
     extend type Query {
-        weatherRange(scope: String, from:Float,to:Float): [Serie]
+        weatherRange(scope: String, lat: Float!, lon: Float!, from:Float,to:Float): [Serie]
         sources: [Source]
         properties: [Property]
     }

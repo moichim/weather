@@ -8,8 +8,6 @@ export const UseDataTest: React.FC = () => {
 
     const data = useMeteoContext();
 
-    console.log("data", data);
-
     return <div>
 
         <Button

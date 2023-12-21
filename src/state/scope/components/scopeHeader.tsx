@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner } from "@nextui-org/react";
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner, Tooltip } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import { useScopeContext } from "../scopeContext";
@@ -19,24 +19,27 @@ export const ScopeHeader: React.FC = () => {
     return <div className="gap-3 flex">
 
         <div>
+            
             <Button
                 onClick={()=>router.push("/")}
                 isIconOnly
                 color="default"
                 variant="shadow"
-                className="bg-foreground text-background"
+                className="bg-foreground text-background bg-opacity-50"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                 </svg>
             </Button>
+            
         </div>
 
         <div>
+            
             <Dropdown>
                 <DropdownTrigger>
-                    <Button color="primary" variant="shadow">
-                        {context.activeScope!.name}
+                    <Button color="default" variant="shadow" className="bg-foreground text-background">
+                        {context.activeScope && context.activeScope.name}
                         {context.isLoading && <Spinner size="sm" color="default" />}
                         {context.availableScopes.length > 0 &&
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
@@ -50,6 +53,7 @@ export const ScopeHeader: React.FC = () => {
                     {(item) => <DropdownItem href={`/${item.key}`} key={item.key}>{item.label}</DropdownItem>}
                 </DropdownMenu>
             </Dropdown>
+            
         </div>
 
     </div>

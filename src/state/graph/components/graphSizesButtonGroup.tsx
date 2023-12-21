@@ -58,14 +58,14 @@ export const GraphSizesButtonGroup: React.FC = () => {
             return <Tooltip
                 content={size.label}
                 showArrow
-                // color="foreground"
+                color="foreground"
                 key={size.key}
             >
 
                 <Button
                     isIconOnly
                     variant="solid"
-                    color={ size.key === activeScale ? "primary" : "default" }
+                    className={ size.key === activeScale ? "bg-background bg-opacity-90" : "bg-background bg-opacity-50" }
                     onClick={() => dispatch( StackActions.setSharedScale( size.key ) )}
                 >
                     {size.name}

@@ -10,8 +10,8 @@ export type MeteoQueryResponseType = {
 }
 
 export const METEO_DATA_QUERY = gql`
-query Entries($from: Float, $to: Float, $scope: String ) {
-  weatherRange(from: $from, to: $to, scope: $scope) {
+query Entries($from: Float, $lat: Float, $lon: Float, $to: Float, $scope: String ) {
+  weatherRange(from: $from, lat: $lat, lon: $lon, to: $to, scope: $scope) {
     entries {
       time
       temperature
@@ -108,7 +108,7 @@ query Entries($from: Float, $to: Float, $scope: String ) {
       }
     }
   }
-  range(from: $from, to: $to, scope: $scope) {
+  range(from: $from, lat: $lat, lon: $lon, to: $to, scope: $scope) {
     data {
       name
       slug

@@ -49,7 +49,7 @@ export type GoogleScopeData = {
 export const googleTypeDefs = gql`
 
     extend type Query {
-        range( scope: String, from:Float, to:Float ): GoogleScopeData
+        range( scope: String, lat: Float!, lon: Float!, from:Float, to:Float ): GoogleScopeData
         googleScope( scope: String! ): GoogleScope
         googleScopes: [GoogleScope]
     }
@@ -93,6 +93,8 @@ export const googleTypeDefs = gql`
 
 export type GoogleRequest = {
     scope: string,
+    lat: number,
+    lon: number,
     from: number,
     to: number
 }

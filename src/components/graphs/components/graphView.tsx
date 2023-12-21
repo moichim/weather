@@ -209,7 +209,6 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
                 <XAxis
                     dataKey="time"
                     tickFormatter={ticks.formatter}
-                    onMouseDown={console.log}
                     ticks={ticks.times}
                 />
 

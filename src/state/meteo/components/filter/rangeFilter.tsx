@@ -30,8 +30,6 @@ export const RangeFilter: React.FC = () => {
         context.dispatch(DataActionsFactory.setFilterString(fromInternal, toInternal));
     }, [toInternal, fromInternal]);
 
-    console.log( toInternal );
-
     /*
     useEffect(() => {
 

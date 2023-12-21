@@ -2,7 +2,8 @@
 
 import { useMeteoContext } from "@/state/meteo/meteoContext";
 import { DataActionsFactory } from "@/state/meteo/reducerInternals/actions";
-import { Button, ButtonGroup } from "@nextui-org/react";
+import { Button, ButtonGroup, Tooltip } from "@nextui-org/react";
+import { CloseIcon, ZoomInIcon } from "../ui/icons";
 
 export const RangeDisplay: React.FC = () => {
 
@@ -10,22 +11,43 @@ export const RangeDisplay: React.FC = () => {
 
     if (!selection.hasRange) return <></>
 
-    return <div className="absolute right-[4rem] bottom-10 rounded-lg shadow-xl bg-foreground  text-background px-6 py-4">
-        <h1 className="text-sm text-gray-400 mb-2">Vybráno {selection.rangeDurationString}</h1>
-        <p className="mb-2">{selection.rangeMinHumanReadable} - {selection.rangeMaxMumanReadable}</p>
-
-        <ButtonGroup
-            variant="solid"
-            color="default"
+    return <>
+        <div className="grow"></div>
+    <div className="flex items-center justify-center gap-2">
+        <Tooltip content={selection.rangeDurationString} color="foreground" showArrow size="lg">
+        <div className="rounded-xl bg-foreground text-background px-6 py-3 cursor-help">
+            {selection.rangeMinHumanReadable} - {selection.rangeMaxMumanReadable}
+        </div>
+        </Tooltip>
+        <Tooltip
+            content="Přiblížit na zvýrazněný rozsah"
+            color="foreground"
+            showArrow
+        >
+        <Button
+                onClick={() => dispatch(DataActionsFactory.setFilterTimestamp(selection.rangeMinTimestamp!, selection.rangeMaxTimestamp!))}
+                isIconOnly
+                className="bg-foreground text-background"
+                size="lg"
+            >
+                <ZoomInIcon />
+            </Button>
+            </Tooltip>
+            <Tooltip
+            content="Zrušit výběr"
+            color="foreground"
+            showArrow
         >
             <Button
                 onClick={() => dispatch(DataActionsFactory.removeRange())}
-            >Zrušit výběr</Button>
-            <Button
-                onClick={() => dispatch(DataActionsFactory.setFilterTimestamp( selection.rangeMinTimestamp!, selection.rangeMaxTimestamp! ))}
-            >Přiblížit</Button>
-
-        </ButtonGroup>
+                isIconOnly
+                className="bg-foreground text-background"
+                size="lg"
+            >
+                <CloseIcon />
+            </Button>
+            </Tooltip>
     </div>
+    </>
 
 }

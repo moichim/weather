@@ -1,7 +1,7 @@
 import { useGraphContext } from "@/state/graph/graphContext"
 import { StackActions } from "@/state/graph/reducerInternals/actions"
 import { GraphToolType, graphTools } from "@/state/graph/data/tools"
-import { Button, Tooltip } from "@nextui-org/react"
+import { Button, Tooltip, cn } from "@nextui-org/react"
 import React, { useCallback, useMemo } from "react"
 
 
@@ -37,7 +37,10 @@ const Tool: React.FC<GraphToolType> = props => {
             variant={"shadow"}
             isIconOnly
             onClick={onClick}
-            className={isActive ? "bg-primary text-white" : "bg-foreground text-white"}
+            className={cn(
+                "bg-foreground text-background shadow-xl",
+                isActive ? "bg-opacity-90" : "bg-opacity-50"
+            ) }
         >
             <Icon />
         </Button>
@@ -46,7 +49,7 @@ const Tool: React.FC<GraphToolType> = props => {
 
 export const Toolbar: React.FC = () => {
 
-    return <div className="fixed left-5 top-[4.5rem] flex flex-col gap-3">
+    return <div className="fixed left-5 flex flex-col gap-1" style={{top: "4rem"}}>
         {Object.values(graphTools).map(tool => <Tool
             key={tool.name}
             {...tool}

@@ -25,7 +25,9 @@ export const useScopeInternal = (
 
             dispatch(ScopeActionsFactory.setAvailableScopes(data.googleScopes));
 
-        }
+        },
+
+        ssr: false
 
     });
 

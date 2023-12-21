@@ -17,12 +17,13 @@ export const Filter: React.FC = () => {
         <Tooltip
             content="Jeden den"
             showArrow
+            color="foreground"
         >
         <Button
             isIconOnly
             size="lg"
             variant={"solid"}
-            color={!isRange ? "primary" : "default"}
+            className={!isRange ? "bg-foreground bg-opacity-90 text-background" : "bg-background bg-opacity-50"}
             title="Jeden den"
             onClick={() => setIsRange(false)}
         >
@@ -35,12 +36,13 @@ export const Filter: React.FC = () => {
         <Tooltip
             content="Rozsah dní"
             showArrow
+            color="foreground"
         >
         <Button
             isIconOnly
             size="lg"
             variant={"solid"}
-            color={isRange ? "primary" : "default"}
+            className={isRange ? "bg-foreground bg-opacity-90 text-background" : "bg-background bg-opacity-50"}
             title="Více dní"
             onClick={() => setIsRange(true)}
         >

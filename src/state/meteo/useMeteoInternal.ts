@@ -1,13 +1,20 @@
-import { useApolloClient, useQuery } from "@apollo/client";
-import { useEffect, useReducer, useState } from "react";
+"use client"
+
+import { useApolloClient, useLazyQuery, useQuery } from "@apollo/client";
+import { useEffect, useMemo, useReducer, useState } from "react";
 import { MeteoStateFactory } from "./data/meteoStateFactory";
 import { METEO_DATA_QUERY, METEO_RANGE_QUERY, MeteoQueryResponseType, MeteoRequestType } from "./data/query";
 import { MeteoDataProcessed, MeteoResponseProcessor } from "./data/responseProcessing";
 import { GraphStatisticsDataType, StatisticsProcessing } from "./data/statisticsProcessing";
 import { meteoReducer } from "./reducerInternals/reducer";
+import { useScopeContext } from "../scope/scopeContext";
 
 /** Hook used by reducer. DO NOT USE IN COMPONENTS! */
 export const useMeteoInternal = () => {
+
+    const { activeScope } = useScopeContext();
+
+    console.log("aktivní scope", activeScope);
 
     const [selection, dispatch] = useReducer(meteoReducer, MeteoStateFactory.defaultState());
 
@@ -20,15 +27,19 @@ export const useMeteoInternal = () => {
 
     const [rangeStatistics, setRangeStatistics] = useState<GraphStatisticsDataType>();
 
-    const query = useQuery<MeteoQueryResponseType, MeteoRequestType>(METEO_DATA_QUERY, {
+    const [fetchQuery, query] = useLazyQuery<MeteoQueryResponseType, MeteoRequestType>(METEO_DATA_QUERY, {
 
         variables: {
             scope: selection.scope,
             from: selection.fromTimestamp,
-            to: selection.toTimestamp
+            to: selection.toTimestamp,
+            lat: 0,//activeScope.lat,
+            lon: 0//activeScope.lon,
         },
 
         onCompleted: data => {
+
+            console.log(data);
 
             // Process the graph data
             const processedResponse = MeteoResponseProcessor.process(data);
@@ -39,6 +50,8 @@ export const useMeteoInternal = () => {
             setViewStatistics(statistics);
         },
 
+        ssr: false,
+
         onError: (e) => {
             console.error("error loading data", e, e.graphQLErrors, e.message);
         },
@@ -48,10 +61,25 @@ export const useMeteoInternal = () => {
     const client = useApolloClient();
 
     const refetchView = () => {
-        console.log("refeč");
+        console.log("refetching");
         client.resetStore();
         query.refetch();
     }
+
+    useEffect(() => {
+        console.log("here", activeScope);
+        if (activeScope !== undefined)
+            fetchQuery({
+                variables: {
+                    lat: activeScope.lat ?? 0,
+                    lon: activeScope.lon ?? 0,
+                    scope: selection.scope,
+                    from: selection.fromTimestamp,
+                    to: selection.toTimestamp,
+                },
+                ssr: false
+            })
+    }, [activeScope, selection.scope, selection.fromTimestamp, selection.toTimestamp]);
 
 
     const rangeQuery = useQuery<MeteoQueryResponseType>(METEO_RANGE_QUERY, {
@@ -68,6 +96,8 @@ export const useMeteoInternal = () => {
             console.log(statistics);
             setRangeStatistics(statistics);
         },
+
+        ssr: false,
 
         fetchPolicy: "network-only"
 

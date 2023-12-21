@@ -10,20 +10,11 @@ export const Bar: React.FC<PropsWithChildren> = props => {
 
     const {expanded} = useDisplayContext();
 
-    return <div className="w-full fixed bottom-0 left-0 shadow-2xl z-10 border-t">
-        <div className="w-full bg-foreground text-background flex items-center p-3">
+    return <div className="w-full fixed bottom-0 left-0 p-5 z-10">
+        <div style={{paddingLeft: "1.25rem", paddingRight:"1.25rem", paddingBottom:"1.25rem"}}>
+        <div className="rounded-xl w-full bg-foreground bg-opacity-50 text-background flex items-center p-3">
             <BarPanel />
-            <BarExpandButton />
         </div>
-        <div 
-            className={cn([
-                "ease-in-out duration-400 transition-all",
-                !expanded ? "max-h-0 h-0" : "max-h-40 h-[400px]"
-            ])}
-        >
-            <div className="p-3 bg-gray-100 w-full h-full">
-                {props.children}
-            </div>
         </div>
     </div>
 
