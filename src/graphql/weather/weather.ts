@@ -7,6 +7,7 @@ import { NtcProvider } from "./weatherProviders/ntcProvider";
 import { NumberDomain } from "recharts/types/util/types";
 import { MeteoRequestType } from "@/state/meteo/data/query";
 import { GoogleRequest } from "../google/google";
+import { AbstractWeatherProvider } from "./weatherProviders/abstractProvider";
 
 export type WeatherEntryMetaType = {
     time: number,
@@ -69,7 +70,7 @@ export type WeatherProviderRequest = GoogleRequest
 export const weatherTypeDefs = gql`
 
     extend type Query {
-        weatherRange(scope: String, lat: Float!, lon: Float!, from:Float,to:Float): [Serie]
+        weatherRange(scope: String, lat: Float!, lon: Float!, from:Float,to:Float, hasNtc: Boolean!): [Serie]
         sources: [Source]
         properties: [Property]
     }
@@ -150,10 +151,14 @@ export const weatherResolvers = {
             args: MeteoRequestType, 
         ): Promise<WeatherSerie[]> => {
 
-            return Promise.all([
-                ntcProvider.fetch( args ),
-                openMeteoProvider.fetch( args )
-            ]);
+
+            const providers: AbstractWeatherProvider[] = [ openMeteoProvider ];
+
+            if ( args.hasNtc ) {
+                providers.push( ntcProvider );
+            }
+
+            return Promise.all(providers.map( p => p.fetch( args ) ));
 
         },
         sources: () => Sources.all(),

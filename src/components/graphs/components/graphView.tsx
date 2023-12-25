@@ -232,7 +232,7 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
         </ResponsiveContainer>
 
         {isLoadingData && <div className="absolute w-full h-full top-0 height-0 bg-gray-200 bg-opacity-50 flex items-center justify-center">
-            <Spinner size="lg" />
+            <Spinner size="lg" color="primary" />
         </div>}
 
     </div>

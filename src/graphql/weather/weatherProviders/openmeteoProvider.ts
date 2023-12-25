@@ -19,8 +19,8 @@ export class OpenmeteoProvider extends AbstractWeatherProvider {
         const to = stringFromTimestamp( args.to );
 
         const params = {
-            "latitude": 49.7245947848106,
-            "longitude": 13.327946050435685,
+            "latitude": args.lat,
+            "longitude": args.lon,
             "hourly": this.fields,
             "start_date": from,
             "end_date": to

@@ -13,7 +13,8 @@ export const GraphStatistics: React.FC<GraphInstanceState> = props => {
         isLoadingData,
         rangeStatistics,
         isLoadingRange,
-        selection
+        selection,
+        data
     } = useGraphInstanceMeteo(props.property.slug);
 
     const [selected, setSelected] = useState<string>("view");
@@ -30,6 +31,8 @@ export const GraphStatistics: React.FC<GraphInstanceState> = props => {
     }, [selection.hasRange]);
 
     if (isLoadingData) return <></>;
+    if ( ! data ) return <></>
+    if ( ! ( "data" in data ) ) return <></>
 
     const disabled = rangeStatistics === undefined
         || (rangeStatistics === undefined && isLoadingRange);

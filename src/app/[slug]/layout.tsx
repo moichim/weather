@@ -11,26 +11,22 @@ type ScopeLayoutProps = PropsWithChildren & ScopePageProps;
 
 const ScopeLayout: React.FC<ScopeLayoutProps> = async ({ ...props }) => {
 
-    const scope = await GoogleSheetsProvider.getScope(props.params.slug)!;
+    return <MeteoContextProvider>
+        <GraphContextProvider>
+            <DisplayContextProvider>
 
-    return <ScopeContextProvider scope={scope!} >
-        <MeteoContextProvider>
-            <GraphContextProvider>
-                <DisplayContextProvider>
+                <main className="">
 
-                    <main className="">
+                    <header className="fixed w-0 h-0 top-5 left-5 z-[100]">
+                        <ScopeHeader />
+                    </header>
 
-                        <header className="fixed w-0 h-0 top-5 left-5 z-[100]">
-                            <ScopeHeader />
-                        </header>
+                    {props.children}
+                </main>
 
-                        {props.children}
-                    </main>
-
-                </DisplayContextProvider>
-            </GraphContextProvider>
-        </MeteoContextProvider>
-    </ScopeContextProvider>
+            </DisplayContextProvider>
+        </GraphContextProvider>
+    </MeteoContextProvider>
 }
 
 export default ScopeLayout;

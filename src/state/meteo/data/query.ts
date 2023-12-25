@@ -2,7 +2,9 @@ import { GoogleRequest, GoogleScopeData } from "@/graphql/google/google";
 import { WeatherSerie } from "@/graphql/weather/weather";
 import gql from "graphql-tag";
 
-export type MeteoRequestType = GoogleRequest;
+export type MeteoRequestType = GoogleRequest & {
+  hasNtc: boolean
+};
 
 export type MeteoQueryResponseType = {
   range: GoogleScopeData,
@@ -10,8 +12,8 @@ export type MeteoQueryResponseType = {
 }
 
 export const METEO_DATA_QUERY = gql`
-query Entries($from: Float, $lat: Float, $lon: Float, $to: Float, $scope: String ) {
-  weatherRange(from: $from, lat: $lat, lon: $lon, to: $to, scope: $scope) {
+query Entries($from: Float, $lat: Float!, $lon: Float!, $to: Float, $scope: String, $hasNtc: Boolean! ) {
+  weatherRange(from: $from, lat: $lat, lon: $lon, to: $to, scope: $scope, hasNtc: $hasNtc) {
     entries {
       time
       temperature
@@ -140,8 +142,8 @@ query Entries($from: Float, $lat: Float, $lon: Float, $to: Float, $scope: String
 
 export const METEO_RANGE_QUERY = gql`
 
-query Entries($from: Float, $to: Float, $scope: String ) {
-  weatherRange(from: $from, to: $to, scope: $scope) {
+query Entries($from: Float, $lat: Float!, $lon: Float!, $to: Float, $scope: String, $hasNtc: Boolean! ) {
+  weatherRange(from: $from, lat: $lat, lon: $lon, to: $to, scope: $scope, hasNtc: $hasNtc) {
     source {
       name
       color
@@ -224,7 +226,7 @@ query Entries($from: Float, $to: Float, $scope: String ) {
       }
     }
   }
-  range(from: $from, to: $to, scope: $scope) {
+  range(from: $from, to: $to, scope: $scope, lat: $lat, lon: $lon) {
     data {
       name
       slug

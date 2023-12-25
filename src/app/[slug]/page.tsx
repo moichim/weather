@@ -4,6 +4,9 @@ import { GoogleScope } from '@/graphql/google/google';
 import { GoogleSheetsProvider } from '@/graphql/google/googleProvider/googleProvider';
 import { ScopeHeader } from '@/state/scope/components/scopeHeader';
 import { NextPage } from 'next';
+import { useScopeContext } from '@/state/scope/scopeContext';
+import { useEffect } from 'react';
+import { ScopePageWrapper } from '@/state/scope/components/ScopePageWrapper';
 
 export const generateStaticParams = async () => {
 
@@ -14,8 +17,8 @@ export const generateStaticParams = async () => {
 
 export const dynamicParams = true
 
-const getScope = async ( slug: string ) => {
-    return (await GoogleSheetsProvider.getAllScopes()).find( s => s.slug === slug )!
+const getScope = async (slug: string) => {
+    return (await GoogleSheetsProvider.getAllScopes()).find(s => s.slug === slug)!
 }
 
 export type ScopePageProps = {
@@ -26,7 +29,7 @@ export type ScopePageProps = {
 
 const ScopePage: NextPage<ScopePageProps> = async (props) => {
 
-    const scope = await GoogleSheetsProvider.getScope( props.params.slug );
+    const scope = await getScope( props.params.slug );
 
     return <>
 
@@ -34,9 +37,13 @@ const ScopePage: NextPage<ScopePageProps> = async (props) => {
 
             <div className="w-full pt-20 bg-gray-200">
 
-                <Graphs />
+                <ScopePageWrapper scope={scope}>
 
-                <Bar />
+                    <Graphs />
+
+                    <Bar />
+
+                </ScopePageWrapper>
 
             </div>
 

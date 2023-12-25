@@ -4,6 +4,7 @@ import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner,
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import { useScopeContext } from "../scopeContext";
+import { ScopeActions, ScopeActionsFactory } from "../reducerInternals/actions";
 
 export const ScopeHeader: React.FC = () => {
 
@@ -21,7 +22,10 @@ export const ScopeHeader: React.FC = () => {
         <div>
             
             <Button
-                onClick={()=>router.push("/")}
+                onClick={()=>{
+                    // context.dispatch( ScopeActionsFactory.removeActiveScope() );
+                    router.push("/")
+                }}
                 isIconOnly
                 color="default"
                 variant="shadow"

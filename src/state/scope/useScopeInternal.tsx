@@ -7,23 +7,21 @@ import { scopeReducer } from "./reducerInternals/reducer";
 import { ScopeContextType } from "./reducerInternals/storage";
 
 
-export const useScopeInternal = (
-    scope: GoogleScope
-) => {
+export const useScopeInternal = () => {
 
     const [
         state,
         dispatch
     ] = useReducer<React.Reducer<ScopeContextType, ScopeActionBase>>(scopeReducer, {
-        activeScope: scope,
-        availableScopes: []
+        availableScopes: [],
+        allScopes: []
     });
 
     const query = useQuery<GoogleScopesQueryResponse, GoogleScopeQueryRequest>(GOOGLE_SCOPES_QUERY, {
 
         onCompleted: data => {
 
-            dispatch(ScopeActionsFactory.setAvailableScopes(data.googleScopes));
+            dispatch(ScopeActionsFactory.setAllScopes(data.googleScopes));
 
         },
 
@@ -45,6 +43,7 @@ export const getContextDefaults = (): UseScopeHookType => {
     return {
         activeScope: undefined,
         availableScopes: [],
+        allScopes: [],
         isLoading: false,
         dispatch: () => { }
     }

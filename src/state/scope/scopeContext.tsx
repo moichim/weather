@@ -8,13 +8,11 @@ const def = getContextDefaults();
 
 const ScopeContext = createContext(def);
 
-type ScopeContextProviderProps = React.PropsWithChildren & {
-    scope: GoogleScope
-}
+type ScopeContextProviderProps = React.PropsWithChildren
 
 export const ScopeContextProvider: React.FC<ScopeContextProviderProps> = props => {
 
-    const value = useScopeInternal( props.scope );
+    const value = useScopeInternal();
 
     return <ScopeContext.Provider value={value}>
         {props.children}
