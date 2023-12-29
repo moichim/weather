@@ -21,14 +21,13 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <div className={cn([
-        inter.className,
-        "h-[100vh]"//,
-        // "bg-black"
-      ])}>
-        <Providers>
-          {children}
-          <NotificationListing />
-        </Providers>
+          inter.className,
+          "h-[100vh]"
+        ])}>
+          <Providers>
+            {children}
+            <NotificationListing />
+          </Providers>
         </div>
       </body>
     </html>

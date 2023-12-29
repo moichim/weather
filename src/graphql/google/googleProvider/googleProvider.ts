@@ -2,6 +2,7 @@ import { ApolloError } from "@apollo/client";
 import { google } from "googleapis";
 import { GoogleColumn, GoogleColumnValue, GoogleDataColumnDefinition, GoogleRequest, GoogleScope } from "../google";
 import { AvailableWeatherProperties, Properties, WeatherProperty } from "../../weather/definitions/properties";
+import { notFound } from "next/navigation";
 
 export type ValueSerieDefinition = {
     name: string,
@@ -164,7 +165,12 @@ export class GoogleSheetsProvider {
         
         const scopes = await GoogleSheetsProvider.getAllScopes();
 
-        return scopes.find(row => row.slug === scope);
+        const result = scopes.find(row => row.slug === scope);
+
+        if ( result === undefined ) 
+            notFound();
+
+        return result;
 
     }
 
@@ -327,9 +333,6 @@ export class GoogleSheetsProvider {
             const count = values.length;
 
             const avg = values.reduce((state, current) => current.value + state, 0) / count;
-
-
-
 
             return {
                 ...column,

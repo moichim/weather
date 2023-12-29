@@ -1,10 +1,10 @@
 "use client";
 
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner, Tooltip } from "@nextui-org/react";
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import { useScopeContext } from "../scopeContext";
-import { ScopeActions, ScopeActionsFactory } from "../reducerInternals/actions";
+import { ScopeHeaderMenuItem } from "./scopeHeaderMenuItem";
 
 export const ScopeHeader: React.FC = () => {
 
@@ -17,12 +17,12 @@ export const ScopeHeader: React.FC = () => {
         label: s.name
     })), [context.availableScopes]);
 
-    return <div className="gap-3 flex">
+    return <div className="gap-1 flex">
 
         <div>
-            
+
             <Button
-                onClick={()=>{
+                onClick={() => {
                     // context.dispatch( ScopeActionsFactory.removeActiveScope() );
                     router.push("/")
                 }}
@@ -35,11 +35,11 @@ export const ScopeHeader: React.FC = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                 </svg>
             </Button>
-            
+
         </div>
 
         <div>
-            
+
             <Dropdown>
                 <DropdownTrigger>
                     <Button color="default" variant="shadow" className="bg-foreground text-background">
@@ -57,8 +57,16 @@ export const ScopeHeader: React.FC = () => {
                     {(item) => <DropdownItem href={`/${item.key}`} key={item.key}>{item.label}</DropdownItem>}
                 </DropdownMenu>
             </Dropdown>
-            
+
         </div>
+
+        <ScopeHeaderMenuItem href={`/${context.activeScope?.slug}`}>
+            Grafy
+        </ScopeHeaderMenuItem>
+        
+        <ScopeHeaderMenuItem href={`/${context.activeScope?.slug}/info`}>
+            Info
+        </ScopeHeaderMenuItem>
 
     </div>
 }
