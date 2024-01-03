@@ -4,7 +4,8 @@ import { GraphTools } from "@/state/graph/data/tools";
 import { useGraphContext } from "@/state/graph/graphContext";
 import { GraphActions, StackActions } from "@/state/graph/reducerInternals/actions";
 import { useMeteoContext } from "@/state/meteo/meteoContext";
-import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@nextui-org/react";
+import { useScopeContext } from "@/state/scope/scopeContext";
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner } from "@nextui-org/react";
 import dynamic from "next/dynamic";
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
 
@@ -13,24 +14,21 @@ export const GraphTour: React.FC = () => {
 
     const { graphState: state, graphDispatch } = useGraphContext();
 
-    const { data: contentData, selection } = useMeteoContext();
+    const { data: contentData, response, selection } = useMeteoContext();
+
+    const { activeScope } = useScopeContext();
 
     const Tour = useMemo(() => dynamic(
         () => import("@reactour/tour").then(mod => mod.Tour),
         { ssr: false }
     ), []);
 
-    const [tourOfferModalOpen, setTourOfferModalOpen] = useState(false);
-
-    useEffect( () => {
-        if ( state.tourPassed === false )
-            setTourOfferModalOpen( true );
-    },[state.tourPassed] );
+    const [tourOfferModalOpen, setTourOfferModalOpen] = useState(true);
 
     const onTourOfferClose = useCallback((shouldOpenTour: boolean) => {
-            setTourOfferModalOpen(false);
-            if (shouldOpenTour)
-                graphDispatch( StackActions.setTourRunning(true) )
+        setTourOfferModalOpen(false);
+        if (shouldOpenTour)
+            graphDispatch(StackActions.setTourRunning(true))
     }, [setTourOfferModalOpen]);
 
     const closeTour = () => graphDispatch(StackActions.setTourRunning(false));
@@ -80,8 +78,8 @@ export const GraphTour: React.FC = () => {
                 <Button
                     color="primary"
                     onClick={() => {
-                        graphDispatch( StackActions.setTourPassed(true) );
-                        graphDispatch( StackActions.setTourRunning(false) );
+                        graphDispatch(StackActions.setTourPassed(true));
+                        graphDispatch(StackActions.setTourRunning(false));
                     }}
                 >Ukončit průvodce</Button>
             </>,
@@ -90,25 +88,50 @@ export const GraphTour: React.FC = () => {
     ], []);
 
     const currentStep = state.tourCurrentStep;
-    const setCurrentStep = (step:number) => graphDispatch( StackActions.setTourCurrentStep( step ) );
+    const setCurrentStep = (step: number) => graphDispatch(StackActions.setTourCurrentStep(step));
 
-    useEffect( () => {
+    useEffect(() => {
 
-        if ( state.tourCurrentStep === 3 ) {
-            if ( state.activeTool === GraphTools.SELECT) {
-                graphDispatch( StackActions.setTourCurrentStep( 4 ) );
+        if (state.tourCurrentStep === 3) {
+            if (state.activeTool === GraphTools.SELECT) {
+                graphDispatch(StackActions.setTourCurrentStep(4));
             }
         }
 
-    }, [state.activeTool,state.tourCurrentStep] );
+    }, [state.activeTool, state.tourCurrentStep]);
 
-    useEffect( () => {
-        if ( state.tourCurrentStep === 4 ) {
-            if ( selection.hasRange === true ) {
-                graphDispatch( StackActions.setTourCurrentStep( 5 ) );
+    useEffect(() => {
+        if (state.tourCurrentStep === 4) {
+            if (selection.hasRange === true) {
+                graphDispatch(StackActions.setTourCurrentStep(5));
             }
         }
-    }, [state.tourCurrentStep, selection.hasRange] );
+    }, [state.tourCurrentStep, selection.hasRange]);
+
+    const queriedProperties: {
+        name: string, color: string, in: string
+    }[] = useMemo(() => {
+        if (response === undefined)
+            return [];
+        return response.range.data.map(property => ({
+            name: property.name,
+            color: property.color,
+            in: property.in.name ?? property.in.slug
+        }));
+    }, [response?.range.data]);
+
+    const queriedSources: {
+        name: string, color: string, description: string, link?: string
+    }[] = useMemo(() => {
+        if (response === undefined)
+            return [];
+        return response.weatherRange.map(source => ({
+            name: source.source.name,
+            color: source.source.color,
+            description: source.source.description,
+            link: source.source.link
+        }));
+    }, [response?.weatherRange]);
 
     return <>
 
@@ -121,16 +144,47 @@ export const GraphTour: React.FC = () => {
                 {(onClose) => (<>
                     <ModalHeader className="flex flex-col gap-1">Vítejte!</ModalHeader>
                     <ModalBody>
-                        Chcete úvodní prohlídku?
+
+                        {activeScope === undefined && <Spinner />}
+
+                        {(activeScope !== undefined && queriedProperties.length == 0) && <>
+                            <Spinner />Načítám data týmu {activeScope.name}
+                        </>}
+
+                        {queriedProperties.length > 0 && <>
+                            <p>Tým <strong>{activeScope?.name}</strong> měří v lokalitě <strong>{activeScope?.locality}</strong>. Rozhodl se měřit následující údaje:</p>
+                            <ul className="list-disc ml-5">
+                                {queriedProperties.map(property => <li>{property.in}: <span style={{ color: property.color }}>{property.name}</span></li>)}
+                            </ul>
+                            <p>Dále jsou k dispozici údaje z těchto zdrojů:</p>
+                            <ul className="list-disc ml-5">
+                                {queriedSources.map(source => <li>
+                                    <span style={{ color: source.color }}>{source.name}</span>
+                                    <br />
+                                    {source.description}
+                                    {source.link && <a href={source.link} target="_blank" rel="nofollow">info</a>}
+                                </li>)}
+                            </ul>
+                        </>}
                     </ModalBody>
-                    <ModalFooter>
-                        <Button
-                            onClick={() => onTourOfferClose(true)}
-                        >Prohlídka funkcí</Button>
-                        <Button
-                            onClick={() => onTourOfferClose(false)}
-                        >Přeskočit prohlídku</Button>
-                    </ModalFooter>
+                    {queriedProperties.length > 0 &&
+                        <ModalFooter>
+                            {state.tourPassed === false
+                                ? <>
+                                    <Button
+                                        onClick={() => onTourOfferClose(true)}
+                                    >Prohlídka funkcí aplikace</Button>
+                                    <Button
+                                        onClick={() => onTourOfferClose(false)}
+                                    >Přeskočit prohlídku</Button>
+                                </>
+                                : <Button
+                                    onClick={() => onTourOfferClose(false)}
+                                >Prohlížet data</Button>
+                            }
+
+                        </ModalFooter>
+                    }
                 </>)}
             </ModalContent>
 

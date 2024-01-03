@@ -5,7 +5,9 @@ type WeatherSourceBaseType = {
     name: string,
     color: string,
     stroke: string,
-    props: Array<keyof WeatherEntryDataType>
+    props: Array<keyof WeatherEntryDataType>,
+    description: string,
+    link?: string,
 }
 
 type WeatherSourceInternalType = WeatherSourceBaseType
@@ -21,6 +23,7 @@ const sources: {
         name: "Meteostanice Teslova",
         color: "red",
         stroke: "red",
+        description: "Meteostanice umístěná na střeše laboratoří NTC.",
         props: [
             "temperature",
             // "wind_dir",
@@ -37,6 +40,8 @@ const sources: {
         name: "Open Meteo",
         color: "green",
         stroke: "green",
+        description: "Veřejně dostupná služba poskytující údaje o počasí.",
+        link: "https://open-meteo.com/",
         props: [
             "temperature",
             "wind_dir",

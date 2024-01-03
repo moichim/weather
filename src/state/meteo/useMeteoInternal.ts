@@ -137,6 +137,7 @@ export const useMeteoInternal = () => {
         selection,
         dispatch,
         refetch: refetchView,
+        response: query.data,
         data: processedData,
         isLoadingData: query.loading,
         isLoadingRange: rangeQuery.loading,
@@ -153,6 +154,7 @@ export const useMeteoDataDefaults: useMeteoDataReturnType = {
     dispatch: () => { },
     refetch: () => { },
     data: {},
+    response: undefined,
     isLoadingData: false,
     isLoadingRange: false,
     viewStatistics: {

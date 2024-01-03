@@ -11,7 +11,7 @@ const parseTourState = ( state: ReturnType<typeof encodeTourState> ) => {
     return state === "1";
 }
 
-const localStorageKey = "graphTour3";
+const localStorageKey = "graphTour4";
 
 export const useGraphInternal = () => {
 

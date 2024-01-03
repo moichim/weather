@@ -90,7 +90,6 @@ const properties: {
         color: "bg-teal-300",
         min: 0,
         max: 1000,
-        description: "Sluneční svit je měřen dvakrát. (1) Položený přístroj mířící senzorem kolmo k zemi. (2) Přístroj manířený na aktuální polohu Slunce."
     },
     uv: {
         type: "Float",

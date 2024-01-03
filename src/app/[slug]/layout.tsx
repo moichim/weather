@@ -21,7 +21,7 @@ const ScopeLayout: React.FC<ScopeLayoutProps> = async ({ ...props }) => {
 
                 <ScopePageWrapper scope={scope}>
 
-                    <header className="fixed w-0 h-0 top-5 left-5 z-[100]">
+                    <header className="fixed w-0 h-0 top-5 left-5 z-[20]">
                         <ScopeHeader />
                     </header>
 
