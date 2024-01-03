@@ -177,10 +177,7 @@ export const GraphTour: React.FC = () => {
                                 ? <>
                                     <Button
                                         onClick={() => onTourOfferClose(true)}
-                                    >Prohlídka funkcí aplikace</Button>
-                                    <Button
-                                        onClick={() => onTourOfferClose(false)}
-                                    >Přeskočit prohlídku</Button>
+                                    >Začněte prohlídkou funkcí</Button>
                                 </>
                                 : <Button
                                     onClick={() => onTourOfferClose(false)}
