@@ -40,13 +40,14 @@ export const ScopeCard: React.FC<ScopeCardProps> = props => {
                             dispatch(ScopeActionsFactory.setActiveScope(props));
                             router.push(`/${props.slug}`)
                         }}>Aktuální data</Button>
-                    <Button
+                    {/*<Button
                         variant="flat"
                         color="primary"
                         onClick={() => {
                             dispatch(ScopeActionsFactory.setActiveScope(props));
                             router.push(`/${props.slug}/info`)
                         }}>Informace</Button>
+                        */}
             </div>
         </CardFooter>
     </Card>

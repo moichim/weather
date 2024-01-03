@@ -60,6 +60,8 @@ export const ScopeHeader: React.FC = () => {
 
         </div>
 
+        {/*
+        
         <ScopeHeaderMenuItem href={`/${context.activeScope?.slug}`}>
             Grafy
         </ScopeHeaderMenuItem>
@@ -67,6 +69,8 @@ export const ScopeHeader: React.FC = () => {
         <ScopeHeaderMenuItem href={`/${context.activeScope?.slug}/info`}>
             Info
         </ScopeHeaderMenuItem>
+
+        */}
 
     </div>
 }

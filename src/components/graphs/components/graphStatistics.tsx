@@ -1,7 +1,7 @@
 "use client";
 
-import { GraphInstanceState } from "@/state/graph/reducerInternals/storage";
-import { Card, CardBody, Spinner, Tab, Tabs } from "@nextui-org/react";
+import { GraphInstanceState, graphInstanceHeights } from "@/state/graph/reducerInternals/storage";
+import { Card, CardBody, ScrollShadow, Spinner, Tab, Tabs } from "@nextui-org/react";
 import { useGraphInstanceMeteo } from "../utils/useGraphInstancData";
 import { GraphTable } from "./ui/graphTable";
 import { useEffect, useState } from "react";
@@ -31,8 +31,8 @@ export const GraphStatistics: React.FC<GraphInstanceState> = props => {
     }, [selection.hasRange]);
 
     if (isLoadingData) return <></>;
-    if ( ! data ) return <></>
-    if ( ! ( "data" in data ) ) return <></>
+    if (!data) return <></>
+    if (!("data" in data)) return <></>
 
     const disabled = rangeStatistics === undefined
         || (rangeStatistics === undefined && isLoadingRange);
@@ -43,17 +43,20 @@ export const GraphStatistics: React.FC<GraphInstanceState> = props => {
             selectedKey={selected}
             onSelectionChange={value => setSelected(value.toString())}
         >
-            <Tab 
+            <Tab
                 id={`graph${props.id}statiscicsView`}
-                key="view" 
+                key="view"
                 title="Zobrazený rozsah"
             >
+
                 <Card>
                     <CardBody>
-                        <GraphTable
-                            statisticsData={viewStatistics}
-                            property={props.property}
-                        />
+                        <ScrollShadow style={{ height: `${graphInstanceHeights[props.scale]-75}px` }} size={50}>
+                            <GraphTable
+                                statisticsData={viewStatistics}
+                                property={props.property}
+                            />
+                        </ScrollShadow>
                     </CardBody>
                 </Card>
             </Tab>
@@ -67,6 +70,7 @@ export const GraphStatistics: React.FC<GraphInstanceState> = props => {
             >
                 <Card id={`${props.id}statistics`}>
                     <CardBody>
+                    <ScrollShadow style={{ height: `${graphInstanceHeights[props.scale]-75}px` }} size={50}>
                         <div>
                             {rangeStatistics
                                 ? <GraphTable
@@ -76,6 +80,7 @@ export const GraphStatistics: React.FC<GraphInstanceState> = props => {
                                 : <div className="flex w-full items-center justify-center min-h-[5rem]"><Spinner color="default" /></div>
                             }
                         </div>
+                        </ScrollShadow>
                     </CardBody>
                 </Card>
             </Tab>

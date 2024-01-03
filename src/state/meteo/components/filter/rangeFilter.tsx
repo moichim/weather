@@ -8,10 +8,10 @@ import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input } 
 import { useEffect, useState } from "react";
 
 enum RangePreset {
-    LAST_3 = 0,
+    LAST_90 = 0,
     LAST_7 = 1,
-    LAST_14 = 2,
-    LAST_3_MONTHS = 5
+    LAST_30 = 2,
+    LAST_60 = 5
 }
 
 export const RangeFilter: React.FC = () => {
@@ -47,17 +47,6 @@ export const RangeFilter: React.FC = () => {
 
     const applyPreset = (preset: RangePreset) => {
 
-        const today = getTodayDateString();
-
-        if (preset == RangePreset.LAST_3) {
-
-            const dates = MeteoStateFactory.buildRelativeSelectionDates(- 3, 0);
-
-            setFromInternal(dates.from.internal);
-            setToInternal(dates.to.internal);
-
-        }
-
         if (preset == RangePreset.LAST_7) {
 
             const dates = MeteoStateFactory.buildRelativeSelectionDates(- 7, 0);
@@ -67,16 +56,25 @@ export const RangeFilter: React.FC = () => {
 
         }
 
-        if (preset == RangePreset.LAST_14) {
+        if (preset == RangePreset.LAST_30) {
 
-            const dates = MeteoStateFactory.buildRelativeSelectionDates(- 14, 0);
+            const dates = MeteoStateFactory.buildRelativeSelectionDates(- 30, 0);
 
             setFromInternal(dates.from.internal);
             setToInternal(dates.to.internal);
 
         }
 
-        if (preset == RangePreset.LAST_3_MONTHS) {
+        if (preset == RangePreset.LAST_60) {
+
+            const dates = MeteoStateFactory.buildRelativeSelectionDates(- 60, 0);
+
+            setFromInternal(dates.from.internal);
+            setToInternal(dates.to.internal);
+
+        }
+
+        if (preset == RangePreset.LAST_90) {
 
             const dates = MeteoStateFactory.buildRelativeSelectionDates(- 90, 0);
 
@@ -125,10 +123,10 @@ export const RangeFilter: React.FC = () => {
                     aria-label="Přednastavené datumy"
                     onAction={key => applyPreset(key as RangePreset)}
                 >
-                    <DropdownItem key={RangePreset.LAST_3}>Poslední 3 dny</DropdownItem>
-                    <DropdownItem key={RangePreset.LAST_7}>Posledních 7 dní</DropdownItem>
-                    <DropdownItem key={RangePreset.LAST_14}>Posledních 14 dní</DropdownItem>
-                    <DropdownItem key={RangePreset.LAST_3_MONTHS}>Poslední 3 měsíce</DropdownItem>
+                    <DropdownItem key={RangePreset.LAST_7}>Poslední týden</DropdownItem>
+                    <DropdownItem key={RangePreset.LAST_30}>Poslední měsíc</DropdownItem>
+                    <DropdownItem key={RangePreset.LAST_60}>Poslední 2 měsíce</DropdownItem>
+                    <DropdownItem key={RangePreset.LAST_90}>Poslední 3 měsíce</DropdownItem>
                 </DropdownMenu>
             </Dropdown>
         </div>

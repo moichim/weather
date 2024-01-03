@@ -126,8 +126,6 @@ const useNotifications = () => {
 
     }
 
-    useEffect(() => console.log(notifications), [notifications]);
-
     return {
         addNotification,
         notifications

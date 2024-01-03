@@ -1,7 +1,7 @@
 "use client";
 
 import { WeatherProperty } from "@/graphql/weather/definitions/properties";
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, getKeyValue } from "@nextui-org/react";
+import { ScrollShadow, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, cn, getKeyValue } from "@nextui-org/react";
 import { useCallback, useMemo } from "react";
 import { ViewInstanceStatisticsType, useGraphInstanceMeteo } from "../../utils/useGraphInstancData";
 
@@ -24,7 +24,7 @@ export const GraphTable: React.FC<GraphTablePropsType> = props => {
         // { key: "count", label: "Počet záznamů" },
     ], []);
 
-    const formatOutputValue = useCallback((value?: number) => value && `${value.toFixed(2)} ${props.property.unit ?? ""}`, [props.property.unit])
+    const formatOutputValue = useCallback((value?: number) => value && `${value.toFixed(2)}`, [props.property.unit])
 
     const tableRows = useMemo(() => rows.map(row => {
 
@@ -47,18 +47,22 @@ export const GraphTable: React.FC<GraphTablePropsType> = props => {
         <Table
             aria-label={`Statistiky pro veličinu '${props.property.name}'`}
             removeWrapper
+            isHeaderSticky
         >
             <TableHeader
                 columns={columns}
+                
             >
-                {(column) => <TableColumn>{column.label}</TableColumn>}
+                {(column) => <TableColumn width={column.key === "name" ? 300 : 50}>{column.label}</TableColumn>}
             </TableHeader>
             <TableBody
                 items={tableRows}
             >
                 {(item) => (
                     <TableRow key={item.key} style={{ color: item.color }}>
-                        {(columnKey) => <TableCell>{getKeyValue(item, columnKey)}</TableCell>}
+                        {(columnKey) => <TableCell>
+                            {getKeyValue(item, columnKey)}
+                       </TableCell>}
                     </TableRow>
                 )}
             </TableBody>

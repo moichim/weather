@@ -139,23 +139,26 @@ export const GraphTour: React.FC = () => {
         <Modal
             isOpen={tourOfferModalOpen}
             onOpenChange={onTourOfferClose}
-            
+            isDismissable={false}
+            hideCloseButton={true}
         >
             <ModalContent>
                 {(onClose) => (<>
-                    <ModalHeader className="flex flex-col gap-1">Vítejte!</ModalHeader>
+                    <ModalHeader className="flex flex-col gap-1">
+                    {(activeScope !== undefined && queriedProperties.length !== 0 ) 
+                    ? "Vítejte!"
+                    : "Načítám"
+                    }</ModalHeader>
                     <ModalBody>
 
-                        {activeScope === undefined && <Spinner />}
-
-                        {(activeScope !== undefined && queriedProperties.length == 0) && <>
-                            <Spinner />Načítám data týmu {activeScope.name}
-                        </>}
+                        {(activeScope === undefined || queriedProperties.length == 0) && <div className="py-10 text-center">
+                            <Spinner />
+                        </div>}
 
                         {queriedProperties.length > 0 && <>
                             <p>Tým <strong>{activeScope?.name}</strong> měří v lokalitě <strong>{activeScope?.locality}</strong>. Rozhodl se měřit následující údaje:</p>
                             <ul className="list-disc ml-5">
-                                {queriedProperties.map(property => <li key={property.name}>{property.in}: <span style={{ color: property.color }}>{property.name}</span></li>)}
+                                {queriedProperties.map(property => <li key={property.name}><span style={{ color: property.color }}>{property.name}</span></li>)}
                             </ul>
                             <p>Dále jsou k dispozici údaje z těchto zdrojů:</p>
                             <ul className="list-disc ml-5">

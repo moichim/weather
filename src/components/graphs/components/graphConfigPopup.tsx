@@ -97,10 +97,10 @@ export const GraphConfigPopup: React.FC<GraphInstanceState> = props => {
 
     }, [minInternal, maxInternal, props.domain, props.property.max, props.property.min, props.property.slug]);
 
-    const isDefault = props.domain === GraphDomain.DEFAULT;
+    const isDefault = props.domain === GraphDomain.AUTO;
 
     const setDefault = () => {
-        graphDispatch(StackActions.setInstanceDomain(props.property.slug, GraphDomain.DEFAULT));
+        graphDispatch(StackActions.setInstanceDomain(props.property.slug, GraphDomain.AUTO));
     }
 
     return <>

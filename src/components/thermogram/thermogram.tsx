@@ -100,9 +100,6 @@ export const Thermogram: React.FC<ThermogramPropsType> = props => {
 
                 const [r, g, b, a] = splitFloat(data[i]);
 
-                if (i < 100)
-                    console.log(data[i], r, g, b);
-
                 const offset = i * 4;
 
                 imageData.data[offset] = r;

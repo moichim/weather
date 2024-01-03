@@ -42,7 +42,7 @@ export class MeteoStateFactory {
 
     public static defaultState(): MeteoStorageType {
 
-        const { from, to } = MeteoStateFactory.buildRelativeSelectionDates(-3, 0);
+        const { from, to } = MeteoStateFactory.buildRelativeSelectionDates(-60, 0);
 
         return {
             ...MeteoStateFactory.getStateBase(),

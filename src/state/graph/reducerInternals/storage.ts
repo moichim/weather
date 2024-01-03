@@ -80,7 +80,7 @@ export class GraphStateFactory {
         return {
             property: definition,
             weight: weight,
-            domain: GraphDomain.DEFAULT,
+            domain: GraphDomain.AUTO,
             domainMin: definition.min!,
             domainMax: definition.max!,
             isSelecting: false,

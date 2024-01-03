@@ -46,10 +46,10 @@ type MapBoundsType = [
     [
         // leftmost
         number,
-        // rightmost
+        // topmost
         number
     ], [
-        // topmost
+        // rightmost
         number,
         // bottommost
         number
@@ -67,30 +67,38 @@ export const MapMultipleWrapperElement: React.FC<
         return props.items.reduce(
             (state, current) => {
 
-                if (current.lat > state[0][0])
-                    state[0][0] = current.lat;
-                if (current.lat < state[0][1])
-                    state[0][1] = current.lat;
-                if (current.lng > state[1][0])
-                    state[1][0] = current.lng;
-                if (current.lng < state[1][1])
-                    state[1][1] = current.lng;
+                const st: MapBoundsType = [[...state[0]], [...state[1]]]
 
-                return state
+                console.log(state, current);
+
+                if (current.lat < st[0][0])
+                    st[0][0] = current.lat;
+
+                if (current.lat > st[1][0])
+                    st[1][0] = current.lat;
+
+                if (current.lng > st[0][1])
+                    st[0][1] = current.lng;
+
+                if (current.lng < st[1][1])
+                    st[1][1] = current.lng;
+
+                return st
             },
             [
-                [-Infinity, Infinity],
+                [Infinity, -Infinity],
                 [-Infinity, Infinity]
             ]
         );
 
     }, [props.items]);
 
+
     return <MapContainer
         scrollWheelZoom={false}
         bounds={calculatedBounds}
         boundsOptions={{
-            padding: [50,50]
+            padding: [50, 50]
         }}
         style={{ height: "100%" }}
     >

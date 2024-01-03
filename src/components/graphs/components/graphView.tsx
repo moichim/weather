@@ -7,10 +7,13 @@ import { GraphTools } from "@/state/graph/data/tools";
 import { DataActionsFactory } from "@/state/meteo/reducerInternals/actions";
 import { Spinner } from "@nextui-org/react";
 import { format } from "date-fns";
-import { useEffect, useMemo, useState } from "react";
-import { CartesianGrid, ComposedChart, Line, ReferenceArea, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { CartesianGrid, ComposedChart, Line, LineChart, ReferenceArea, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { CategoricalChartFunc } from "recharts/types/chart/generateCategoricalChart";
 import { useGraphInstanceMeteo } from "../utils/useGraphInstancData";
+import { stringLabelFromTimestamp } from "@/utils/time";
+import { Properties } from "@/graphql/weather/definitions/properties";
+import { Sources } from "@/graphql/weather/definitions/source";
 
 
 export const GraphView: React.FC<GraphInstanceState> = props => {
@@ -34,7 +37,8 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
 
     const [isHovering, setIsHovering] = useState<boolean>(false);
 
-    const onMouseMove: CategoricalChartFunc = event => {
+
+    const onMouseMove: CategoricalChartFunc = useCallback(event => {
         if ("activeLabel" in event) {
             if (!isHovering)
                 setIsHovering(true);
@@ -49,53 +53,52 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
                 setCursor(undefined);
             }
         }
-    }
+    }, [isHovering, selection.isSelectingRange, isSelectingLocal])
 
-    const onClick: CategoricalChartFunc = event => {
+    const onClick: CategoricalChartFunc = useCallback(event => {
 
         if (graphState.activeTool === GraphTools.INSPECT) return;
 
-        if (!isHovering) {
-            dispatch(DataActionsFactory.removeRange());
+        if (graphState.activeTool === GraphTools.SELECT || graphState.activeTool === GraphTools.ZOOM) {
+
             if (isSelectingLocal) {
+
+                let from = selection.rangeTempFromTimestamp!;
+                let to = parseInt(event.activeLabel!);
+
+                dispatch(DataActionsFactory.endSelectingRange(to));
+
                 setIsSelectingLocal(false);
-            }
-            return;
-        };
 
-        if (!selection.isSelectingRange) {
-            dispatch(DataActionsFactory.startSelectingRange(parseInt(event.activeLabel!)));
-            setIsSelectingLocal(true);
-            return;
-        } else {
+                if (graphState.activeTool === GraphTools.ZOOM) {
 
-            let from = selection.rangeTempFromTimestamp!;
-            let to = parseInt(event.activeLabel!);
+                    dispatch(DataActionsFactory.setFilterTimestamp(from, to));
 
-            dispatch(DataActionsFactory.endSelectingRange(parseInt(event.activeLabel!)));
+                    graphDispatch(StackActions.selectTool(GraphTools.INSPECT));
+                }
 
-            setIsSelectingLocal(false);
+                return;
 
-            if (graphState.activeTool === GraphTools.ZOOM) {
-
-                dispatch(DataActionsFactory.setFilterTimestamp(from, to));
-
-                graphDispatch(StackActions.selectTool(GraphTools.INSPECT));
+            } else {
+                dispatch(DataActionsFactory.startSelectingRange(parseInt(event.activeLabel!)));
+                setCursor( parseInt(event.activeLabel!) );
+                setIsSelectingLocal(true);
+                return;
             }
 
         }
 
-    };
+    }, [graphState.activeTool, selection.rangeTempFromTimestamp, isSelectingLocal]);
 
-    let mouse = isHovering ?
+    let mouse = useMemo(() => isHovering ?
         graphState.activeTool === GraphTools.INSPECT
             ? "help"
             : graphState.activeTool === GraphTools.SELECT
                 ? "crosshair"
                 : "crosshair"
-        : "auto";
+        : "auto", [isHovering, graphState.activeTool]);
 
-    const ticks = useMemo( () => {
+    const ticks = useMemo(() => {
 
         let durationInHours = graphData ? graphData.data.length : 0;
 
@@ -125,7 +128,6 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
                 const minute = timestamp / 1000 / 60 % 60;
                 const second = timestamp / 1000 % 60;
                 const result = (hour === 23) && minute === 0 && second === 0;
-                console.log(hour, minute, second, result);
                 return result;
             });
             formatter = name => {
@@ -138,7 +140,24 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
             formatter
         }
 
-    }, [graphData, graphData?.data, graphData?.data.length] );
+    }, [graphData, graphData?.data, graphData?.data.length]);
+
+    const formatLabel = useCallback( (value:number) => stringLabelFromTimestamp( value ), [] );
+
+    const availableSources = useMemo( () => Object.fromEntries( Sources.all().map(s=>[s.slug, s]) ), [] );
+
+    const availableDots = useMemo( () => {
+        if (graphData === undefined ) {
+            return {};
+        }
+        return Object.fromEntries( graphData.dots.map(d=>[d.slug, d]) ) 
+    }, [graphData] );
+
+    const formatTooltip = useCallback((value: number, property: any) => {
+
+        return value.toFixed(3);
+
+    }, []);
 
 
 
@@ -147,12 +166,13 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
             width={"100%"}
             height={graphInstanceHeights[props.scale]}
         >
-            <ComposedChart
+            <LineChart
                 data={data}
                 margin={{ left: 50 }}
                 syncId={"syncId"}
                 onClick={onClick}
-                onMouseMove={onMouseMove}
+                onMouseMove={isSelectingLocal ? onMouseMove : undefined}
+                // onMouseMove={onMouseMove}
                 style={{ cursor: mouse }}
             >
 
@@ -177,9 +197,10 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
                         key={source.slug}
                         dataKey={source.slug}
                         dot={false}
-                        unit={props.property.unit ?? ""}
+                        unit={" " + props.property.unit ?? ""}
                         stroke={source.stroke}
                         isAnimationActive={false}
+                        name={source.name}
                     />
 
                 })}
@@ -192,6 +213,8 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
                         dataKey={dot.slug}
                         isAnimationActive={false}
                         unit={dot.in.unit ?? ""}
+                        connectNulls={true}
+                        name={dot.name}
                     />
                 })}
 
@@ -209,15 +232,14 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
                 />
 
                 <Tooltip
-                    labelFormatter={(value) => {
-                        return format(new Date(value), "d. M. Y H:mm");
-                    }}
+                    labelFormatter={formatLabel}
+                    formatter={formatTooltip}
+                    
                     isAnimationActive={false}
+                    coordinate={{ x: cursor, y: 0 }}
                 />
 
-
-
-            </ComposedChart>
+            </LineChart>
 
         </ResponsiveContainer>
 

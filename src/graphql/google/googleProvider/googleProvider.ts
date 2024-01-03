@@ -49,7 +49,7 @@ export class GoogleSheetsProvider {
     protected static async getClient() {
 
         const auth = new google.auth.GoogleAuth({
-            keyFile: "./public/credentials.json",
+            // keyFile: "./public/credentials.json",
             credentials: {
                 type: process.env.GOOGLE_TYPE!,
                 project_id: process.env.GOOGLE_PROJECT_ID!,
@@ -310,7 +310,7 @@ export class GoogleSheetsProvider {
         const api = await GoogleSheetsProvider.getClient();
         const response = await api.spreadsheets.values.get({
             spreadsheetId: sheetId,
-            range: GoogleSheetsProvider.formatQueryRange("A1:Z99999", "Data")
+            range: GoogleSheetsProvider.formatQueryRange("A1:Z", "Data")
         });
 
         const definitions = GoogleSheetsProvider.extractColumnDefinitions(response.data.values);

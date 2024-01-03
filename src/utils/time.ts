@@ -38,6 +38,12 @@ export function stringFromTimestamp(timestamp: number) {
     return format(date, "yyyy-MM-dd");
 }
 
+export function stringLabelFromTimestamp(timestamp: number) {
+    const date = new Date;
+    date.setTime(timestamp);
+    return format(date, "d. M. yyyy hh:mm");
+}
+
 export function timestampFromFromString(date: string) {
     const d = dateFromString(date);
 
