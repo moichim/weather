@@ -139,6 +139,7 @@ export const GraphTour: React.FC = () => {
         <Modal
             isOpen={tourOfferModalOpen}
             onOpenChange={onTourOfferClose}
+            
         >
             <ModalContent>
                 {(onClose) => (<>
@@ -154,11 +155,11 @@ export const GraphTour: React.FC = () => {
                         {queriedProperties.length > 0 && <>
                             <p>Tým <strong>{activeScope?.name}</strong> měří v lokalitě <strong>{activeScope?.locality}</strong>. Rozhodl se měřit následující údaje:</p>
                             <ul className="list-disc ml-5">
-                                {queriedProperties.map(property => <li>{property.in}: <span style={{ color: property.color }}>{property.name}</span></li>)}
+                                {queriedProperties.map(property => <li key={property.name}>{property.in}: <span style={{ color: property.color }}>{property.name}</span></li>)}
                             </ul>
                             <p>Dále jsou k dispozici údaje z těchto zdrojů:</p>
                             <ul className="list-disc ml-5">
-                                {queriedSources.map(source => <li>
+                                {queriedSources.map(source => <li key={source.name}>
                                     <span style={{ color: source.color }}>{source.name}</span>
                                     <br />
                                     {source.description}
