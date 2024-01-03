@@ -13,13 +13,13 @@ export type GraphInstanceWithDataPropsType = GraphInstanceState
 
 export const GraphInstance: React.FC<GraphInstanceState> = props => {
 
-    return <div className="flex w-full gap-2 p-3">
+    return <div id={props.id} className="flex w-full gap-2 p-3">
         <div className="w-1/6 flex items-end justify-start flex-col gap-3">
             <div>
                 <GraphSelector {...props}/>
             </div>
 
-            <ButtonGroup size="sm">
+            <ButtonGroup size="sm" id={`${props.id}sizes`}>
                 <GraphConfigScale {...props} />
             </ButtonGroup>
             <ButtonGroup size="sm">

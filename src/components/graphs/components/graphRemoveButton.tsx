@@ -13,7 +13,7 @@ export const GraphRemoveButton: React.FC<GraphInstanceState> = props => {
 
     return <>
 
-        <GraphSettingButton onClick={onOpen} active={false} tooltip={"Nastavení grafu"}>
+        <GraphSettingButton id={`${props.id}remove`} onClick={onOpen} active={false} tooltip={"Nastavení grafu"}>
 
             <CloseIcon />
 

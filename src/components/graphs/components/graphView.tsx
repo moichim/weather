@@ -63,16 +63,6 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
             return;
         };
 
-        /*
-
-        if (selection.hasRange) {
-            dispatch(DataActionsFactory.removeRange());
-            setIsSelectingLocal(false);
-            return;
-        }
-
-        */
-
         if (!selection.isSelectingRange) {
             dispatch(DataActionsFactory.startSelectingRange(parseInt(event.activeLabel!)));
             setIsSelectingLocal(true);
@@ -152,7 +142,7 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
 
 
 
-    return <div className="relative">
+    return <div className="relative" id={`${props.id}view`}>
         <ResponsiveContainer
             width={"100%"}
             height={graphInstanceHeights[props.scale]}

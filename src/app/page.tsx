@@ -1,27 +1,21 @@
 import { ScopeSelectScreen } from '@/state/scope/components/scopeSelectScreen';
 
+import Intro from '@/components/content/intro';
+import { Footer } from '@/components/content/footer';
+import { ContentContainer } from '@/components/content/ui/contentContainer';
 
 export default function Home() {
 
-  return <>
+  return <div className="bg-foreground text-background">
+    
+    <Intro />
 
-    <div className="h-screen w-full p-10 bg-gray-200">
+    <ContentContainer element="main" id="main">
+      <ScopeSelectScreen />
+    </ContentContainer>
 
-      <div className="flex gap-3 w-full">
+    <Footer />
 
-        <div className="w-2/3">
+  </div>;
 
-          <ScopeSelectScreen />
-
-        </div>
-
-        <div className=" w-1/3">
-          Tady je text
-        </div>
-
-
-      </div>
-
-    </div>
-  </>
 }

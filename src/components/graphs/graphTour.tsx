@@ -1,0 +1,152 @@
+"use client";
+
+import { GraphTools } from "@/state/graph/data/tools";
+import { useGraphContext } from "@/state/graph/graphContext";
+import { GraphActions, StackActions } from "@/state/graph/reducerInternals/actions";
+import { useMeteoContext } from "@/state/meteo/meteoContext";
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@nextui-org/react";
+import dynamic from "next/dynamic";
+import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
+
+/** Run the tour */
+export const GraphTour: React.FC = () => {
+
+    const { graphState: state, graphDispatch } = useGraphContext();
+
+    const { data: contentData, selection } = useMeteoContext();
+
+    const Tour = useMemo(() => dynamic(
+        () => import("@reactour/tour").then(mod => mod.Tour),
+        { ssr: false }
+    ), []);
+
+    const [tourOfferModalOpen, setTourOfferModalOpen] = useState(false);
+
+    useEffect( () => {
+        if ( state.tourPassed === false )
+            setTourOfferModalOpen( true );
+    },[state.tourPassed] );
+
+    const onTourOfferClose = useCallback((shouldOpenTour: boolean) => {
+            setTourOfferModalOpen(false);
+            if (shouldOpenTour)
+                graphDispatch( StackActions.setTourRunning(true) )
+    }, [setTourOfferModalOpen]);
+
+    const closeTour = () => graphDispatch(StackActions.setTourRunning(false));
+    const openTour = () => graphDispatch(StackActions.setTourRunning(true));
+
+    const [disableActions, setDisableActions] = useState(false);
+
+    const steps = useMemo(() => [
+        {
+            selector: '#graph0view',
+            content: <>
+                <p className="py-3">Grafy zobrazují údaje vždy po hodinách.</p>
+                <p><strong>Přejíždějte myší</strong> pro prohlídku naměřených hodnot.</p>
+            </>,
+        },
+        {
+            selector: '.graph-selector',
+            content: <>
+                <p className="py-3">Můžete <strong>přepínat</strong> mezi různými veličinami.</p>
+            </>,
+        },
+        {
+            selector: '#filter',
+            content: <>
+                <p className="py-3"><strong>Změnte rozsah</strong> zobrazených dat.</p>
+                <p>Aplikace zobrazuje údaje maximálně 3 měsíce zpětně.</p>
+            </>
+        },
+        {
+            selector: '#selectTool',
+            content: <>
+                <p className="py-3">Zapněte nástroj <strong>Vyznačení oblasti</strong></p>
+            </>,
+            disableActions: true
+        },
+        {
+            selector: '#graph0view',
+            content: <>
+                <p className="py-3">Nyní klikněte do grafu a vyznačte nějaký časový rozsah.</p>
+            </>,
+            disableActions: true
+        },
+        {
+            selector: '#graph0statistics',
+            content: <>
+                <p className="py-3">Zde vidíte souhrn údajů z vyznačené oblasti.</p>
+                <Button
+                    color="primary"
+                    onClick={() => {
+                        graphDispatch( StackActions.setTourPassed(true) );
+                        graphDispatch( StackActions.setTourRunning(false) );
+                    }}
+                >Ukončit průvodce</Button>
+            </>,
+            disableActions: false
+        },
+    ], []);
+
+    const currentStep = state.tourCurrentStep;
+    const setCurrentStep = (step:number) => graphDispatch( StackActions.setTourCurrentStep( step ) );
+
+    useEffect( () => {
+
+        if ( state.tourCurrentStep === 3 ) {
+            if ( state.activeTool === GraphTools.SELECT) {
+                graphDispatch( StackActions.setTourCurrentStep( 4 ) );
+            }
+        }
+
+    }, [state.activeTool,state.tourCurrentStep] );
+
+    useEffect( () => {
+        if ( state.tourCurrentStep === 4 ) {
+            if ( selection.hasRange === true ) {
+                graphDispatch( StackActions.setTourCurrentStep( 5 ) );
+            }
+        }
+    }, [state.tourCurrentStep, selection.hasRange] );
+
+    return <>
+
+        {/** Modal offering the tour */}
+        <Modal
+            isOpen={tourOfferModalOpen}
+            onOpenChange={onTourOfferClose}
+        >
+            <ModalContent>
+                {(onClose) => (<>
+                    <ModalHeader className="flex flex-col gap-1">Vítejte!</ModalHeader>
+                    <ModalBody>
+                        Chcete úvodní prohlídku?
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button
+                            onClick={() => onTourOfferClose(true)}
+                        >Prohlídka funkcí</Button>
+                        <Button
+                            onClick={() => onTourOfferClose(false)}
+                        >Přeskočit prohlídku</Button>
+                    </ModalFooter>
+                </>)}
+            </ModalContent>
+
+        </Modal>
+
+        {/** Modal offering the tour */}
+        {state.tourActive && <Tour
+            onClickClose={closeTour}
+            setIsOpen={openTour}
+            disableInteraction={false}
+            isOpen={state.tourActive}
+            steps={steps}
+            setCurrentStep={setCurrentStep as Dispatch<SetStateAction<number>>}
+            currentStep={currentStep}
+            disabledActions={disableActions}
+            setDisabledActions={setDisableActions} />}
+    </>
+
+}

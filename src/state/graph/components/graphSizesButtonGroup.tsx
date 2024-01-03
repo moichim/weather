@@ -51,7 +51,7 @@ export const GraphSizesButtonGroup: React.FC = () => {
 
     const activeScale = state.sharedScale;
 
-    return <ButtonGroup>
+    return <ButtonGroup id="filterSizes">
 
         {graphInstanceSizes.map(size => {
 

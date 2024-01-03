@@ -248,6 +248,25 @@ export const useGraphStackReducer: Reducer<GraphStackState, GraphStateActionBase
                 barContent: action.payload.content
             }
 
+        case GraphActions.SET_TOUR_PASSED_STATE:
+            return {
+                ...state,
+                tourPassed: action.payload.tourState,
+                tourCurrentStep: action.payload.tourState ? 0 : state.tourCurrentStep
+            }
+
+        case GraphActions.SET_TOUR_RUNNING:
+            return {
+                ...state,
+                tourActive: action.payload.tourRunning
+            }
+
+        case GraphActions.SET_TOUR_CURRENT_STEP:
+            return {
+                ...state,
+                tourCurrentStep: action.payload.currentStep
+            }
+
 
         default:
             return state;

@@ -43,7 +43,11 @@ export const GraphStatistics: React.FC<GraphInstanceState> = props => {
             selectedKey={selected}
             onSelectionChange={value => setSelected(value.toString())}
         >
-            <Tab key="view" title="Zobrazený rozsah">
+            <Tab 
+                id={`graph${props.id}statiscicsView`}
+                key="view" 
+                title="Zobrazený rozsah"
+            >
                 <Card>
                     <CardBody>
                         <GraphTable
@@ -55,12 +59,13 @@ export const GraphStatistics: React.FC<GraphInstanceState> = props => {
             </Tab>
 
             <Tab
+                id={`graph${props.id}statiscicsSelection`}
                 key="range"
                 title="Vybraný rozsah"
                 disabled={disabled}
                 className={disabled === true ? "cursor-not-allowed" : "cursor-pointer"}
             >
-                <Card>
+                <Card id={`${props.id}statistics`}>
                     <CardBody>
                         <div>
                             {rangeStatistics

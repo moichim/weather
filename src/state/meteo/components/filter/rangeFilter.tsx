@@ -87,7 +87,7 @@ export const RangeFilter: React.FC = () => {
 
     }
 
-    return <>
+    return <div id="filterRange" className="flex gap-2 items-center">
         <Input
             type="date"
             label="Od"
@@ -132,7 +132,7 @@ export const RangeFilter: React.FC = () => {
                 </DropdownMenu>
             </Dropdown>
         </div>
-    </>;
+    </div>;
 }
 
 function buildRelativeSelectionDates() {

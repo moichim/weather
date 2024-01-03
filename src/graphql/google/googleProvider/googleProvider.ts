@@ -3,6 +3,7 @@ import { google } from "googleapis";
 import { GoogleColumn, GoogleColumnValue, GoogleDataColumnDefinition, GoogleRequest, GoogleScope } from "../google";
 import { AvailableWeatherProperties, Properties, WeatherProperty } from "../../weather/definitions/properties";
 import { notFound } from "next/navigation";
+import { ApolloServerErrorCode } from "@apollo/server/errors";
 
 export type ValueSerieDefinition = {
     name: string,
@@ -168,7 +169,9 @@ export class GoogleSheetsProvider {
         const result = scopes.find(row => row.slug === scope);
 
         if ( result === undefined ) 
-            notFound();
+            throw new ApolloError({
+            errorMessage: `Scope ${scope} not found!`
+        });
 
         return result;
 
@@ -197,6 +200,7 @@ export class GoogleSheetsProvider {
     public static async getSheetId(
         scope: string
     ): Promise<string> {
+
         const api = await GoogleSheetsProvider.getClient();
         const response = await api.spreadsheets.values.get({
             spreadsheetId: GoogleSheetsProvider.CONFIG_SHEET_ID,

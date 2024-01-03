@@ -15,6 +15,7 @@ export const GraphConfigScale: React.FC<GraphInstanceState> = props => {
         {graphInstanceSizes.map(size => {
 
             return <GraphSettingButton 
+                id={props.id!}
                 key={size.key}
                 active={ graphState.graphs[props.property.slug]?.scale === size.key }
                 onClick={()=>graphDispatch( StackActions.setInstanceHeight( props.property.slug, size.key ) )}

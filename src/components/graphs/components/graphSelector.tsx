@@ -14,11 +14,11 @@ export const GraphSelector: React.FC<GraphInstanceState> = props => {
 
     const {graphState, graphDispatch} = useGraphContext();
 
-    return <Dropdown>
+    return <Dropdown id={`graph${props.id}selector`}>
         <DropdownTrigger>
             <Button
                 variant="light"
-                className="bg-white shadow-xl"
+                className="bg-white shadow-xl graph-selector"
                 size="lg"
             >
                 {props.property.name}

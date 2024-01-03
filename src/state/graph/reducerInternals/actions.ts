@@ -20,7 +20,11 @@ export enum GraphActions {
     SELECTION_REMOVE = 11,
 
     BAR_SET_EXPANDED = 13,
-    BAR_SET_CONTENT = 14
+    BAR_SET_CONTENT = 14,
+
+    SET_TOUR_PASSED_STATE = 15,
+    SET_TOUR_RUNNING = 16,
+    SET_TOUR_CURRENT_STEP = 17
 
 }
 
@@ -168,6 +172,30 @@ export type BarSetContentAction = GraphStackAction<BarSetContentPayload> & {
     type: GraphActions.BAR_SET_CONTENT
 }
 
+export type SetTourPassedPayload = {
+    tourState: boolean
+}
+
+export type SetTourPassedAction = GraphStackAction<SetTourPassedPayload> & {
+    type: GraphActions.SET_TOUR_PASSED_STATE
+}
+
+export type SetTourRunningPayload = {
+    tourRunning: boolean
+}
+
+export type SetTourRunningAction = GraphStackAction<SetTourRunningPayload> & {
+    type: GraphActions.SET_TOUR_RUNNING
+}
+
+export type SetTourCurrentStepPayload = {
+    currentStep: number
+}
+
+export type SetTourCurrentStepAction = GraphStackAction<SetTourCurrentStepPayload> & {
+    type: GraphActions.SET_TOUR_CURRENT_STEP
+}
+
 
 
 
@@ -250,6 +278,7 @@ export class StackActions {
         return action;
     }
 
+
     public static setInstanceProperty(
         fromProperty: AvailableWeatherProperties,
         toProperty: AvailableWeatherProperties
@@ -274,6 +303,7 @@ export class StackActions {
             }
         }
     }
+
 
     public static selectionStart(
         property: AvailableWeatherProperties,
@@ -302,6 +332,7 @@ export class StackActions {
         }
     }
 
+
     public static selectionRemove(): SelectionRemoveAction {
         return {
             type: GraphActions.SELECTION_REMOVE,
@@ -323,6 +354,40 @@ export class StackActions {
             type: GraphActions.BAR_SET_CONTENT,
             payload: {
                 content
+            }
+        }
+    }
+
+
+    public static setTourPassed(
+        state: boolean
+    ): SetTourPassedAction {
+        return {
+            type: GraphActions.SET_TOUR_PASSED_STATE,
+            payload: {
+                tourState: state
+            }
+        }
+    }
+
+    public static setTourRunning(
+        state: boolean
+    ): SetTourRunningAction {
+        return {
+            type: GraphActions.SET_TOUR_RUNNING,
+            payload: {
+                tourRunning: state
+            }
+        }
+    }
+
+    public static setTourCurrentStep(
+        step: number
+    ): SetTourCurrentStepAction {
+        return {
+            type: GraphActions.SET_TOUR_CURRENT_STEP,
+            payload: {
+                currentStep: step
             }
         }
     }

@@ -1,7 +1,9 @@
-import { Map } from "@/components/ui/map";
+// import { Map } from "@/components/ui/map";
 import { GoogleSheetsProvider } from "@/graphql/google/googleProvider/googleProvider";
-import { notFound } from "next/navigation";
 import { ScopePageProps } from "../page";
+import dynamic from "next/dynamic";
+
+const Map = dynamic( () => import("../../../components/ui/map"), {ssr: false} );
 
 export const generateStaticParams = async () => {
 
@@ -19,9 +21,8 @@ const InfoPage: React.FC<ScopePageProps> = async props => {
 
     return <div className="flex gap-3 w-full">
 
-        <section className="min-h-[50rem] w-1/2 rounded-xl overflow-hidden shadow-xl">
-            <Map position={{lat: scope.lat, lng: scope.lon}} zoom={15}/>
-        </section>
+        <Map scope={scope} height="50rem" />
+
         <article className="w-1/2">
 
             <header>{scope.name}</header>

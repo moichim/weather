@@ -34,6 +34,7 @@ const Tool: React.FC<GraphToolType> = props => {
         color="foreground"
     >
         <Button
+            id={`${props.slug}Tool`}
             variant={"shadow"}
             isIconOnly
             onClick={onClick}

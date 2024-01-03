@@ -105,7 +105,7 @@ export const GraphConfigPopup: React.FC<GraphInstanceState> = props => {
 
     return <>
 
-        <GraphSettingButton onClick={onOpen} active={false} tooltip={"Nastavení grafu"}>
+        <GraphSettingButton id={`${props.id}config`} onClick={onOpen} active={false} tooltip={"Nastavení grafu"}>
 
             {isDefault
                 ? <SettingIcon />

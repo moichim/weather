@@ -26,8 +26,9 @@ export type GraphInstanceState = {
     domainMin: number|"auto",
     domainMax: number|"auto",
     isSelecting: boolean,
-    /** @deprecated should be flat, so is is advided this is converted into string */
-    property: WeatherProperty
+    /** @deprecated should be flat, so it is advided this is converted into string */
+    property: WeatherProperty,
+    id?: string
 }
 
 export type GraphStackState = {
@@ -36,6 +37,9 @@ export type GraphStackState = {
     selectionStart?: number,
     selectionEnd?: number,
     activeTool: GraphTools,
+    tourPassed?: boolean,
+    tourActive: boolean,
+    tourCurrentStep: number,
     graphs: {
         [T in AvailableWeatherProperties]?: GraphInstanceState
     }
@@ -53,6 +57,8 @@ export class GraphStateFactory {
             sharedScale: "md",
             isSelecting: false,
             activeTool: GraphTools.INSPECT,
+            tourActive: false,
+            tourCurrentStep: 0,
             graphs: Object.fromEntries( properties.map( property => {
                 const definition = GraphStateFactory.defaultInstanceState(property);
                 return [ property, definition ];

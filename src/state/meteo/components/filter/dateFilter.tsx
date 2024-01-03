@@ -35,7 +35,7 @@ export const DateFilter: React.FC = () => {
 
     const hasMax = timestampToFromString( context.selection.toSelectionMin ) > context.selection.toTimestamp;
 
-    return <>
+    return <div id="filterDate" className="flex gap-2 items-center">
 
         <Button
             isIconOnly
@@ -53,6 +53,7 @@ export const DateFilter: React.FC = () => {
         </Button>
 
         <Input
+        id="filterDate"
             type="date"
             value={context.selection.fromInternalString}
             onChange={event => setDates(event.target.value)}
@@ -76,5 +77,5 @@ export const DateFilter: React.FC = () => {
             </svg>
         </Button>
 
-    </>
+    </div>
 }
