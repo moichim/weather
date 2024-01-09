@@ -11,7 +11,7 @@ type ScopePageWrapperProps = React.PropsWithChildren & {
 
 export const ScopePageWrapper: React.FC<ScopePageWrapperProps> = props => {
 
-    const { availableScopes, activeScope, dispatch } = useScopeContext();
+    const { activeScope, dispatch } = useScopeContext();
 
     useEffect(() => {
 

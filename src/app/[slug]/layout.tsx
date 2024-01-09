@@ -3,8 +3,7 @@ import { GraphContextProvider } from "@/state/graph/graphContext";
 import { DisplayContextProvider } from "@/state/graph/useBarInternal";
 import { MeteoContextProvider } from "@/state/meteo/meteoContext";
 import { ScopePageWrapper } from "@/state/scope/components/ScopePageWrapper";
-import { ScopeHeader } from "@/state/scope/components/scopeHeader";
-import { notFound } from "next/navigation";
+import { ScopeHeading } from "@/state/scope/components/scopeHeading";
 import { PropsWithChildren } from "react";
 import { ScopePageProps } from "./page";
 
@@ -22,7 +21,7 @@ const ScopeLayout: React.FC<ScopeLayoutProps> = async ({ ...props }) => {
                 <ScopePageWrapper scope={scope}>
 
                     <header className="fixed w-0 h-0 top-5 left-5 z-[20]">
-                        <ScopeHeader />
+                        <ScopeHeading {...scope} />
                     </header>
 
                     <main className="w-full h-full min-h-screen bg-gray-200 pb-[10rem] pt-20">

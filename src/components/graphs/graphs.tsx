@@ -4,7 +4,7 @@ import { useGraphContext } from "@/state/graph/graphContext";
 import { GraphInstance } from "./graphInstance";
 import { Toolbar } from "../../state/graph/components/toolbar/toolbar";
 import { GraphAdd } from "./components/graphAdd";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import React from "react";
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@nextui-org/react";

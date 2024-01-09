@@ -33,21 +33,15 @@ export const ScopeCard: React.FC<ScopeCardProps> = props => {
         <Divider />
         <CardFooter>
             <div className="text-left px-4 pb-4 flex gap-3">
-                    <Button
+                <Button
                     variant="shadow"
                     color="primary"
-                        onClick={() => {
-                            dispatch(ScopeActionsFactory.setActiveScope(props));
-                            router.push(`/${props.slug}`)
-                        }}>Aktuální data</Button>
-                    {/*<Button
-                        variant="flat"
-                        color="primary"
-                        onClick={() => {
-                            dispatch(ScopeActionsFactory.setActiveScope(props));
-                            router.push(`/${props.slug}/info`)
-                        }}>Informace</Button>
-                        */}
+                    onClick={() => {
+                        dispatch(ScopeActionsFactory.setActiveScope(props));
+                        router.push(`/${props.slug}`)
+                    }}>
+                    Aktuální data
+                </Button>
             </div>
         </CardFooter>
     </Card>

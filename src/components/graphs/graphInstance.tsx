@@ -8,6 +8,7 @@ import { GraphRemoveButton } from "./components/graphRemoveButton"
 import { GraphSelector } from "./components/graphSelector"
 import { GraphStatistics } from "./components/graphStatistics"
 import { GraphView } from "./components/graphView"
+import { Suspense } from "react"
 
 export type GraphInstanceWithDataPropsType = GraphInstanceState
 

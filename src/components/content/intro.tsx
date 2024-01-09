@@ -1,22 +1,10 @@
-"use client"
-
-import { Dialog } from '@headlessui/react'
-import { XMarkIcon } from '@heroicons/react/24/outline'
-import { useState } from 'react'
 import Timeline from './timeline'
 
 import Image from 'next/image'
 import logo from "../../../public/logo.svg"
 
-const navigation = [
-    { name: 'Product', href: '#' },
-    { name: 'Features', href: '#' },
-    { name: 'Marketplace', href: '#' },
-    { name: 'Company', href: '#' },
-]
 
 export default function Intro() {
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
     return (
         <>
@@ -33,27 +21,8 @@ export default function Intro() {
                             />
                         </a>
                     </div>
-                    
-                    {/*
-                    <div className="flex lg:hidden">
-                        <button
-                            type="button"
-                            className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-primary"
-                            onClick={() => setMobileMenuOpen(true)}
-                        >
-                            <span className="sr-only">Open main menu</span>
-                            <Bars3Icon className="h-6 w-6" aria-hidden="true" />
-                        </button>
-                    </div>
-                    <div className="hidden lg:flex lg:gap-x-12">
-                        {navigation.map((item) => (
-                            <a key={item.name} href={item.href} className="text-sm leading-6 text-background">
-                                {item.name}
-                            </a>
-                        ))}
-                    </div>
-                    */}
-                    <div className="hidden lg:flex lg:flex-1 lg:justify-end">
+                
+                    <div className="lg:flex lg:flex-1 lg:justify-end">
                         <a href="https://edu.labir.cz" className="text-sm leading-6 text-background">
                             O platformě <span className="border-b-1 border-b-primary">edu.labir.cz</span> <span aria-hidden="true">&rarr;</span>
                         </a>
@@ -74,11 +43,11 @@ export default function Intro() {
                         }}
                     />
                 </div>
-                <div className="mx-auto max-w-screen-xl py-20 sm:py-20 lg:py-24">
+                <div className="mx-auto max-w-screen-xl pt-20 sm:pt-20 lg:pt-24">
 
-                    <div className="flex flex-auto w-full gap-4 items-center">
+                    <div className="flex flex-wrap w-full items-center">
 
-                        <div className="w-full md:w-1/2">
+                        <div className="w-full md:w-2/3 lg:w-1/2">
 
                             <div className="mb-8 flex justify-start">
                                 <div className="relative rounded-full px-3 py-1 text-sm leading-6 text-primary ring-1 ring-primary hover:ring-gray-900/20">
@@ -97,7 +66,7 @@ export default function Intro() {
 
                         </div>
 
-                        <div className="w-full md:w-1/2">
+                        <div className="w-full md:w-1/3 lg:w-1/2">
 
                             <Timeline />
 
