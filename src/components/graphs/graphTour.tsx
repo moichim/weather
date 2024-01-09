@@ -113,18 +113,18 @@ export const GraphTour: React.FC = () => {
 
     useEffect(() => {
 
-        if (state.tourCurrentStep === 4) {
+        if (state.tourCurrentStep === 5) {
             if (state.activeTool === GraphTools.SELECT) {
-                graphDispatch(StackActions.setTourCurrentStep(5));
+                graphDispatch(StackActions.setTourCurrentStep(6));
             }
         }
 
     }, [state.activeTool, state.tourCurrentStep]);
 
     useEffect(() => {
-        if (state.tourCurrentStep === 5) {
+        if (state.tourCurrentStep === 6) {
             if (selection.hasRange === true) {
-                graphDispatch(StackActions.setTourCurrentStep(6));
+                graphDispatch(StackActions.setTourCurrentStep(7));
             }
         }
     }, [state.tourCurrentStep, selection.hasRange]);
