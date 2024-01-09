@@ -1,7 +1,7 @@
 "use client";
 
 import { GraphInstanceState, graphInstanceHeights } from "@/state/graph/reducerInternals/storage";
-import { Card, CardBody, ScrollShadow, Spinner, Tab, Tabs } from "@nextui-org/react";
+import { Card, CardBody, ScrollShadow, Spinner, Tab, Tabs, cn } from "@nextui-org/react";
 import { useGraphInstanceMeteo } from "../utils/useGraphInstancData";
 import { GraphTable } from "./ui/graphTable";
 import { useEffect, useState } from "react";
@@ -49,16 +49,17 @@ export const GraphStatistics: React.FC<GraphInstanceState> = props => {
                 title="Zobrazený rozsah"
             >
 
-                <Card>
-                    <CardBody>
-                        <ScrollShadow style={{ height: `${graphInstanceHeights[props.scale]-75}px` }} size={50}>
-                            <GraphTable
+                <ScrollShadow style={{ height: `${graphInstanceHeights[props.scale] - 75}px` }} size={50}>
+                    <div>
+                        {viewStatistics
+                            ? <GraphTable
                                 statisticsData={viewStatistics}
                                 property={props.property}
                             />
-                        </ScrollShadow>
-                    </CardBody>
-                </Card>
+                            : <div className="flex w-full items-center justify-center min-h-[5rem]"><Spinner color="primary" /></div>
+                        }
+                    </div>
+                </ScrollShadow>
             </Tab>
 
             <Tab
@@ -66,23 +67,28 @@ export const GraphStatistics: React.FC<GraphInstanceState> = props => {
                 key="range"
                 title="Vybraný rozsah"
                 disabled={disabled}
-                className={disabled === true ? "cursor-not-allowed" : "cursor-pointer"}
+                className={cn(
+                    "overflow-hidden",
+                    "transition-all duration-300",
+                    disabled === true
+                        ? "cursor-not-allowed"
+                        : "cursor-pointer"
+                )}
             >
-                <Card id={`${props.id}statistics`}>
-                    <CardBody>
-                    <ScrollShadow style={{ height: `${graphInstanceHeights[props.scale]-75}px` }} size={50}>
-                        <div>
-                            {rangeStatistics
-                                ? <GraphTable
-                                    statisticsData={rangeStatistics}
-                                    property={props.property}
-                                />
-                                : <div className="flex w-full items-center justify-center min-h-[5rem]"><Spinner color="default" /></div>
-                            }
-                        </div>
-                        </ScrollShadow>
-                    </CardBody>
-                </Card>
+
+
+                <ScrollShadow id={`${props.id}statistics`} style={{ height: `${graphInstanceHeights[props.scale] - 75}px` }} size={50}>
+                    <div>
+                        {rangeStatistics
+                            ? <GraphTable
+                                statisticsData={rangeStatistics}
+                                property={props.property}
+                            />
+                            : <div className="flex w-full items-center justify-center min-h-[5rem]"><Spinner color="primary" /></div>
+                        }
+                    </div>
+                </ScrollShadow>
+
             </Tab>
             {props.property.description &&
                 <Tab key="info" title="Info">

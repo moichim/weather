@@ -11,7 +11,7 @@ export enum GraphDomain {
 
 export const graphInstanceHeights = {
     sm: 100, 
-    md: 230, 
+    md: 300, 
     lg: 500, 
     xl: 750, 
     "2xl": 1000

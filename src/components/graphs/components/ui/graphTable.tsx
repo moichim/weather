@@ -46,7 +46,6 @@ export const GraphTable: React.FC<GraphTablePropsType> = props => {
     return <>
         <Table
             aria-label={`Statistiky pro veličinu '${props.property.name}'`}
-            removeWrapper
             isHeaderSticky
         >
             <TableHeader

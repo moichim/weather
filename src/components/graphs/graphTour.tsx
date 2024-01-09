@@ -5,9 +5,10 @@ import { useGraphContext } from "@/state/graph/graphContext";
 import { GraphActions, StackActions } from "@/state/graph/reducerInternals/actions";
 import { useMeteoContext } from "@/state/meteo/meteoContext";
 import { useScopeContext } from "@/state/scope/scopeContext";
-import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner } from "@nextui-org/react";
+import { Button, Kbd, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner } from "@nextui-org/react";
 import dynamic from "next/dynamic";
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
+import { CloseIcon, ZoomInIcon } from "../ui/icons";
 
 /** Run the tour */
 export const GraphTour: React.FC = () => {
@@ -51,10 +52,22 @@ export const GraphTour: React.FC = () => {
             </>,
         },
         {
+            selector: '#graph0sizes',
+            content: <>
+                <p className="py-3"><strong>Velikost každého</strong> grafu můžete nastavit zde.</p>
+            </>,
+        },
+        {
+            selector: '#barSizing',
+            content: <>
+                <p className="py-3">Zde lze nastavit <strong>velikost všech grafů</strong> najednou.</p>
+            </>,
+        },
+        {
             selector: '#filter',
             content: <>
                 <p className="py-3"><strong>Změnte rozsah</strong> zobrazených dat.</p>
-                <p>Aplikace zobrazuje údaje maximálně 3 měsíce zpětně.</p>
+                <p>Aplikace zobrazuje údaje maximálně tři měsíce zpětně.</p>
             </>
         },
         {
@@ -75,6 +88,15 @@ export const GraphTour: React.FC = () => {
             selector: '#graph0statistics',
             content: <>
                 <p className="py-3">Zde vidíte souhrn údajů z vyznačené oblasti.</p>
+            </>,
+            disableActions: false
+        },
+        {
+            selector: "#barRange",
+            content: <>
+                <p className="py-3">Zde vidíte informace o vyznačeném <strong>rozsahu</strong>.</p>
+                <p className="py-3">Pomocí tlačítka <Kbd>Přiblížit</Kbd> přiblížíte celé zobrazení na vyznačené časové období.</p>
+                <p className="py-3">Pomocí tlačítka <Kbd>Zavřít</Kbd> vyznačení zrušíte.</p>
                 <Button
                     color="primary"
                     onClick={() => {
@@ -82,9 +104,8 @@ export const GraphTour: React.FC = () => {
                         graphDispatch(StackActions.setTourRunning(false));
                     }}
                 >Ukončit průvodce</Button>
-            </>,
-            disableActions: false
-        },
+            </>
+        }
     ], []);
 
     const currentStep = state.tourCurrentStep;
@@ -92,18 +113,18 @@ export const GraphTour: React.FC = () => {
 
     useEffect(() => {
 
-        if (state.tourCurrentStep === 3) {
+        if (state.tourCurrentStep === 4) {
             if (state.activeTool === GraphTools.SELECT) {
-                graphDispatch(StackActions.setTourCurrentStep(4));
+                graphDispatch(StackActions.setTourCurrentStep(5));
             }
         }
 
     }, [state.activeTool, state.tourCurrentStep]);
 
     useEffect(() => {
-        if (state.tourCurrentStep === 4) {
+        if (state.tourCurrentStep === 5) {
             if (selection.hasRange === true) {
-                graphDispatch(StackActions.setTourCurrentStep(5));
+                graphDispatch(StackActions.setTourCurrentStep(6));
             }
         }
     }, [state.tourCurrentStep, selection.hasRange]);

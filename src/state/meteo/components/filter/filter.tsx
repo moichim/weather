@@ -25,7 +25,7 @@ export const Filter: React.FC = () => {
                     isIconOnly
                     size="lg"
                     variant={"solid"}
-                    className={!isRange ? "bg-foreground bg-opacity-90 text-background" : "bg-background bg-opacity-50"}
+                    className={!isRange ? "bg-background bg-opacity-90" : "bg-background bg-opacity-50"}
                     title="Jeden den"
                     onClick={() => setIsRange(false)}
                 >
@@ -45,7 +45,7 @@ export const Filter: React.FC = () => {
                     isIconOnly
                     size="lg"
                     variant={"solid"}
-                    className={isRange ? "bg-foreground bg-opacity-90 text-background" : "bg-background bg-opacity-50"}
+                    className={isRange ? "bg-background bg-opacity-90" : "bg-background bg-opacity-50"}
                     title="Více dní"
                     onClick={() => setIsRange(true)}
                 >

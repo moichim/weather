@@ -18,8 +18,7 @@ export const GraphSelector: React.FC<GraphInstanceState> = props => {
         <DropdownTrigger>
             <Button
                 variant="light"
-                className="bg-white shadow-xl graph-selector"
-                size="lg"
+                className="bg-white graph-selector z-0"
             >
                 {props.property.name}
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">

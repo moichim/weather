@@ -18,9 +18,7 @@ export const Providers: React.FC<React.PropsWithChildren> = props => {
     return <ApolloProvider client={client}>
         <NextUIProvider>
             <NotificationsContextProvider>
-                <ScopeContextProvider>
                     {props.children}
-                </ScopeContextProvider>
             </NotificationsContextProvider>
         </NextUIProvider>
     </ApolloProvider>
