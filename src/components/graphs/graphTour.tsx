@@ -85,7 +85,7 @@ export const GraphTour: React.FC = () => {
             disableActions: true
         },
         {
-            selector: '#graph0statistics',
+            selector: '#graph0Statistics',
             content: <>
                 <p className="py-3">Zde vidíte souhrn údajů z vyznačené oblasti.</p>
             </>,

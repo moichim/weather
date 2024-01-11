@@ -33,8 +33,6 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
         if (isSelectingLocal === false) setCursor(undefined);
     }, [isSelectingLocal]);
 
-    const data = graphData?.data;
-
     const [isHovering, setIsHovering] = useState<boolean>(false);
 
     const onMouseMove: CategoricalChartFunc = useCallback(event => {

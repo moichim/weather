@@ -87,7 +87,7 @@ export const GraphStatistics: React.FC<GraphInstanceState> = props => {
             </StatisticsButton>}
         </div>
 
-        <div className="relative">
+        <div id={`${props.id}Statistics`} className="relative">
 
             <ScrollShadow
                 id={`${props.id}Shadow`}
