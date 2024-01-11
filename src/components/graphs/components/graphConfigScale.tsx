@@ -1,14 +1,22 @@
 "use client";
 
-import { graphInstanceSizes } from "@/state/graph/components/graphSizesButtonGroup";
+import { graphInstanceSizes } from "@/components/bar/graphSizesButtonGroup";
 import { useGraphContext } from "@/state/graph/graphContext";
 import { StackActions } from "@/state/graph/reducerInternals/actions";
 import { GraphInstanceState } from "@/state/graph/reducerInternals/storage";
 import { GraphSettingButton } from "./ui/graphSettingButton";
+import { useMeteoContext } from "@/state/meteo/meteoContext";
+import { Skeleton } from "@nextui-org/react";
 
 export const GraphConfigScale: React.FC<GraphInstanceState> = props => {
 
     const {graphState, graphDispatch} = useGraphContext();
+
+    const meteo = useMeteoContext();
+
+    if ( meteo.data === undefined ) {
+        return <Skeleton className="rounded-xl w-48 h-8 bg-gray-400" />
+    }
 
     return <>
 

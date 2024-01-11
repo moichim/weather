@@ -77,7 +77,7 @@ export const Thermogram: React.FC<ThermogramPropsType> = props => {
 
     const width = useMemo(() => Math.abs(Math.round(props.width)), [props.width]);
 
-    const length = useMemo(() => props.pixels.length - 1, []);
+    const length = useMemo(() => props.pixels.length - 1, [props.pixels.length]);
 
     const isValid = useMemo(() => (width * height) !== length, [width, height, length]);
 
@@ -113,7 +113,7 @@ export const Thermogram: React.FC<ThermogramPropsType> = props => {
 
         }
 
-    }, []);
+    }, [width, height, props.pixels, length]);
 
     return <canvas
         ref={ref}

@@ -1,4 +1,4 @@
-import { ScopeSelectScreen } from '@/state/scope/components/scopeSelectScreen';
+import { ScopeSelectScreen } from '@/components/scope/scopeSelectScreen';
 
 import Intro from '@/components/content/intro';
 import { ContentContainer } from '@/components/content/ui/contentContainer';

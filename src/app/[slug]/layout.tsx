@@ -2,7 +2,7 @@ import { GoogleSheetsProvider } from "@/graphql/google/googleProvider/googleProv
 import { GraphContextProvider } from "@/state/graph/graphContext";
 import { DisplayContextProvider } from "@/state/graph/useBarInternal";
 import { MeteoContextProvider } from "@/state/meteo/meteoContext";
-import { ScopeHeading } from "@/state/scope/components/scopeHeading";
+import { ScopeHeading } from "@/components/scope/scopeHeading";
 import { ScopeContextProvider } from "@/state/scope/scopeContext";
 import { notFound } from "next/navigation";
 import { PropsWithChildren } from "react";

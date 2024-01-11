@@ -25,7 +25,7 @@ const Tool: React.FC<GraphToolType> = props => {
             props.onDeactivate && props.onDeactivate(graph);
         }
 
-    }, [dispatch, isActive, props.onActivate, props.onDeactivate, props.slug]);
+    }, [dispatch, isActive, props, graph]);
 
     return <Tooltip
         showArrow={true}

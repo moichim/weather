@@ -2,13 +2,14 @@
 
 import { GraphInstanceState } from "@/state/graph/reducerInternals/storage"
 import { ButtonGroup, Divider } from "@nextui-org/react"
-import { GraphConfigPopup } from "./components/graphConfigPopup"
+import { GraphConfigPopup } from "./components/popups/graphConfigPopup"
 import { GraphConfigScale } from "./components/graphConfigScale"
-import { GraphRemoveButton } from "./components/graphRemoveButton"
+import { GraphRemoveButton } from "./components/popups/graphRemoveButton"
 import { GraphSelector } from "./components/graphSelector"
 import { GraphStatistics } from "./components/graphStatistics"
 import { GraphView } from "./components/graphView"
 import { Suspense } from "react"
+import { GraphPopups } from "./components/graphPopups"
 
 export type GraphInstanceWithDataPropsType = GraphInstanceState
 
@@ -28,8 +29,7 @@ export const GraphInstance: React.FC<GraphInstanceState> = props => {
                     <GraphConfigScale {...props} />
                 </ButtonGroup>
                 <ButtonGroup size="sm">
-                    <GraphConfigPopup {...props} />
-                    <GraphRemoveButton {...props} />
+                    <GraphPopups {...props} />
                 </ButtonGroup>
 
             </div>
@@ -44,7 +44,7 @@ export const GraphInstance: React.FC<GraphInstanceState> = props => {
             <GraphStatistics {...props} />
         </div>
 
-        <Divider className="lg:hidden my-16" />
+        <Divider className="lg:hidden my-8" />
     </div>
 
 }

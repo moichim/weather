@@ -4,7 +4,7 @@ import { useMeteoContext } from "@/state/meteo/meteoContext";
 import { DataActionsFactory } from "@/state/meteo/reducerInternals/actions";
 import { Button, ButtonGroup, Tooltip } from "@nextui-org/react";
 import { CloseIcon, ZoomInIcon } from "../ui/icons";
-import { BarContainer } from "@/state/graph/components/bar/barContainer";
+import { BarContainer } from "@/components/bar/barContainer";
 
 export const RangeDisplay: React.FC = () => {
 

@@ -69,8 +69,6 @@ export const MapMultipleWrapperElement: React.FC<
 
                 const st: MapBoundsType = [[...state[0]], [...state[1]]]
 
-                console.log(state, current);
-
                 if (current.lat < st[0][0])
                     st[0][0] = current.lat;
 

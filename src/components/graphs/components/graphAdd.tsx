@@ -14,10 +14,10 @@ export const GraphAdd: React.FC = () => {
     if (graphState.availableGraphs.length === 0)
         return <></>
 
-    return <><div className="flex w-full gap-2 p-3 mt-10">
-        <div className="w-1/6 flex items-end justify-start flex-col gap-3"></div>
-        <div 
-            className="w-2/3 border-1 border-gray-400 border-dashed rounded-xl flex items-center justify-center h-[20vh] hover:bg-gray-100 cursor-pointer ease-in-out transition-all duration-300 group"
+    return <>
+    <div className="p-3 md:px-20 lg:px-40">
+        <div
+            className="w-full border-1 border-gray-400 border-dashed rounded-xl flex items-center justify-center h-[20vh] bg-gray-100 hover:bg-white cursor-pointer ease-in-out transition-all duration-300 group"
             role="button"
             onClick={onOpen}
         >
@@ -25,33 +25,32 @@ export const GraphAdd: React.FC = () => {
                 className="px-5 py-3 bg-default rounded-lg group-hover:bg-default-200 transition-all duration-300 ease-in-out"
             >Přidat graf</div>
         </div>
-        <div className="w-1/3"></div>
-    </div>
-    <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+        </div>
+        <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
 
-        <ModalContent>
-        {(onClose) => (
+            <ModalContent>
+                {(onClose) => (
                     <>
                         <ModalHeader className="flex flex-col gap-1">Přidat graf</ModalHeader>
                         <ModalBody>
 
-                            {graphState.availableGraphs.map( state => {
+                            {graphState.availableGraphs.map(state => {
                                 return <Button
                                     key={state.slug}
                                     onClick={() => {
-                                        graphDispatch( StackActions.addGraph( state.slug ) );
+                                        graphDispatch(StackActions.addGraph(state.slug));
                                         onClose();
                                     }}
                                 >{state.name}</Button>
-                            } )}
+                            })}
 
                         </ModalBody>
 
                     </>
                 )}
-        </ModalContent>
+            </ModalContent>
 
-    </Modal>
+        </Modal>
     </>
 
 }

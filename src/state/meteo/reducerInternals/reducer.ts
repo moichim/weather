@@ -62,7 +62,7 @@ export const getSelectionRange = () => {
     min.setMilliseconds(0);
 
     let max = new Date();
-    max = subDays( max, 1 );
+    max = subDays(max, 1);
 
     return {
         fromSelectionMin: roundFromTimestamp(min.getTime()).internal,
@@ -226,8 +226,17 @@ export const meteoReducer: Reducer<MeteoStorageType, DataAction<DataPayloadBase>
 
             const { from: sff, to: sft } = formatViewDatesFromStrings(setFilterFrom, setFilterTo);
 
-            const resetRange = sff.timestamp < state.rangeMinTimestamp!
-                || sft.timestamp > state.rangeMaxTimestamp!
+            let doResetRangeString = false;
+
+            if (state.rangeMinTimestamp)
+                if (state.rangeMinTimestamp < sff.timestamp)
+                    doResetRangeString = true;
+
+            if (state.rangeMaxTimestamp)
+                if (state.rangeMaxTimestamp > sft.timestamp)
+                    doResetRangeString = true;
+
+            const newRangeString = doResetRangeString
                 ? {
                     rangeTempFromTimestamp: undefined,
                     rangeTempToTimestamp: undefined,
@@ -256,8 +265,7 @@ export const meteoReducer: Reducer<MeteoStorageType, DataAction<DataPayloadBase>
 
                 viewDurationString: getDurationString(sff.date, sft.date),
 
-                ...resetRange,
-                ...getSelectionRange()
+                ...newRangeString
 
             };
 
@@ -268,8 +276,17 @@ export const meteoReducer: Reducer<MeteoStorageType, DataAction<DataPayloadBase>
 
             const { from: tff, to: tft } = formatViewDatesFromTimestamps(setFilterFromTimestamp, setFilterToTimestamp);
 
-            const resetRanger = tff.timestamp < state.rangeMinTimestamp!
-                || tft.timestamp > state.rangeMaxTimestamp!
+            let doResetRange = false;
+
+            if (state.rangeMinTimestamp)
+                if (state.rangeMinTimestamp < tff.timestamp)
+                    doResetRange = true;
+
+            if (state.rangeMaxTimestamp)
+                if (state.rangeMaxTimestamp > tft.timestamp)
+                    doResetRange = true;
+
+            const newRange = doResetRange
                 ? {
                     rangeTempFromTimestamp: undefined,
                     rangeTempToTimestamp: undefined,
@@ -298,8 +315,7 @@ export const meteoReducer: Reducer<MeteoStorageType, DataAction<DataPayloadBase>
 
                 viewDurationString: getDurationString(tff.date, tft.date),
 
-                ...resetRanger,
-                ...getSelectionRange()
+                ...newRange
 
             };
 

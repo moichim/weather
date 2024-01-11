@@ -59,14 +59,14 @@ export default function Intro() {
                                     Environmentální výchova pro ZŠ
                                 </h1>
                                 <p className="mt-6 text-lg leading-8 text-primary">
-                                    10 západočeských škol využívají termokamery a meteostanice k analýze konkrétních lokalit
+                                    10 týmů ze západočeských škol měří mikroklima ve svém okolí
                                 </p>
     
                             </div>
 
                         </div>
 
-                        <div className="w-full md:w-1/3 lg:w-1/2">
+                        <div className="w-full md:w-1/3 lg:w-1/2 py-5">
 
                             <Timeline />
 

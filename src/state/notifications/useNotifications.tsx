@@ -3,7 +3,7 @@
 import { ErrorIcon, HelpIcon, InfoIcon, SuccessIcon } from "@/components/ui/icons";
 import { generateRandomString } from "@/utils/strings";
 import { Button, ButtonVariantProps } from "@nextui-org/react";
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useContext, useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
 
 type NotificationButtonType = {
@@ -13,7 +13,7 @@ type NotificationButtonType = {
     variant: ButtonVariantProps
 }
 
-type NotificationType = {
+export type NotificationType = {
     id: string,
     message: React.ReactNode,
     classes: string,

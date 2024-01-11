@@ -1,12 +1,14 @@
 import { GoogleScope } from "@/graphql/google/google";
-import { useQuery } from "@apollo/client";
 import { useReducer } from "react";
-import { GOOGLE_SCOPES_QUERY, GoogleScopeQueryRequest, GoogleScopesQueryResponse } from "./data/query";
-import { ScopeActionBase, ScopeActionsFactory } from "./reducerInternals/actions";
+import { ScopeActionBase } from "./reducerInternals/actions";
 import { scopeReducer } from "./reducerInternals/reducer";
 import { ScopeContextType } from "./reducerInternals/storage";
 
-
+/** 
+ * Used to share data across the scope pages and subpages. 
+ * The data should be provided once and never changed again.
+ * @todo Perhaps the reducer should be removed.
+*/
 export const useScopeInternal = (
     activeScope: GoogleScope,
     allScopes: GoogleScope[]
@@ -21,7 +23,9 @@ export const useScopeInternal = (
         allScopes: allScopes
     });
 
-    const query = useQuery<GoogleScopesQueryResponse, GoogleScopeQueryRequest>(GOOGLE_SCOPES_QUERY, {
+    /*
+
+    const [refetch, query] = useLazyQuery<GoogleScopesQueryResponse, GoogleScopeQueryRequest>(GOOGLE_SCOPES_QUERY, {
 
         onCompleted: data => {
 
@@ -33,11 +37,9 @@ export const useScopeInternal = (
 
     });
 
-    return {
-        ...state,
-        dispatch,
-        isLoading: query.loading
-    }
+    */
+
+    return state;
 
 }
 
@@ -47,8 +49,6 @@ export const getContextDefaults = (): UseScopeHookType => {
     return {
         activeScope: undefined,
         availableScopes: [],
-        allScopes: [],
-        isLoading: false,
-        dispatch: () => { }
+        allScopes: []
     }
 }

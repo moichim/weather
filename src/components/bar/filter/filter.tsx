@@ -13,7 +13,7 @@ export const Filter: React.FC = () => {
     const [isRange, setIsRange] = useState<boolean>(true);
 
     return <>
-        <div id="filter" className="flex items-center gap-3">
+        <div id="filter" className="flex items-center gap-2 flex-wrap">
 
             <Tooltip
                 content="Jeden den"

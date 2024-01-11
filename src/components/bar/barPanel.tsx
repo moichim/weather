@@ -1,11 +1,11 @@
 "use client";
 
 import { Button } from "@nextui-org/react";
-import { RangeDisplay } from "../../../../components/graphs/rangeDisplay";
-import { Filter } from "../../../meteo/components/filter/filter";
-import { useGraphContext } from "../../graphContext";
-import { StackActions } from "../../reducerInternals/actions";
-import { GraphSizesButtonGroup } from "../graphSizesButtonGroup";
+import { RangeDisplay } from "./rangeDisplay";
+import { Filter } from "./filter/filter";
+import { useGraphContext } from "../../state/graph/graphContext";
+import { StackActions } from "../../state/graph/reducerInternals/actions";
+import { GraphSizesButtonGroup } from "./graphSizesButtonGroup";
 import { BarContainer } from "./barContainer";
 
 export const BarPanel: React.FC<React.PropsWithChildren> = props => {

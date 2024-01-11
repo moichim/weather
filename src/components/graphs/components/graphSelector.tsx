@@ -5,7 +5,8 @@ import { Sources } from "@/graphql/weather/definitions/source";
 import { useGraphContext } from "@/state/graph/graphContext";
 import { StackActions } from "@/state/graph/reducerInternals/actions";
 import { GraphInstanceState } from "@/state/graph/reducerInternals/storage";
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-org/react";
+import { useMeteoContext } from "@/state/meteo/meteoContext";
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Skeleton } from "@nextui-org/react";
 
 const itemBargeDimension = 10;
 const badgeWidth = Sources.all().length * itemBargeDimension;
@@ -13,6 +14,12 @@ const badgeWidth = Sources.all().length * itemBargeDimension;
 export const GraphSelector: React.FC<GraphInstanceState> = props => {
 
     const {graphState, graphDispatch} = useGraphContext();
+
+    const meteo = useMeteoContext();
+
+    if ( meteo.data === undefined ) {
+        return <Skeleton className="rounded-xl w-40 h-10 bg-gray-400" />
+    }
 
     return <Dropdown id={`graph${props.id}selector`}>
         <DropdownTrigger>

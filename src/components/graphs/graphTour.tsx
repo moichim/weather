@@ -30,7 +30,7 @@ export const GraphTour: React.FC = () => {
         setTourOfferModalOpen(false);
         if (shouldOpenTour)
             graphDispatch(StackActions.setTourRunning(true))
-    }, [setTourOfferModalOpen]);
+    }, [setTourOfferModalOpen, graphDispatch]);
 
     const closeTour = () => graphDispatch(StackActions.setTourRunning(false));
     const openTour = () => graphDispatch(StackActions.setTourRunning(true));
@@ -106,7 +106,7 @@ export const GraphTour: React.FC = () => {
                 >Ukončit průvodce</Button>
             </>
         }
-    ], []);
+    ], [graphDispatch]);
 
     const currentStep = state.tourCurrentStep;
     const setCurrentStep = (step: number) => graphDispatch(StackActions.setTourCurrentStep(step));
@@ -119,7 +119,7 @@ export const GraphTour: React.FC = () => {
             }
         }
 
-    }, [state.activeTool, state.tourCurrentStep]);
+    }, [state.activeTool, state.tourCurrentStep, graphDispatch]);
 
     useEffect(() => {
         if (state.tourCurrentStep === 6) {
@@ -127,7 +127,7 @@ export const GraphTour: React.FC = () => {
                 graphDispatch(StackActions.setTourCurrentStep(7));
             }
         }
-    }, [state.tourCurrentStep, selection.hasRange]);
+    }, [state.tourCurrentStep, selection.hasRange, graphDispatch]);
 
     const queriedProperties: {
         name: string, color: string, in: string
@@ -139,7 +139,7 @@ export const GraphTour: React.FC = () => {
             color: property.color,
             in: property.in.name ?? property.in.slug
         }));
-    }, [response?.range.data]);
+    }, [response]);
 
     const queriedSources: {
         name: string, color: string, description: string, link?: string
@@ -152,7 +152,7 @@ export const GraphTour: React.FC = () => {
             description: source.source.description,
             link: source.source.link
         }));
-    }, [response?.weatherRange]);
+    }, [response]);
 
     return <>
 

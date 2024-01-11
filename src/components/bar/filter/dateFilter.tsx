@@ -9,12 +9,14 @@ export const DateFilter: React.FC = () => {
 
     const context = useMeteoContext();
 
+    // Set initial filter value
+
     useEffect( () => {
         context.dispatch( DataActionsFactory.setFilterString(
             context.selection.fromInternalString,
             context.selection.fromInternalString
         ) );
-    }, [] );
+    }, [] ); // eslint-disable-line react-hooks/exhaustive-deps
 
     const setDates = (date: string) => {
         context.dispatch( DataActionsFactory.setFilterString( date, date ) );

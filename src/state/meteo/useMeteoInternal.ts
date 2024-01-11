@@ -75,7 +75,7 @@ export const useMeteoInternal = () => {
                 },
                 ssr: false
             })
-    }, [activeScope, activeScope?.lat, activeScope?.lon, selection.fromTimestamp, selection.toTimestamp]);
+    }, [activeScope, activeScope?.lat, activeScope?.lon, selection.fromTimestamp, selection.toTimestamp, fetchQuery]);
 
 
     const [fetchRange, rangeQuery] = useLazyQuery<MeteoQueryResponseType>(METEO_RANGE_QUERY, {
@@ -130,7 +130,7 @@ export const useMeteoInternal = () => {
             setRangeStatistics( undefined );
         }
 
-    }, [selection.hasRange, activeScope?.lat, activeScope?.lon, selection.rangeMinTimestamp, selection.rangeMaxTimestamp] );
+    }, [selection.hasRange, activeScope?.lat, activeScope?.lon, selection.rangeMinTimestamp, selection.rangeMaxTimestamp, activeScope, fetchRange] );
 
 
     return {

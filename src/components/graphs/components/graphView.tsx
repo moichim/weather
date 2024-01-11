@@ -5,7 +5,7 @@ import { useGraphContext } from "@/state/graph/graphContext";
 import { GraphDomain, GraphInstanceState, graphInstanceHeights } from "@/state/graph/reducerInternals/storage";
 import { GraphTools } from "@/state/graph/data/tools";
 import { DataActionsFactory } from "@/state/meteo/reducerInternals/actions";
-import { Spinner } from "@nextui-org/react";
+import { Skeleton, Spinner, cn } from "@nextui-org/react";
 import { format } from "date-fns";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { CartesianGrid, ComposedChart, Line, LineChart, ReferenceArea, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
@@ -37,7 +37,6 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
 
     const [isHovering, setIsHovering] = useState<boolean>(false);
 
-
     const onMouseMove: CategoricalChartFunc = useCallback(event => {
         if ("activeLabel" in event) {
             if (!isHovering)
@@ -53,7 +52,7 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
                 setCursor(undefined);
             }
         }
-    }, [isHovering, selection.isSelectingRange, isSelectingLocal])
+    }, [isHovering, selection.isSelectingRange, isSelectingLocal, dispatch])
 
     const onClick: CategoricalChartFunc = useCallback(event => {
 
@@ -81,14 +80,14 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
 
             } else {
                 dispatch(DataActionsFactory.startSelectingRange(parseInt(event.activeLabel!)));
-                setCursor( parseInt(event.activeLabel!) );
+                setCursor(parseInt(event.activeLabel!));
                 setIsSelectingLocal(true);
                 return;
             }
 
         }
 
-    }, [graphState.activeTool, selection.rangeTempFromTimestamp, isSelectingLocal]);
+    }, [graphState.activeTool, selection.rangeTempFromTimestamp, isSelectingLocal, dispatch, graphDispatch]);
 
     let mouse = useMemo(() => isHovering ?
         graphState.activeTool === GraphTools.INSPECT
@@ -140,112 +139,113 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
             formatter
         }
 
-    }, [graphData, graphData?.data, graphData?.data.length]);
+    }, [graphData]);
 
-    const formatLabel = useCallback( (value:number) => stringLabelFromTimestamp( value ), [] );
+    const formatLabel = useCallback((value: number) => stringLabelFromTimestamp(value), []);
 
-    const availableSources = useMemo( () => Object.fromEntries( Sources.all().map(s=>[s.slug, s]) ), [] );
+    const formatTooltip = useCallback((value: number, property: any) => value.toFixed(3), []);
 
-    const availableDots = useMemo( () => {
-        if (graphData === undefined ) {
-            return {};
-        }
-        return Object.fromEntries( graphData.dots.map(d=>[d.slug, d]) ) 
-    }, [graphData] );
+    const containerId = useMemo(() => `${props.id}view`, [props.id]);
+    const height = useMemo(() => graphInstanceHeights[props.scale], [props.scale]);
 
-    const formatTooltip = useCallback((value: number, property: any) => {
+    // Show sleketon whenever the data is loading or unpresent
+    if (isLoadingData === true && graphData === undefined)
+        return <div id={containerId} className="relative">
+            <Skeleton
+                className={cn(
+                    "w-full rounded-xl bg-gray-400"
+                )}
+                style={{ height: height }}
+            />
+        </div>
 
-        return value.toFixed(3);
-
-    }, []);
 
 
+    return <div className="relative" id={containerId}>
 
-    return <div className="relative" id={`${props.id}view`}>
-        <ResponsiveContainer
-            width={"100%"}
-            height={graphInstanceHeights[props.scale]}
-        >
-            <LineChart
-                data={data}
-                margin={{ left: 50 }}
-                syncId={"syncId"}
-                onClick={onClick}
-                onMouseMove={isSelectingLocal ? onMouseMove : undefined}
-                // onMouseMove={onMouseMove}
-                style={{ cursor: mouse }}
+            <ResponsiveContainer
+                width={"100%"}
+                height={height}
             >
+                <LineChart
+                    data={graphData?.data}
+                    margin={{ left: 50 }}
+                    syncId={"syncId"}
+                    onClick={onClick}
+                    onMouseMove={isSelectingLocal ? onMouseMove : undefined}
+                    // onMouseMove={onMouseMove}
+                    style={{ cursor: mouse }}
+                >
 
-                {selection.isSelectingRange ?
-                    selection.rangeTempFromTimestamp && <ReferenceLine
-                        x={selection.rangeTempFromTimestamp}
-                        stroke="black"
+                    {selection.isSelectingRange ?
+                        selection.rangeTempFromTimestamp && <ReferenceLine
+                            x={selection.rangeTempFromTimestamp}
+                            stroke="black"
+                        />
+                        : (selection.rangeMinTimestamp && selection.rangeMaxTimestamp) && <ReferenceArea x1={selection.rangeMinTimestamp} x2={selection.rangeMaxTimestamp} />
+                    }
+
+                    {(isSelectingLocal && selection.rangeTempFromTimestamp) && <ReferenceArea
+                        x1={selection.rangeTempFromTimestamp}
+                        x2={cursor}
+                    />}
+
+                    <CartesianGrid strokeDasharray={"2 2"} />
+
+                    {graphData && graphData.lines.map(source => {
+
+                        return <Line
+                            key={source.slug}
+                            dataKey={source.slug}
+                            dot={false}
+                            unit={" " + props.property.unit ?? ""}
+                            stroke={source.stroke}
+                            isAnimationActive={false}
+                            name={source.name}
+                        />
+
+                    })}
+
+                    {graphData && graphData.dots.map(dot => {
+                        return <Line
+                            key={dot.slug}
+                            fill={dot.color}
+                            stroke={dot.color}
+                            dataKey={dot.slug}
+                            isAnimationActive={false}
+                            unit={dot.in.unit ?? ""}
+                            connectNulls={true}
+                            name={dot.name}
+                        />
+                    })}
+
+
+                    <XAxis
+                        dataKey="time"
+                        tickFormatter={ticks.formatter}
+                        ticks={ticks.times}
                     />
-                    : (selection.rangeMinTimestamp && selection.rangeMaxTimestamp) && <ReferenceArea x1={selection.rangeMinTimestamp} x2={selection.rangeMaxTimestamp} />
-                }
 
-                {(isSelectingLocal && selection.rangeTempFromTimestamp) && <ReferenceArea
-                    x1={selection.rangeTempFromTimestamp}
-                    x2={cursor}
-                />}
 
-                <CartesianGrid strokeDasharray={"2 2"} />
+                    <YAxis
+                        unit={props.property.unit}
+                        domain={domain as any}
+                    />
 
-                {graphData && graphData.lines.map(source => {
+                    <Tooltip
+                        labelFormatter={formatLabel}
+                        formatter={formatTooltip}
 
-                    return <Line
-                        key={source.slug}
-                        dataKey={source.slug}
-                        dot={false}
-                        unit={" " + props.property.unit ?? ""}
-                        stroke={source.stroke}
                         isAnimationActive={false}
-                        name={source.name}
+                        coordinate={{ x: cursor, y: 0 }}
                     />
 
-                })}
+                </LineChart>
 
-                {graphData && graphData.dots.map(dot => {
-                    return <Line
-                        key={dot.slug}
-                        fill={dot.color}
-                        stroke={dot.color}
-                        dataKey={dot.slug}
-                        isAnimationActive={false}
-                        unit={dot.in.unit ?? ""}
-                        connectNulls={true}
-                        name={dot.name}
-                    />
-                })}
+            </ResponsiveContainer>
 
-
-                <XAxis
-                    dataKey="time"
-                    tickFormatter={ticks.formatter}
-                    ticks={ticks.times}
-                />
-
-
-                <YAxis
-                    unit={props.property.unit}
-                    domain={domain as any}
-                />
-
-                <Tooltip
-                    labelFormatter={formatLabel}
-                    formatter={formatTooltip}
-                    
-                    isAnimationActive={false}
-                    coordinate={{ x: cursor, y: 0 }}
-                />
-
-            </LineChart>
-
-        </ResponsiveContainer>
-
-        {isLoadingData && <div className="absolute w-full h-full top-0 height-0 bg-gray-200 bg-opacity-50 flex items-center justify-center">
-            <Spinner size="lg" color="primary" />
-        </div>}
-
+            {( graphData !== undefined && isLoadingData === true ) && <div className="absolute inset-0 w-full h-full flex items-center justify-center bg-gray-200 bg-opacity-50">
+                <Spinner size="lg" color="primary" />
+            </div>}
     </div>
 }

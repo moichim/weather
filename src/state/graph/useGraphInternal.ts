@@ -35,7 +35,7 @@ export const useGraphInternal = () => {
             }
 
         }
-    }, [] );
+    }, [state.tourPassed] );
 
     useEffect( () => {
         if ( state.tourPassed !== undefined ) {

@@ -28,7 +28,7 @@ export const RangeFilter: React.FC = () => {
 
     useEffect(() => {
         context.dispatch(DataActionsFactory.setFilterString(fromInternal, toInternal));
-    }, [toInternal, fromInternal]);
+    }, [toInternal, fromInternal]); // eslint-disable-line react-hooks/exhaustive-deps
 
     /*
     useEffect(() => {

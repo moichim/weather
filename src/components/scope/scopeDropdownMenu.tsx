@@ -3,7 +3,7 @@
 import { GoogleScope } from "@/graphql/google/google";
 import { DropdownItem, DropdownMenu } from "@nextui-org/react";
 import { useMemo } from "react";
-import { useScopeContext } from "../scopeContext";
+import { useScopeContext } from "../../state/scope/scopeContext";
 
 export const ScopeDropdownMenu: React.FC<GoogleScope> = props => {
 

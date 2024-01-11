@@ -1,13 +1,10 @@
 "use client"
 
 import { useGraphContext } from "@/state/graph/graphContext";
-import { GraphInstance } from "./graphInstance";
-import { Toolbar } from "../../state/graph/components/toolbar/toolbar";
-import { GraphAdd } from "./components/graphAdd";
-import { Suspense, useEffect, useMemo, useState } from "react";
-import dynamic from "next/dynamic";
 import React from "react";
-import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@nextui-org/react";
+import { Toolbar } from "../toolbar/toolbar";
+import { GraphAdd } from "./components/graphAdd";
+import { GraphInstance } from "./graphInstance";
 import { GraphTour } from "./graphTour";
 
 export const Graphs: React.FC = () => {

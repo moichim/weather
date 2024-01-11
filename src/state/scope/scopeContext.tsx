@@ -1,8 +1,8 @@
 "use client";
 
-import {createContext, useContext} from "react";
-import { UseScopeHookType, getContextDefaults, useScopeInternal } from "./useScopeInternal";
 import { GoogleScope } from "@/graphql/google/google";
+import { createContext, useContext } from "react";
+import { getContextDefaults, useScopeInternal } from "./useScopeInternal";
 
 const def = getContextDefaults();
 

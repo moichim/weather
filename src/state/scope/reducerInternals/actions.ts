@@ -3,7 +3,11 @@ import { GoogleScope } from "@/graphql/google/google"
 export enum ScopeActions {
 
     SET_ALL_SCOPES = 4,
+
+    /** @deprecated */
     SET_ACTIVE_SCOPE = 1,
+    
+    /** @deprecated */
     REMOVE_ACTIVE_SCOPE = 2
 
 }
@@ -66,6 +70,7 @@ export class ScopeActionsFactory {
         }
     }
 
+    /** @deprecated */
     public static setActiveScope(
         scope: GoogleScope
     ): SetActiveScopeAction {
@@ -77,6 +82,7 @@ export class ScopeActionsFactory {
         }
     }
 
+    /** @deprecated */
     public static removeActiveScope(): RemoveActiveScopeAction {
         return {
             type: ScopeActions.REMOVE_ACTIVE_SCOPE,

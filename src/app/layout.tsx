@@ -3,12 +3,13 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { Providers } from '../components/providers'
 import './globals.css'
-import { NotificationListing } from '@/state/notifications/notificationListing'
+import { NotificationListing } from '@/components/notifications/notificationListing'
+import { getMetadataTitle } from '@/utils/metadata'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Meteostanice',
+  title: getMetadataTitle(),
   description: 'GUI pro meteostanici.',
 }
 

@@ -2,9 +2,9 @@
 
 import { useDisplayContext } from "@/state/graph/useBarInternal";
 import { Button } from "@nextui-org/react";
-import { useGraphContext } from "../../graphContext";
-import { GraphStateFactory } from "../../reducerInternals/storage";
-import { StackActions } from "../../reducerInternals/actions";
+import { useGraphContext } from "../../state/graph/graphContext";
+import { GraphStateFactory } from "../../state/graph/reducerInternals/storage";
+import { StackActions } from "../../state/graph/reducerInternals/actions";
 
 export const BarExpandButton: React.FC = () => {
 

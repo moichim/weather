@@ -2,7 +2,7 @@ import { GoogleSheetsProvider } from "@/graphql/google/googleProvider/googleProv
 import { ScopeCard } from "./scopeCard";
 import dynamic from "next/dynamic";
 
-const Map = dynamic( () => import("../../../components/ui/map"), {ssr: false} );
+const Map = dynamic( () => import("../ui/map"), {ssr: false} );
 
 export const ScopeSelectScreen = async () => {
 

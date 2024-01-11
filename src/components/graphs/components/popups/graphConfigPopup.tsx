@@ -1,10 +1,13 @@
+"use client";
+
 import { SettingIcon } from "@/components/ui/icons";
 import { useGraphContext } from "@/state/graph/graphContext";
 import { StackActions } from "@/state/graph/reducerInternals/actions";
 import { GraphDomain, GraphInstanceState } from "@/state/graph/reducerInternals/storage";
-import { Badge, Button, ButtonGroup, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Radio, RadioGroup, useDisclosure } from "@nextui-org/react";
+import { Badge, Button, ButtonGroup, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Radio, RadioGroup, Skeleton, useDisclosure } from "@nextui-org/react";
 import { useCallback, useEffect, useState } from "react";
-import { GraphSettingButton } from "./ui/graphSettingButton";
+import { GraphSettingButton } from "../ui/graphSettingButton";
+import { useMeteoContext } from "@/state/meteo/meteoContext";
 
 export const GraphConfigPopup: React.FC<GraphInstanceState> = props => {
 
@@ -56,7 +59,7 @@ export const GraphConfigPopup: React.FC<GraphInstanceState> = props => {
             if (maxInternal !== props.domainMax)
                 setMaxInternal(props.domainMax.toString());
         }
-    }, [props.domain, props.domainMax, props.domainMax, minInternal, maxInternal]);
+    }, [props.domain, props.domainMin, props.domainMax, minInternal, maxInternal]);
 
 
 
@@ -95,7 +98,7 @@ export const GraphConfigPopup: React.FC<GraphInstanceState> = props => {
             ))
         }
 
-    }, [minInternal, maxInternal, props.domain, props.property.max, props.property.min, props.property.slug]);
+    }, [minInternal, maxInternal, props.domain, props.property.max, props.property.min, props.property.slug, graphDispatch, isValidValue, sanitizeValue, translateRangeValue]);
 
     const isDefault = props.domain === GraphDomain.AUTO;
 
