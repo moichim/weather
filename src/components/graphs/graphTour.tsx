@@ -9,6 +9,7 @@ import { Button, Kbd, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, 
 import dynamic from "next/dynamic";
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
 import { CloseIcon, ZoomInIcon } from "../ui/icons";
+import { GraphLegend } from "./components/legend/graphLegend";
 
 /** Run the tour */
 export const GraphTour: React.FC = () => {
@@ -177,19 +178,7 @@ export const GraphTour: React.FC = () => {
                         </div>}
 
                         {queriedProperties.length > 0 && <>
-                            <p>Tým <strong>{activeScope?.name}</strong> měří v lokalitě <strong>{activeScope?.locality}</strong>. Rozhodl se měřit následující údaje:</p>
-                            <ul className="list-disc ml-5">
-                                {queriedProperties.map(property => <li key={property.name}><span style={{ color: property.color }}>{property.name}</span></li>)}
-                            </ul>
-                            <p>Dále jsou k dispozici údaje z těchto zdrojů:</p>
-                            <ul className="list-disc ml-5">
-                                {queriedSources.map(source => <li key={source.name}>
-                                    <span style={{ color: source.color }}>{source.name}</span>
-                                    <br />
-                                    {source.description}
-                                    {source.link && <a href={source.link} target="_blank" rel="nofollow">info</a>}
-                                </li>)}
-                            </ul>
+                            <GraphLegend />
                         </>}
                     </ModalBody>
                     {queriedProperties.length > 0 &&
