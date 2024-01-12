@@ -2,6 +2,10 @@ import Timeline from './timeline'
 
 import Image from 'next/image'
 import logo from "../../../public/logo.svg"
+import { Button } from '@nextui-org/react'
+import Link from 'next/link'
+
+import img from "../../../public/letecke-02.jpg";
 
 
 export default function Intro() {
@@ -14,14 +18,14 @@ export default function Intro() {
                     <div className="flex lg:flex-1">
                         <a href="#" className="-m-1.5 p-1.5">
                             <span className="sr-only">LabIR Edu</span>
-                            <Image 
+                            <Image
                                 src={logo}
                                 alt="LabIR Edu"
                                 width="150"
                             />
                         </a>
                     </div>
-                
+
                     <div className="lg:flex lg:flex-1 lg:justify-end">
                         <a href="https://edu.labir.cz" className="text-sm leading-6 text-background">
                             O platformě <span className="border-b-1 border-b-primary">edu.labir.cz</span> <span aria-hidden="true">&rarr;</span>
@@ -30,7 +34,7 @@ export default function Intro() {
                 </nav>
             </header>
 
-            <div className="relative isolate px-6 pt-14 lg:px-8">
+            <div className="relative isolate px-6 pt-14 lg:px-8 text-background">
                 <div
                     className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
                     aria-hidden="true"
@@ -50,18 +54,18 @@ export default function Intro() {
                         <div className="w-full md:w-2/3 lg:w-1/2">
 
                             <div className="mb-8 flex justify-start">
-                                <div className="relative rounded-full px-3 py-1 text-sm leading-6 text-primary ring-1 ring-primary hover:ring-gray-900/20">
+                                <div className="relative rounded-full px-3 py-1 text-sm leading-6 text-primary ring-1 ring-primary">
                                     2023 / 2024 - Pilotní ročník
                                 </div>
                             </div>
                             <div className="text-left">
                                 <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
-                                    Environmentální výchova pro ZŠ
+                                    Mikroklima v mé obci
                                 </h1>
                                 <p className="mt-6 text-lg leading-8 text-primary">
                                     10 týmů ze západočeských škol měří mikroklima ve svém okolí
                                 </p>
-    
+
                             </div>
 
                         </div>
@@ -75,6 +79,34 @@ export default function Intro() {
                     </div>
 
                 </div>
+
+                {/*
+                <div className="mx-auto max-w-screen-xl pt-20 sm:pt-20 lg:pt-24 relative">
+
+                    <div className="flex w-full flex-wrap relative">
+
+                        <div className="w-full lg:w-1/2">
+                            <h2 className="text-xl font-bold pb-4">Budujeme komunitu</h2>
+
+                            <Image 
+                                src={img}
+                                alt="letecká termografie"
+                                className="rounded-xl"
+                            />
+                        </div>
+
+                        <div className="w-full lg:w-1/2 relative">
+                            <div className="lg:absolute right-0 -top-20">
+                                <iframe src="https://discord.com/widget?id=1195359160972361881&theme=dark" width="350" height="500" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+
                 <div
                     className="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]"
                     aria-hidden="true"
@@ -87,6 +119,8 @@ export default function Intro() {
                         }}
                     />
                 </div>
+                */}
+
             </div>
 
         </>

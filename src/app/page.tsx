@@ -5,7 +5,7 @@ import { ContentContainer } from '@/components/content/ui/contentContainer';
 
 export default function Home() {
 
-  return <div className="bg-foreground text-background pb-20">
+  return <div className="bg-foreground pb-20">
     
     <Intro />
 
