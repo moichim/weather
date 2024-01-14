@@ -1,6 +1,6 @@
 import gql from "graphql-tag"
 import { WeatherProperty } from "../weather/definitions/properties"
-import { GoogleSheetsProvider } from "./googleProvider/googleProvider"
+import { googleSheetsProvider } from "./googleProvider/googleProvider"
 
 export type GoogleScope = {
     /** Name of the scope */
@@ -107,7 +107,7 @@ export const googleResolvers = {
             args: GoogleRequest
         ) => {
 
-            const data = await GoogleSheetsProvider.range( args );
+            const data = await googleSheetsProvider.range( args );
 
             return {
                 data
@@ -120,10 +120,10 @@ export const googleResolvers = {
                 scope: string
             }
         ) => {
-            return await GoogleSheetsProvider.getScope( args.scope );
+            return await googleSheetsProvider.getScope( args.scope );
         },
         googleScopes: async () => {
-            return await GoogleSheetsProvider.getAllScopes();
+            return await googleSheetsProvider.getAllScopes();
         }
     }
 

@@ -1,17 +1,15 @@
-import { Graphs } from '@/components/graphs/graphs';
-import { GoogleSheetsProvider } from '@/graphql/google/googleProvider/googleProvider';
 import { Bar } from '@/components/bar/bar';
-import { Metadata, NextPage, ResolvingMetadata } from 'next';
+import { Graphs } from '@/components/graphs/graphs';
+import { googleSheetsProvider } from '@/graphql/google/googleProvider/googleProvider';
 import { getMetadataPublisher, getMetadataTitle } from '@/utils/metadata';
+import { Metadata, NextPage, ResolvingMetadata } from 'next';
 
 export const generateStaticParams = async () => {
 
-    const scopes = await GoogleSheetsProvider.getAllScopes();
+    const scopes = await googleSheetsProvider.getAllScopes();
     return scopes;
 
 }
-
-export const dynamicParams = true
 
 
 export type ScopePageProps = {
@@ -27,7 +25,7 @@ export async function generateMetadata(
 ): Promise<Metadata> {
 
 
-    const scope = await GoogleSheetsProvider.getScope(params.slug);
+    const scope = await googleSheetsProvider.getScope(params.slug);
 
     return {
         title: getMetadataTitle( scope.name ),

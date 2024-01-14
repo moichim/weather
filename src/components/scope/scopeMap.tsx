@@ -1,4 +1,4 @@
-import { GoogleSheetsProvider } from "@/graphql/google/googleProvider/googleProvider";
+import { GoogleScope } from "@/graphql/google/google";
 import { Skeleton } from "@nextui-org/react";
 import dynamic from "next/dynamic";
 
@@ -7,11 +7,13 @@ const Map = dynamic( () => import("../ui/map"), {
     loading: () => <Skeleton className="h-[500px] w-full rounded-lg"/>
 } );
 
-export const ScopeMap = async () => {
+type ScopeMapProps = {
+    scopes: GoogleScope[]
+}
 
-    const data = await GoogleSheetsProvider.getAllScopes();
+export const ScopeMap: React.FC<ScopeMapProps> = props => {
 
-    return <Map scopes={data} height="500px" />
+    return <Map scopes={props.scopes} height="500px" />
 
 
 }

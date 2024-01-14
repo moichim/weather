@@ -1,8 +1,8 @@
-import { GoogleSheetsProvider } from "@/graphql/google/googleProvider/googleProvider";
+import { ScopeHeading } from "@/components/scope/scopeHeading";
+import { googleSheetsProvider } from "@/graphql/google/googleProvider/googleProvider";
 import { GraphContextProvider } from "@/state/graph/graphContext";
 import { DisplayContextProvider } from "@/state/graph/useBarInternal";
 import { MeteoContextProvider } from "@/state/meteo/meteoContext";
-import { ScopeHeading } from "@/components/scope/scopeHeading";
 import { ScopeContextProvider } from "@/state/scope/scopeContext";
 import { notFound } from "next/navigation";
 import { PropsWithChildren } from "react";
@@ -12,7 +12,7 @@ type ScopeLayoutProps = PropsWithChildren & ScopePageProps;
 
 const ScopeLayout: React.FC<ScopeLayoutProps> = async ({ ...props }) => {
 
-    const allScopes = await GoogleSheetsProvider.getAllScopes();
+    const allScopes = await googleSheetsProvider.getAllScopes();
     const scope = allScopes.find( s => s.slug === props.params.slug );
 
     if ( scope === undefined )

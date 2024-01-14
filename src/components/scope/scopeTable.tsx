@@ -1,9 +1,7 @@
 "use client";
 
 import { GoogleScope } from "@/graphql/google/google";
-import { GoogleSheetsProvider } from "@/graphql/google/googleProvider/googleProvider";
 import { Button, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, getKeyValue } from "@nextui-org/react";
-import { NextComponentType } from "next";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 

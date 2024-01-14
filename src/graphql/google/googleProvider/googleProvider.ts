@@ -4,6 +4,7 @@ import { GoogleColumn, GoogleColumnValue, GoogleDataColumnDefinition, GoogleRequ
 import { AvailableWeatherProperties, Properties, WeatherProperty } from "../../weather/definitions/properties";
 import { notFound } from "next/navigation";
 import { ApolloServerErrorCode } from "@apollo/server/errors";
+import { randomUUID } from "crypto";
 
 export type ValueSerieDefinition = {
     name: string,
@@ -37,7 +38,9 @@ export type GoogleResponseType = {
     columns: GooglePropertyResponse[]
 }
 
-export class GoogleSheetsProvider {
+
+
+class GoogleSheetsProvider {
 
     protected static CONFIG_SHEET_ID = "1YNjQNCUYUlw96uaQ6RYTq4MG5zUzhHwW-XM-chJWkjE";
 
@@ -45,8 +48,39 @@ export class GoogleSheetsProvider {
 
     protected static DATA_TAB_NAME = "Data";
 
+    public readonly ID: string;
+    protected cachedResult: {
+        [index: string]: GoogleScope
+    } = {};
 
-    protected static async getClient() {
+    protected storeCachedResults( scopes: GoogleScope[] ) {
+        this.cachedResult = Object.fromEntries( scopes.map( s => [s.slug, s] ) );
+    }
+    protected storeCachedResult( scope: GoogleScope ) {
+        this.cachedResult[ scope.slug ] = scope;
+    }
+
+    protected getCachedResult( slug: string ) {
+        return Object.keys( this.cachedResult ).includes( slug )
+            ? this.cachedResult[ slug ]
+            : undefined;
+    }
+
+    protected getCachedResults() {
+        return Object.entries( this.cachedResult ).length > 0
+            ? Object.values( this.cachedResult )
+            : undefined;
+    }
+
+    public constructor() {
+        this.ID = randomUUID();
+    }
+
+    protected static getInstance() {
+        return googleSheetsProvider;
+    }
+
+    protected async getClient() {
 
         const auth = new google.auth.GoogleAuth({
             // keyFile: "./public/credentials.json",
@@ -68,28 +102,14 @@ export class GoogleSheetsProvider {
         });
     }
 
-    protected static formatQueryRange(
+    protected formatQueryRange(
         range: string,
         sheet: string = GoogleSheetsProvider.CONFIG_TAB_NAME
     ): string {
         return `${sheet}!${range}`
     }
 
-    public static async getSheets(): Promise<GoogleSheetsDefinitionType[]> {
-        const api = await GoogleSheetsProvider.getClient();
-        const config = await api.spreadsheets.values.get({
-            spreadsheetId: GoogleSheetsProvider.CONFIG_SHEET_ID,
-            range: GoogleSheetsProvider.formatQueryRange("A2:C")
-        });
-
-        return config.data.values!.map(row => ({
-            name: row[0],
-            sheetId: row[1]
-        }));
-
-    }
-
-    protected static inputDateToString(
+    protected inputDateToString(
         input: string
     ): string {
 
@@ -102,25 +122,24 @@ export class GoogleSheetsProvider {
 
     }
 
-
-    protected static inputDateToDate(input: string): Date {
-        return new Date(GoogleSheetsProvider.inputDateToString(input));
+    protected inputDateToDate(input: string): Date {
+        return new Date(this.inputDateToString(input));
     }
 
-    protected static inputDateToTimestamp(input: string): number {
-        return GoogleSheetsProvider.inputDateToDate(input).getTime();
+    protected inputDateToTimestamp(input: string): number {
+        return this.inputDateToDate(input).getTime();
     }
 
-    protected static isValidScopeString(item: any) {
+    protected isValidScopeString(item: any) {
         const result = typeof item === "string"
             && item !== "";
 
         return result;
     }
 
-    protected static isValidScopeNumber(item: any) {
+    protected isValidScopeNumber(item: any) {
 
-        const isString = GoogleSheetsProvider.isValidScopeString(item);
+        const isString = this.isValidScopeString(item);
 
         const isNumber = parseFloat(item);
 
@@ -130,19 +149,19 @@ export class GoogleSheetsProvider {
 
     }
 
-    protected static isValidScope(slug: string, row: any[]) {
-        return GoogleSheetsProvider.isValidScopeString(row[0])
-            && GoogleSheetsProvider.isValidScopeString(row[1])
-            && GoogleSheetsProvider.isValidScopeString(row[2])
-            && GoogleSheetsProvider.isValidScopeNumber(row[4])
-            && GoogleSheetsProvider.isValidScopeNumber(row[5])
-            && GoogleSheetsProvider.isValidScopeString(row[6])
-            && GoogleSheetsProvider.isValidScopeString(row[7])
-            && GoogleSheetsProvider.isValidScopeString(row[8])
-            && GoogleSheetsProvider.isValidScopeString(row[9])
+    protected isValidScope(slug: string, row: any[]) {
+        return this.isValidScopeString(row[0])
+            && this.isValidScopeString(row[1])
+            && this.isValidScopeString(row[2])
+            && this.isValidScopeNumber(row[4])
+            && this.isValidScopeNumber(row[5])
+            && this.isValidScopeString(row[6])
+            && this.isValidScopeString(row[7])
+            && this.isValidScopeString(row[8])
+            && this.isValidScopeString(row[9])
     }
 
-    protected static formatScope(row: any[]): GoogleScope {
+    protected formatScope(row: any[]): GoogleScope {
 
         const lat = parseFloat(row[4].replace(",", "."));
         const lon = parseFloat(row[5].replace(",", "."));
@@ -162,9 +181,10 @@ export class GoogleSheetsProvider {
     }
 
 
-    public static async getScope(scope: string) {
+    /** @deprecated Should use instances or be releted */
+    public async getScope(scope: string) {
         
-        const scopes = await GoogleSheetsProvider.getAllScopes();
+        const scopes = await this.getAllScopes();
 
         const result = scopes.find(row => row.slug === scope);
 
@@ -177,17 +197,27 @@ export class GoogleSheetsProvider {
 
     }
 
-    public static async getAllScopes(): Promise<GoogleScope[]> {
+    public async getAllScopes(): Promise<GoogleScope[]> {
 
-        const api = await GoogleSheetsProvider.getClient();
+        const cached = this.getCachedResults();
+
+        if ( cached ) {
+            return cached;
+        }
+
+        const api = await this.getClient();
         const response = await api.spreadsheets.values.get({
             spreadsheetId: GoogleSheetsProvider.CONFIG_SHEET_ID,
-            range: GoogleSheetsProvider.formatQueryRange("A2:Z", "Config")
+            range: this.formatQueryRange("A2:Z", "Config")
         });
 
-        const correctRows = response.data.values!.filter(row => GoogleSheetsProvider.isValidScope(row[1], row));
+        const correctRows = response.data.values!.filter(row => this.isValidScope(row[1], row));
 
-        return correctRows.map(row => GoogleSheetsProvider.formatScope(row))
+        const scopes = correctRows.map(row => this.formatScope(row));
+
+        this.storeCachedResults( scopes );
+
+        return scopes;
 
     }
 
@@ -196,15 +226,16 @@ export class GoogleSheetsProvider {
     /** 
      * Fetches the scope's sheet id from the global config table 
      * @throws ApolloError in case of any errors
+     * @deprecated Causes too many calls
     */
-    public static async getSheetId(
+    public async getSheetId(
         scope: string
     ): Promise<string> {
 
-        const api = await GoogleSheetsProvider.getClient();
+        const api = await this.getClient();
         const response = await api.spreadsheets.values.get({
             spreadsheetId: GoogleSheetsProvider.CONFIG_SHEET_ID,
-            range: GoogleSheetsProvider.formatQueryRange("A2:C", "Config")
+            range: this.formatQueryRange("A2:C", "Config")
         });
 
         const [row] = response.data.values!.filter((entry) => {
@@ -227,7 +258,7 @@ export class GoogleSheetsProvider {
 
     }
 
-    protected static extractColumnDefinitionFromResponseData(
+    protected extractColumnDefinitionFromResponseData(
         data: any[][] | null | undefined,
         index: number
     ): GoogleDataColumnDefinition {
@@ -249,7 +280,7 @@ export class GoogleSheetsProvider {
 
     }
 
-    protected static extractColumnValues(
+    protected extractColumnValues(
         data: any[][] | null | undefined,
         index: number
     ): GoogleColumnValue[] {
@@ -276,7 +307,7 @@ export class GoogleSheetsProvider {
             const value = parseFloat(valueRaw);
 
             return {
-                time: GoogleSheetsProvider.inputDateToTimestamp(row[0] as string),
+                time: this.inputDateToTimestamp(row[0] as string),
                 value: value,
                 note: row[1]
             }
@@ -284,7 +315,7 @@ export class GoogleSheetsProvider {
 
     }
 
-    protected static extractColumnDefinitions(data: any[][] | null | undefined): GoogleDataColumnDefinition[] {
+    protected extractColumnDefinitions(data: any[][] | null | undefined): GoogleDataColumnDefinition[] {
 
         if (!data)
             throw new ApolloError({
@@ -296,31 +327,32 @@ export class GoogleSheetsProvider {
         const defs: GoogleDataColumnDefinition[] = [];
 
         for (let i = 0; i < columnsCount; i++) {
-            defs.push(GoogleSheetsProvider.extractColumnDefinitionFromResponseData(data, i));
+            defs.push(this.extractColumnDefinitionFromResponseData(data, i));
         }
 
         return defs;
 
     }
 
-    public static async range(args: GoogleRequest): Promise<any> {
+    /** @deprecated Should know sheet ID from the context */
+    public async range(args: GoogleRequest): Promise<any> {
 
-        const sheetId = await GoogleSheetsProvider.getSheetId(args.scope);
+        const sheetId = await this.getSheetId(args.scope);
 
-        const api = await GoogleSheetsProvider.getClient();
+        const api = await this.getClient();
         const response = await api.spreadsheets.values.get({
             spreadsheetId: sheetId,
-            range: GoogleSheetsProvider.formatQueryRange("A1:Z", "Data")
+            range: this.formatQueryRange("A1:Z", "Data")
         });
 
-        const definitions = GoogleSheetsProvider.extractColumnDefinitions(response.data.values);
+        const definitions = this.extractColumnDefinitions(response.data.values);
 
         const from = args.from;
         const to = args.to;
 
         const result: GoogleColumn[] = definitions.map((column, index) => {
 
-            const values = GoogleSheetsProvider.extractColumnValues(response.data.values, index).filter(entry => {
+            const values = this.extractColumnValues(response.data.values, index).filter(entry => {
                 return entry.time >= from && entry.time <= to;
             });
 
@@ -353,3 +385,6 @@ export class GoogleSheetsProvider {
     }
 
 }
+
+/** Create the global instance of the provider in order to prevent multiple calls */
+export const googleSheetsProvider = new GoogleSheetsProvider;
