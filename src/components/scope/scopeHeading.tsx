@@ -50,12 +50,9 @@ export const ScopeHeading: React.FC<GoogleScope> = props => {
                 color="default"
                 variant="shadow"
                 className={cn( 
-                    "bg-foreground text-background" ,
-                    !isData 
-                        ? "" 
-                        : "bg-opacity-50"
+                    "bg-foreground text-background bg-opacity-50" ,
                 )}
-                as={isData ? Link : "button"}
+                as={Link}
                 href={`/${props.slug}`}
             >Naměřená data</Button>
         </Divider>
@@ -64,12 +61,9 @@ export const ScopeHeading: React.FC<GoogleScope> = props => {
                 color="default"
                 variant="shadow"
                 className={cn( 
-                    "bg-foreground text-background" ,
-                    isData 
-                        ? "" 
-                        : "bg-opacity-50"
+                    "bg-foreground text-background bg-opacity-50" ,
                 )}
-                as={!isData ? Link : "button"}
+                as={Link}
                 href={`/${props.slug}/info`}
             >Informace</Button>
         </Divider>
