@@ -6,6 +6,7 @@ import { Button } from '@nextui-org/react'
 import Link from 'next/link'
 
 import img from "../../../public/letecke-02.jpg";
+import { GoogleDocsViewer } from '../documents/googleDocumentViewer'
 
 
 export default function Intro() {

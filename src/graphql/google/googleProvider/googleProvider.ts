@@ -1,10 +1,8 @@
 import { ApolloError } from "@apollo/client";
-import { google } from "googleapis";
-import { GoogleColumn, GoogleColumnValue, GoogleDataColumnDefinition, GoogleRequest, GoogleScope } from "../google";
-import { AvailableWeatherProperties, Properties, WeatherProperty } from "../../weather/definitions/properties";
-import { notFound } from "next/navigation";
-import { ApolloServerErrorCode } from "@apollo/server/errors";
 import { randomUUID } from "crypto";
+import { google } from "googleapis";
+import { AvailableWeatherProperties, Properties, WeatherProperty } from "../../weather/definitions/properties";
+import { GoogleColumn, GoogleColumnValue, GoogleDataColumnDefinition, GoogleRequest, GoogleScope } from "../google";
 
 export type ValueSerieDefinition = {
     name: string,
@@ -53,22 +51,22 @@ class GoogleSheetsProvider {
         [index: string]: GoogleScope
     } = {};
 
-    protected storeCachedResults( scopes: GoogleScope[] ) {
-        this.cachedResult = Object.fromEntries( scopes.map( s => [s.slug, s] ) );
+    protected storeCachedResults(scopes: GoogleScope[]) {
+        this.cachedResult = Object.fromEntries(scopes.map(s => [s.slug, s]));
     }
-    protected storeCachedResult( scope: GoogleScope ) {
-        this.cachedResult[ scope.slug ] = scope;
+    protected storeCachedResult(scope: GoogleScope) {
+        this.cachedResult[scope.slug] = scope;
     }
 
-    protected getCachedResult( slug: string ) {
-        return Object.keys( this.cachedResult ).includes( slug )
-            ? this.cachedResult[ slug ]
+    protected getCachedResult(slug: string) {
+        return Object.keys(this.cachedResult).includes(slug)
+            ? this.cachedResult[slug]
             : undefined;
     }
 
     protected getCachedResults() {
-        return Object.entries( this.cachedResult ).length > 0
-            ? Object.values( this.cachedResult )
+        return Object.entries(this.cachedResult).length > 0
+            ? Object.values(this.cachedResult)
             : undefined;
     }
 
@@ -80,9 +78,8 @@ class GoogleSheetsProvider {
         return googleSheetsProvider;
     }
 
-    protected async getClient() {
-
-        const auth = new google.auth.GoogleAuth({
+    protected async getAuth() {
+        return new google.auth.GoogleAuth({
             // keyFile: "./public/credentials.json",
             credentials: {
                 type: process.env.GOOGLE_TYPE!,
@@ -93,8 +90,25 @@ class GoogleSheetsProvider {
                 token_url: process.env.GOOGLE_TOKEN_URI!,
                 universe_domain: process.env.GOOGLE_UNIVERSE_DOMAIN!,
             },
-            scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+            scopes: [
+                'https://www.googleapis.com/auth/spreadsheets',
+                'https://www.googleapis.com/auth/documents'
+            ],
         });
+    }
+
+    protected async getDocsClient() {
+        const auth = await this.getAuth();
+
+        return google.docs({
+            version: "v1",
+            auth: auth
+        });
+    }
+
+    protected async getSheetsClient() {
+
+        const auth = await this.getAuth();
 
         return google.sheets({
             version: 'v4',
@@ -183,15 +197,15 @@ class GoogleSheetsProvider {
 
     /** @deprecated Should use instances or be releted */
     public async getScope(scope: string) {
-        
+
         const scopes = await this.getAllScopes();
 
         const result = scopes.find(row => row.slug === scope);
 
-        if ( result === undefined ) 
+        if (result === undefined)
             throw new ApolloError({
-            errorMessage: `Scope ${scope} not found!`
-        });
+                errorMessage: `Scope ${scope} not found!`
+            });
 
         return result;
 
@@ -201,11 +215,11 @@ class GoogleSheetsProvider {
 
         const cached = this.getCachedResults();
 
-        if ( cached ) {
+        if (cached) {
             return cached;
         }
 
-        const api = await this.getClient();
+        const api = await this.getSheetsClient();
         const response = await api.spreadsheets.values.get({
             spreadsheetId: GoogleSheetsProvider.CONFIG_SHEET_ID,
             range: this.formatQueryRange("A2:Z", "Config")
@@ -215,7 +229,7 @@ class GoogleSheetsProvider {
 
         const scopes = correctRows.map(row => this.formatScope(row));
 
-        this.storeCachedResults( scopes );
+        this.storeCachedResults(scopes);
 
         return scopes;
 
@@ -232,7 +246,7 @@ class GoogleSheetsProvider {
         scope: string
     ): Promise<string> {
 
-        const api = await this.getClient();
+        const api = await this.getSheetsClient();
         const response = await api.spreadsheets.values.get({
             spreadsheetId: GoogleSheetsProvider.CONFIG_SHEET_ID,
             range: this.formatQueryRange("A2:C", "Config")
@@ -339,7 +353,7 @@ class GoogleSheetsProvider {
 
         const sheetId = await this.getSheetId(args.scope);
 
-        const api = await this.getClient();
+        const api = await this.getSheetsClient();
         const response = await api.spreadsheets.values.get({
             spreadsheetId: sheetId,
             range: this.formatQueryRange("A1:Z", "Data")
@@ -381,6 +395,19 @@ class GoogleSheetsProvider {
         });
 
         return result;
+
+    }
+
+
+    public async getDocument() {
+
+        const client = await this.getDocsClient();
+
+        const response = await client.documents.get({
+            documentId: "1ju2ejVopG71HijyAjS9XZP3YWvGFHblncbLm2twrJRU"
+        });
+
+        return response;
 
     }
 

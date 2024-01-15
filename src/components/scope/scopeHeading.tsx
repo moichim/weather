@@ -1,11 +1,16 @@
+"use client";
+
 import { GoogleScope } from "@/graphql/google/google";
-import { Button, Dropdown, DropdownTrigger, Link } from "@nextui-org/react";
-import React from "react";
+import { Button, Dropdown, DropdownTrigger, Link, cn } from "@nextui-org/react";
+import React, { useMemo } from "react";
 import { ScopeDropdownMenu } from "./scopeDropdownMenu";
 
 const Divider: React.FC<React.PropsWithChildren> = props => <div>{props.children}</div>
 
 export const ScopeHeading: React.FC<GoogleScope> = props => {
+
+    const isData = false;
+    //useMemo( () => window.location.pathname.includes("/info"), [] );
 
     return <header className="flex gap-1 items-center">
         <Divider>
@@ -44,8 +49,27 @@ export const ScopeHeading: React.FC<GoogleScope> = props => {
             <Button
                 color="default"
                 variant="shadow"
-                className="bg-foreground text-background"
-                as={Link}
+                className={cn( 
+                    "bg-foreground text-background" ,
+                    !isData 
+                        ? "" 
+                        : "bg-opacity-50"
+                )}
+                as={isData ? Link : "button"}
+                href={`/${props.slug}`}
+            >Naměřená data</Button>
+        </Divider>
+        <Divider>
+            <Button
+                color="default"
+                variant="shadow"
+                className={cn( 
+                    "bg-foreground text-background" ,
+                    isData 
+                        ? "" 
+                        : "bg-opacity-50"
+                )}
+                as={!isData ? Link : "button"}
                 href={`/${props.slug}/info`}
             >Informace</Button>
         </Divider>

@@ -38,14 +38,10 @@ export async function generateMetadata(
 }
 
 const ScopePage: NextPage<ScopePageProps> = async (props) => {
-    return <MeteoContextProvider>
-        <GraphContextProvider>
-            <DisplayContextProvider>
-                <Graphs />
-                <Bar />
-            </DisplayContextProvider>
-        </GraphContextProvider>
-    </MeteoContextProvider>
+    return <>
+        <Graphs />
+        <Bar />
+    </>
 }
 
 export default ScopePage;

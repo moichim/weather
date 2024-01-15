@@ -32,7 +32,7 @@ type MapProps = MapCommonProps & ({
 
 const Map: React.FC<MapProps> = props => {
     if ( "scope" in props ) {
-        return <MapSingleComponent {...props.scope} height={props.height}/>
+        return <MapSingleComponent {...props.scope} height={props.height} zoom={13}/>
     }
     return <MapMultipleComponent items={props.scopes} height={props.height}/>
 }

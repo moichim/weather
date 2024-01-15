@@ -25,7 +25,7 @@ export const GraphLegendColumns: React.FC<LegendWithDescription> = ( {
     return <>
 
         {Object.entries( columns ).map( ([property,columns]) => <div key={property}>
-            <h3 className="mb-2">{property}</h3>
+            <h3 className="mb-2 mt-4 font-bold">{property}</h3>
             <ul className="list-disc">
                 {columns.map( column => <GraphLegendItemDetail {...column} key={column.name?.toString()} showDescription={showDescription}/> )}
             </ul>

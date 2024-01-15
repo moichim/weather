@@ -14,7 +14,7 @@ export const GraphLegendItemDetail:  React.FC<GraphLegendColumnDetailProps> = pr
 
         <GraphLegendItemTitle {...props} />
 
-        {( props.description && props.showDescription === true ) && <div>{props.description}</div>}
+        {( props.description && props.showDescription === true ) && <div className="pl-7 text-sm text-gray-500">{props.description}</div>}
 
     </div>
 

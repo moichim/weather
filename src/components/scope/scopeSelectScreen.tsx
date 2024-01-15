@@ -27,10 +27,6 @@ export const ScopeSelectScreen: React.FC<ScopeSelectScreenProps> = props => {
             <ScopeTable scopes={props.scopes}/>
         </div>
 
-        <div className="flex flex-wrap w-full pb-16">
-            {props.scopes.map(scope => <ScopeCard {...scope} key={scope.slug} />)}
-        </div>
-
         
     </>
 
