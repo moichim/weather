@@ -53,7 +53,7 @@ export class NtcProvider extends AbstractWeatherProvider {
             bar: responseItem.bar,
             rain: responseItem.rain_rate,
             clouds: 0,
-            humidity: responseItem.inside_humidity,
+            humidity: responseItem.out_hum,
             uv: responseItem.high_uv,
             radiance: responseItem.solar_rad
         } as WeatherEntryType
