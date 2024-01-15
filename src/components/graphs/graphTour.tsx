@@ -2,13 +2,12 @@
 
 import { GraphTools } from "@/state/graph/data/tools";
 import { useGraphContext } from "@/state/graph/graphContext";
-import { GraphActions, StackActions } from "@/state/graph/reducerInternals/actions";
+import { StackActions } from "@/state/graph/reducerInternals/actions";
 import { useMeteoContext } from "@/state/meteo/meteoContext";
 import { useScopeContext } from "@/state/scope/scopeContext";
 import { Button, Kbd, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner } from "@nextui-org/react";
 import dynamic from "next/dynamic";
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
-import { CloseIcon, ZoomInIcon } from "../ui/icons";
 import { GraphLegend } from "./components/legend/graphLegend";
 
 /** Run the tour */
@@ -178,7 +177,7 @@ export const GraphTour: React.FC = () => {
                         </div>}
 
                         {queriedProperties.length > 0 && <>
-                            <GraphLegend />
+                            <GraphLegend showDescriptionColumns={false} showDescriptionSources={true}/>
                         </>}
                     </ModalBody>
                     {queriedProperties.length > 0 &&

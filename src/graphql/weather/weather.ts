@@ -136,6 +136,7 @@ export const weatherTypeDefs = gql`
         stroke: String!
         slug: String!
         props:[String]
+        description: String
     }
 
 `;

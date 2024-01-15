@@ -7,7 +7,7 @@ const Divider: React.FC<React.PropsWithChildren> = props => <div>{props.children
 
 export const ScopeHeading: React.FC<GoogleScope> = props => {
 
-    return <header className="flex gap-1">
+    return <header className="flex gap-1 items-center">
         <Divider>
             <Button
                 isIconOnly
@@ -39,6 +39,15 @@ export const ScopeHeading: React.FC<GoogleScope> = props => {
                 </DropdownTrigger>
                 <ScopeDropdownMenu {...props} />
             </Dropdown>
+        </Divider>
+        <Divider>
+            <Button
+                color="default"
+                variant="shadow"
+                className="bg-foreground text-background"
+                as={Link}
+                href={`/${props.slug}/info`}
+            >Informace</Button>
         </Divider>
     </header>
 

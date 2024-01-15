@@ -1,18 +1,15 @@
-"use client"
-
 import { useMeteoContext } from "@/state/meteo/meteoContext";
 import { useMemo } from "react";
-import { LegendItem } from "./legendITem";
 
-export const GraphLegendCustom: React.FC = () => {
+export const useLegendSources = () => {
 
     const { response } = useMeteoContext();
 
-    const queriedSources: {
-        name: string, color: string, description: string, link?: string
-    }[] = useMemo(() => {
+    return useMemo(() => {
+
         if (response === undefined)
             return [];
+
         return response.weatherRange.map(source => ({
             name: source.source.name,
             color: source.source.color,
@@ -21,7 +18,4 @@ export const GraphLegendCustom: React.FC = () => {
         }));
     }, [response]);
 
-    return <ul className="list-disc ml-5">
-        {queriedSources.map( property => <LegendItem key={property.name} {...property} /> )}
-    </ul>
 }

@@ -1,26 +1,19 @@
 "use client"
 
-import { useMeteoContext } from "@/state/meteo/meteoContext";
-import { useMemo } from "react";
-import { LegendItem } from "./legendITem";
+import { LegendWithDescription } from "./graphLegend";
+import { GraphLegendItemDetail } from "./partials/GraphLegendItemDetail";
+import { useLegendSources } from "./utils/useLegendSources";
 
-export const GraphLegendSources: React.FC = () => {
 
-    const { response } = useMeteoContext();
 
-    const queriedProperties: {
-        name: string, color: string, in: string
-    }[] = useMemo(() => {
-        if (response === undefined)
-            return [];
-        return response.range.data.map(property => ({
-            name: property.name,
-            color: property.color,
-            in: property.in.name ?? property.in.slug
-        }));
-    }, [response]);
+export const GraphLegendSources: React.FC<LegendWithDescription> = ({
+    showDescription = false, 
+    ...props
+} )=> {
 
-    return <ul className="list-disc ml-5">
-        {queriedProperties.map( property => <LegendItem key={property.name} {...property} /> )}
+    const sources = useLegendSources();
+
+    return <ul className="list-disc">
+        {sources.map( property => <GraphLegendItemDetail key={property.name} {...property} showDescription={showDescription} /> )}
     </ul>
 }

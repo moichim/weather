@@ -81,6 +81,7 @@ export const googleTypeDefs = gql`
         max: Float
         avg: Float
         count: Float
+        description: String
     }
 
     type GoogleColumnValue {

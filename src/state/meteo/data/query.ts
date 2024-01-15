@@ -32,6 +32,7 @@ query Entries($from: Float, $lat: Float!, $lon: Float!, $to: Float, $scope: Stri
       name
       color
       stroke
+      description
       slug
       props
     }
@@ -113,6 +114,7 @@ query Entries($from: Float, $lat: Float!, $lon: Float!, $to: Float, $scope: Stri
   range(from: $from, lat: $lat, lon: $lon, to: $to, scope: $scope) {
     data {
       name
+      description
       slug
       color
       in {
@@ -149,6 +151,7 @@ query Entries($from: Float, $lat: Float!, $lon: Float!, $to: Float, $scope: Stri
       color
       stroke
       slug
+      description
       props
     }
     statistics {

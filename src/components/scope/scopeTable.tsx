@@ -1,9 +1,10 @@
 "use client";
 
 import { GoogleScope } from "@/graphql/google/google";
-import { Button, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, getKeyValue } from "@nextui-org/react";
+import { Button, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, cn, getKeyValue } from "@nextui-org/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { ArrowRightIcon } from "../ui/icons";
 
 type ScopeTableProps = {
     scopes: GoogleScope[]
@@ -23,7 +24,12 @@ export const ScopeTable: React.FC<ScopeTableProps> = props => {
 
     const rows = props.scopes.map(item => ({
         slug: item.slug,
-        school: <strong>{item.name}</strong>,
+        school: <div className="flex w-full items-center gap-4">
+            <div className="group-hover:translate-x-1 text-gray-500 group-hover:text-primary-500 transform-all duration-200 ease-in-out group-hover:scale-[1.2]">
+                <ArrowRightIcon />
+            </div>
+            <strong className="group-hover:text-primary-500">{item.name}</strong>
+        </div>,
         locality: item.locality,
         description: item.description,
         team: item.team,
@@ -37,7 +43,6 @@ export const ScopeTable: React.FC<ScopeTableProps> = props => {
     }));
 
     return <Table
-        // className="text-foreground"
         // removeWrapper
         isStriped
         onRowAction={key => router.push(`/${key}`)}
@@ -48,7 +53,7 @@ export const ScopeTable: React.FC<ScopeTableProps> = props => {
         <TableBody items={rows}>
             {row => <TableRow
                 key={row.slug}
-                className=""
+                className="group cursor-pointer"
             >
                 {( key ) => <TableCell className={ ["team","description"].includes( key.toString() ) ? "hidden lg:table-cell" : "" }>
                     {getKeyValue(row, key)}
