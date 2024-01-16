@@ -8,6 +8,7 @@ export type GoogleScope = {
     slug: string,
     /** ID of the scope's data sheet */
     sheetId: string,
+    sheetTab: string,
     lat: number,
     lon: number,
     hasNtc: boolean,
@@ -49,7 +50,7 @@ export type GoogleScopeData = {
 export const googleTypeDefs = gql`
 
     extend type Query {
-        range( scope: String, lat: Float!, lon: Float!, from:Float, to:Float ): GoogleScopeData
+        range( scope: String, lat: Float!, lon: Float!, from:Float, to:Float, sheetId: String!, sheetTab: String! ): GoogleScopeData
         googleScope( scope: String! ): GoogleScope
         googleScopes: [GoogleScope]
     }
@@ -58,6 +59,7 @@ export const googleTypeDefs = gql`
         name: String!
         slug: String!
         sheetId: String!
+        sheetTab: String!
         lat: Float!
         lon: Float!
         hasNtc: Boolean!
@@ -94,6 +96,8 @@ export const googleTypeDefs = gql`
 
 export type GoogleRequest = {
     scope: string,
+    sheetId: string,
+    sheetTab: string,
     lat: number,
     lon: number,
     from: number,

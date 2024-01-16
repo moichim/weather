@@ -12,7 +12,7 @@ export type MeteoQueryResponseType = {
 }
 
 export const METEO_DATA_QUERY = gql`
-query Entries($from: Float, $lat: Float!, $lon: Float!, $to: Float, $scope: String, $hasNtc: Boolean! ) {
+query Entries($from: Float, $lat: Float!, $lon: Float!, $to: Float, $scope: String, $hasNtc: Boolean!, $sheetId: String!, $sheetTab: String! ) {
   weatherRange(from: $from, lat: $lat, lon: $lon, to: $to, scope: $scope, hasNtc: $hasNtc) {
     entries {
       time
@@ -111,7 +111,7 @@ query Entries($from: Float, $lat: Float!, $lon: Float!, $to: Float, $scope: Stri
       }
     }
   }
-  range(from: $from, lat: $lat, lon: $lon, to: $to, scope: $scope) {
+  range(from: $from, lat: $lat, lon: $lon, to: $to, scope: $scope, sheetId: $sheetId, sheetTab: $sheetTab) {
     data {
       name
       description
@@ -144,7 +144,7 @@ query Entries($from: Float, $lat: Float!, $lon: Float!, $to: Float, $scope: Stri
 
 export const METEO_RANGE_QUERY = gql`
 
-query Entries($from: Float, $lat: Float!, $lon: Float!, $to: Float, $scope: String, $hasNtc: Boolean! ) {
+query Entries($from: Float, $lat: Float!, $lon: Float!, $to: Float, $scope: String, $hasNtc: Boolean!, $sheetId: String!, $sheetTab: String! ) {
   weatherRange(from: $from, lat: $lat, lon: $lon, to: $to, scope: $scope, hasNtc: $hasNtc) {
     source {
       name
@@ -229,7 +229,7 @@ query Entries($from: Float, $lat: Float!, $lon: Float!, $to: Float, $scope: Stri
       }
     }
   }
-  range(from: $from, to: $to, scope: $scope, lat: $lat, lon: $lon) {
+  range(from: $from, lat: $lat, lon: $lon, to: $to, scope: $scope, sheetId: $sheetId, sheetTab: $sheetTab) {
     data {
       name
       slug

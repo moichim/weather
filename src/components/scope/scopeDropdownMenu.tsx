@@ -11,7 +11,7 @@ export const ScopeDropdownMenu: React.FC<GoogleScope> = props => {
 
     const items = useMemo( () => availableScopes.map( scope => ({
         key: scope.slug,
-        label: scope.name
+        label: scope.name + " (" + scope.team + ")"
     }) ), [availableScopes] );
 
     return <DropdownMenu items={items}>
