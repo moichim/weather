@@ -8,7 +8,7 @@ import { NumberDomain } from "recharts/types/util/types";
 import { MeteoRequestType } from "@/state/meteo/data/query";
 import { GoogleRequest } from "../google/google";
 import { AbstractWeatherProvider } from "./weatherProviders/abstractProvider";
-import { OpenMeteoHistoryProvider } from "./weatherProviders/openmeteohistoryProvider";
+import { OpenMeteoHistoryProvider } from "./weatherProviders/openmeteoHistoryProvider";
 
 export type WeatherEntryMetaType = {
     time: number,
