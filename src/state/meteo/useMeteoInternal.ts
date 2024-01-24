@@ -29,6 +29,8 @@ export const useMeteoInternal = () => {
 
         variables: {
             scope: selection.scope,
+            sheetId: activeScope?.sheetId ?? "",
+            sheetTab: activeScope?.sheetTab ?? "",
             from: selection.fromTimestamp,
             to: selection.toTimestamp,
             lat: 0,//activeScope.lat,
@@ -69,6 +71,8 @@ export const useMeteoInternal = () => {
                     lat: activeScope.lat ?? 0,
                     lon: activeScope.lon ?? 0,
                     scope: activeScope.slug,
+                    sheetId: activeScope?.sheetId,
+                    sheetTab: activeScope?.sheetTab,
                     from: selection.fromTimestamp,
                     to: selection.toTimestamp,
                     hasNtc: activeScope.hasNtc
@@ -81,6 +85,8 @@ export const useMeteoInternal = () => {
     const [fetchRange, rangeQuery] = useLazyQuery<MeteoQueryResponseType>(METEO_RANGE_QUERY, {
         variables: {
             scope: selection.scope,
+            sheetId: activeScope?.sheetId,
+            sheetTab: activeScope?.sheetTab,
             from: selection.rangeMinTimestamp,
             to: selection.rangeMaxTimestamp,
             lat: activeScope?.lat,
@@ -118,6 +124,8 @@ export const useMeteoInternal = () => {
                 fetchRange({
                     variables: {
                         scope: activeScope.slug,
+                        sheetId: activeScope.sheetId,
+                        sheetTab: activeScope.sheetTab,
                         from: selection.rangeMinTimestamp,
                         to: selection.rangeMaxTimestamp,
                         lat: activeScope.lat,

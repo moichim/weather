@@ -25,7 +25,7 @@ export const GraphLegend: React.FC<GraphLegendType> = ({
         return <></>;
 
     return <>
-        <p>Tým <strong>{activeScope.name}</strong> působí v lokalitě <strong>{activeScope.locality}</strong>. Ve svém měření zaznamenává tyto údaje:</p>
+        <p>Tým <strong>{activeScope.team}</strong> z {activeScope.name} působí v lokalitě <strong>{activeScope.locality}</strong>. Rozhodli se sbírat tyto údaje:</p>
         <GraphLegendColumns showDescription={showDescriptionColumns}/>
 
         <p>Dále jsou v grafu k dispozici meterologická data z těchto zdrojů:</p>

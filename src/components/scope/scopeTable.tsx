@@ -15,10 +15,10 @@ export const ScopeTable: React.FC<ScopeTableProps> = props => {
     const router = useRouter();
 
     const columns = [
-        { key: "school", label: "Škola" },
+        { key: "school", label: "Tým" },
+        // { key: "team", label: "Tým" },
         { key: "locality", label: "Lokalita" },
-        { key: "team", label: "Tým" },
-        { key: "description", label: "Popiska" },
+        { key: "description", label: "Popis" },
         { key: "link", label: "Akce" },
     ];
 
@@ -29,6 +29,7 @@ export const ScopeTable: React.FC<ScopeTableProps> = props => {
                 <ArrowRightIcon />
             </div>
             <strong className="group-hover:text-primary-500">{item.name}</strong>
+            <span>{item.team}</span>
         </div>,
         locality: item.locality,
         description: item.description,
@@ -48,18 +49,24 @@ export const ScopeTable: React.FC<ScopeTableProps> = props => {
         onRowAction={key => router.push(`/${key}`)}
     >
         <TableHeader columns={columns}>
-            {column => <TableColumn className={ ["team","description"].includes( column.key.toString() ) ? "hidden lg:table-cell" : "" }>{column.label}</TableColumn>}
+            {column => <TableColumn className={cn(
+                ["team", "description"].includes(column.key.toString()) ? "hidden lg:table-cell" : "",
+                ["locality"].includes(column.key.toString()) ? "hidden md:table-cell" : ""
+            )}>{column.label}</TableColumn>}
         </TableHeader>
         <TableBody items={rows}>
             {row => <TableRow
                 key={row.slug}
-                className="group cursor-pointer"
+                className="group cursor-pointer hover:text-primary-700"
             >
-                {( key ) => <TableCell className={ ["team","description"].includes( key.toString() ) ? "hidden lg:table-cell" : "" }>
-                    {getKeyValue(row, key)}
+                {(key) => <TableCell className={cn(
+                    ["team", "description"].includes(key.toString()) ? "hidden lg:table-cell" : "",
+                    ["locality"].includes(key.toString()) ? "hidden md:table-cell" : ""
+                ) }>
+                    { getKeyValue(row, key) }
                 </TableCell>}
-            </TableRow>}
-        </TableBody>
-    </Table>
+        </TableRow>}
+    </TableBody>
+    </Table >
 
 }

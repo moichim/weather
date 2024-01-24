@@ -167,6 +167,7 @@ class GoogleSheetsProvider {
         return this.isValidScopeString(row[0])
             && this.isValidScopeString(row[1])
             && this.isValidScopeString(row[2])
+            && this.isValidScopeString(row[3])
             && this.isValidScopeNumber(row[4])
             && this.isValidScopeNumber(row[5])
             && this.isValidScopeString(row[6])
@@ -184,6 +185,7 @@ class GoogleSheetsProvider {
             name: row[0],
             slug: row[1],
             sheetId: row[2],
+            sheetTab: row[3],
             lat,
             lon,
             hasNtc: row[6] === "1",
@@ -232,43 +234,6 @@ class GoogleSheetsProvider {
         this.storeCachedResults(scopes);
 
         return scopes;
-
-    }
-
-
-
-    /** 
-     * Fetches the scope's sheet id from the global config table 
-     * @throws ApolloError in case of any errors
-     * @deprecated Causes too many calls
-    */
-    public async getSheetId(
-        scope: string
-    ): Promise<string> {
-
-        const api = await this.getSheetsClient();
-        const response = await api.spreadsheets.values.get({
-            spreadsheetId: GoogleSheetsProvider.CONFIG_SHEET_ID,
-            range: this.formatQueryRange("A2:C", "Config")
-        });
-
-        const [row] = response.data.values!.filter((entry) => {
-            return entry[1] === scope;
-        });
-
-        if (row === undefined) {
-            throw new ApolloError({
-                errorMessage: "Scope not found"
-            })
-        }
-
-        if (row.length < 3) {
-            throw new ApolloError({
-                errorMessage: "Scope is not defined properly"
-            })
-        }
-
-        return row[2] as string;
 
     }
 
@@ -351,12 +316,12 @@ class GoogleSheetsProvider {
     /** @deprecated Should know sheet ID from the context */
     public async range(args: GoogleRequest): Promise<any> {
 
-        const sheetId = await this.getSheetId(args.scope);
+        const sheetId = args.sheetId;
 
         const api = await this.getSheetsClient();
         const response = await api.spreadsheets.values.get({
             spreadsheetId: sheetId,
-            range: this.formatQueryRange("A1:Z", "Data")
+            range: this.formatQueryRange("A1:Z", args.sheetTab)
         });
 
         const definitions = this.extractColumnDefinitions(response.data.values);

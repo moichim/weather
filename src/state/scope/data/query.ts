@@ -14,6 +14,7 @@ export const GOOGLE_SCOPES_QUERY = gql`
            name
             slug
             sheetId
+            sheetTab
             lat
             lon
             hasNtc
