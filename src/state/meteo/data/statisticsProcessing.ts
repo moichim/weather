@@ -1,6 +1,6 @@
 import { ViewInstanceStatisticsType } from "@/components/graphs/utils/useGraphInstancData";
 import { WeatherStatistic, WeatherStatistics } from "@/graphql/weather/weather";
-import { WeatherProperty } from "@/graphql/weather/definitions/properties";
+import { AvailableWeatherProperties, WeatherProperty } from "@/graphql/weather/definitions/properties";
 import { Sources } from "@/graphql/weather/definitions/source";
 import { MeteoQueryResponseType } from "./query";
 
@@ -19,7 +19,7 @@ export class StatisticsProcessing {
         response: MeteoQueryResponseType
     ): GraphStatisticsDataType {
 
-        const propertyStatistics = Object.fromEntries(response.weatherRange.map(source => {
+        const propertyStatistics = Object.fromEntries(response.weatherRange.data.map(source => {
             const statistics = source.statistics;
             return [source.source.slug, statistics]
         }));
@@ -54,7 +54,10 @@ export class StatisticsProcessing {
         const lineStatistics = Object.fromEntries(
             Object.entries(statistics.lines)
                 .filter(([sourceSlug, properties]) => {
-                    return property.in.includes(sourceSlug);
+
+                    const prop = properties[property.slug]!;
+
+                    return property.in.includes(sourceSlug) && prop.count > 0;
                 })
                 .map(([sourceSlug, properties]) => {
                     const source = Sources.one(sourceSlug);

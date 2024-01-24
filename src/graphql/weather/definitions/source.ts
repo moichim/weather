@@ -36,11 +36,32 @@ const sources: {
             "radiance"
         ]
     },
-    openmeteo: {
-        name: "Open Meteo",
+    openmeteo_forecast: {
+        name: "Open Meteo - předpověď",
+        color: "black",
+        stroke: "black",
+        description: "Předpověď počasí z veřejně dostupné služby Open Meteo. Od 5 dní zpětně do budoucnosti.",
+        link: "https://open-meteo.com/",
+        props: [
+            "temperature",
+            "wind_dir",
+            "wind_speed",
+            "uv",
+            "humidity",
+            "bar",
+            "clouds",
+            "rain",
+            "uv",
+            "radiance",
+            "snow_depth",
+            "evapotranspiration"
+        ]
+    },
+    openmeteo_history: {
+        name: "Open Meteo - historická data",
         color: "green",
         stroke: "green",
-        description: "Veřejně dostupná služba poskytující údaje o počasí.",
+        description: "Historické údaje ze služby Open Meteo. Maximálně 5 dní nazpět.",
         link: "https://open-meteo.com/",
         props: [
             "temperature",

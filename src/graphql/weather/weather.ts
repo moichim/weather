@@ -2,12 +2,13 @@ import gql from "graphql-tag"
 import { Sources, WeatherSourceType } from "./definitions/source";
 import { Properties } from "./definitions/properties";
 import { Source } from "postcss";
-import { OpenmeteoProvider } from "./weatherProviders/openmeteoProvider";
+import { OpenmeteoForecastProvider } from "./weatherProviders/openmeteoForecastProvider";
 import { NtcProvider } from "./weatherProviders/ntcProvider";
 import { NumberDomain } from "recharts/types/util/types";
 import { MeteoRequestType } from "@/state/meteo/data/query";
 import { GoogleRequest } from "../google/google";
 import { AbstractWeatherProvider } from "./weatherProviders/abstractProvider";
+import { OpenMeteoHistoryProvider } from "./weatherProviders/openmeteohistoryProvider";
 
 export type WeatherEntryMetaType = {
     time: number,
@@ -33,7 +34,7 @@ export type WeatherStatistic = {
     max?: number,
     avg?: number,
     count: number,
-    type: "line"|"dot",
+    type: "line" | "dot",
     in?: string,
     name: string,
     color: string
@@ -56,7 +57,7 @@ export type WeatherStatistics = {
 export type WeatherEntryType = WeatherEntryMetaType & WeatherEntryDataType;
 
 export type WeatherSerieIndexType = {
-    [index:number]: WeatherEntryType
+    [index: number]: WeatherEntryType
 }
 
 export type WeatherSerie = {
@@ -65,12 +66,17 @@ export type WeatherSerie = {
     statistics: WeatherStatistics
 }
 
-export type WeatherProviderRequest = GoogleRequest
+export type WeatherProviderRequest = GoogleRequest;
+
+export type WeatherResponse = {
+    data: WeatherSerie[],
+    request: WeatherProviderRequest
+}
 
 export const weatherTypeDefs = gql`
 
     extend type Query {
-        weatherRange(scope: String, lat: Float!, lon: Float!, from:Float,to:Float, hasNtc: Boolean!): [Serie]
+        weatherRange(scope: String, lat: Float!, lon: Float!, from:Float,to:Float, hasNtc: Boolean!): WeatherResponse
         sources: [Source]
         properties: [Property]
     }
@@ -139,27 +145,47 @@ export const weatherTypeDefs = gql`
         description: String
     }
 
+    type WeatherRequest {
+        scope: String!
+        lat: Float!
+        lon: Float!
+        from: Float!
+        to: Float!
+    }
+
+    type WeatherResponse {
+        request: WeatherRequest!
+        data: [Serie]!
+    }
+
 `;
 
-const openMeteoProvider = new OpenmeteoProvider;
+const openMeteoForecastProvider = new OpenmeteoForecastProvider;
+const openMeteoHistoryProvider = new OpenMeteoHistoryProvider;
 const ntcProvider = new NtcProvider;
 
 export const weatherResolvers = {
 
     Query: {
-        weatherRange: async ( 
-            parent: any, 
-            args: MeteoRequestType, 
-        ): Promise<WeatherSerie[]> => {
+        weatherRange: async (
+            parent: any,
+            args: MeteoRequestType,
+        ): Promise<WeatherResponse> => {
 
 
-            const providers: AbstractWeatherProvider[] = [ openMeteoProvider ];
+            const providers: AbstractWeatherProvider[] = [openMeteoForecastProvider, openMeteoHistoryProvider];
 
-            if ( args.hasNtc ) {
-                providers.push( ntcProvider );
+            if (args.hasNtc) {
+                providers.push(ntcProvider);
             }
 
-            return Promise.all(providers.map( p => p.fetch( args ) ));
+            return Promise.all(providers.map(p => p.fetch(args)))
+                .then(result => {
+                    return {
+                        data: result,
+                        request: args
+                    }
+                });
 
         },
         sources: () => Sources.all(),

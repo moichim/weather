@@ -1,19 +1,17 @@
 "use client";
 
-import { StackActions } from "@/state/graph/reducerInternals/actions";
-import { useGraphContext } from "@/state/graph/graphContext";
-import { GraphDomain, GraphInstanceState, graphInstanceHeights } from "@/state/graph/reducerInternals/storage";
 import { GraphTools } from "@/state/graph/data/tools";
+import { useGraphContext } from "@/state/graph/graphContext";
+import { StackActions } from "@/state/graph/reducerInternals/actions";
+import { GraphDomain, GraphInstanceState, graphInstanceHeights } from "@/state/graph/reducerInternals/storage";
 import { DataActionsFactory } from "@/state/meteo/reducerInternals/actions";
+import { stringLabelFromTimestamp } from "@/utils/time";
 import { Skeleton, Spinner, cn } from "@nextui-org/react";
 import { format } from "date-fns";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { CartesianGrid, ComposedChart, Line, LineChart, ReferenceArea, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { CartesianGrid, Line, LineChart, ReferenceArea, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { CategoricalChartFunc } from "recharts/types/chart/generateCategoricalChart";
 import { useGraphInstanceMeteo } from "../utils/useGraphInstancData";
-import { stringLabelFromTimestamp } from "@/utils/time";
-import { Properties } from "@/graphql/weather/definitions/properties";
-import { Sources } from "@/graphql/weather/definitions/source";
 
 
 export const GraphView: React.FC<GraphInstanceState> = props => {

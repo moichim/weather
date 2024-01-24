@@ -4,18 +4,53 @@ import { AbstractWeatherProvider, IProvider } from "./abstractProvider";
 import { Sources, WeatherSourceType } from "../definitions/source";
 import { MeteoRequestType } from "@/state/meteo/data/query";
 import { stringFromTimestamp } from "@/utils/time";
+import { subDays } from "date-fns";
 
-export class OpenmeteoProvider extends AbstractWeatherProvider {
+export class OpenmeteoForecastProvider extends AbstractWeatherProvider {
 
-    protected fields = ["temperature_2m", "relative_humidity_2m", "precipitation", "rain", "showers", "snowfall", "snow_depth", "surface_pressure", "cloud_cover", "evapotranspiration", "et0_fao_evapotranspiration", "wind_speed_10m", "wind_direction_10m", "uv_index", "direct_radiation"]
+    protected fields = [
+        "temperature_2m", 
+        "relative_humidity_2m", 
+        "precipitation", 
+        "rain", 
+        "showers", 
+        "snowfall", 
+        "snow_depth", 
+        "surface_pressure", 
+        "cloud_cover", 
+        "evapotranspiration", 
+        "et0_fao_evapotranspiration", 
+        "wind_speed_10m", 
+        "wind_direction_10m", 
+        "uv_index", 
+        "direct_radiation"
+    ]
 
     protected generateSourceDefinition(): WeatherSourceType {
-        return Sources.one( "openmeteo" );
+        return Sources.one( "openmeteo_forecast" );
+    }
+
+
+    protected getMinFrom(): number {
+        const date = subDays( new Date(), 2 );
+        date.setHours( 23 );
+        date.setMinutes( 59 );
+        date.setSeconds( 0 );
+        date.setMilliseconds( 0 );
+        return date.getTime();
+    }
+
+    protected clampFrom( providedFrom: number ): number {
+        return Math.max( this.getMinFrom(), providedFrom );
     }
 
     public async doRequest(args: MeteoRequestType) {
 
-        const from = stringFromTimestamp( args.from - ( 60 * 60 * 1000 ) );
+        const fromTmp = this.clampFrom( args.from - ( 60 * 60 * 1000 ) );
+
+        if ( fromTmp < (new Date).getTime() ) return [];
+
+        const from = stringFromTimestamp( fromTmp );
         const to = stringFromTimestamp( args.to );
 
         const params = {
@@ -37,10 +72,6 @@ export class OpenmeteoProvider extends AbstractWeatherProvider {
         
         // Attributes for timezone and location
         const utcOffsetSeconds = response.utcOffsetSeconds();
-        const timezone = response.timezone();
-        const timezoneAbbreviation = response.timezoneAbbreviation();
-        const latitude = response.latitude();
-        const longitude = response.longitude();
         
         const hourly = response.hourly()!;
         
@@ -87,7 +118,7 @@ export class OpenmeteoProvider extends AbstractWeatherProvider {
                     wind_dir: getValue("windDirection10m", index),
                     wind_speed: getValue( "windSpeed10m", index ),
                     bar: getValue("surfacePressure", index ),
-                    rain: getValue( "rain", index ),
+                    rain: getValue( "precipitation", index ),
                     clouds: getValue( "cloudCover", index ),
                     uv: getValue( "uvIndex", index ),
                     radiance: getValue( "directRadiation", index ),

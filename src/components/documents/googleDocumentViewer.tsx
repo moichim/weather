@@ -17,7 +17,6 @@ const parse = ( document: GoogleDocument ) => {
     const markup: JSX.Element[] = [];
 
     content.forEach( ( partial, index)  => {
-        // console.log( partial );
 
         if ( "paragraph" in partial ) {
 
@@ -32,8 +31,6 @@ const parse = ( document: GoogleDocument ) => {
                     const div: JSX.Element[] = []
 
                     elements.forEach( (entry,index) => {
-
-                        console.log( entry );
 
                         const textRun = entry.textRun;
 

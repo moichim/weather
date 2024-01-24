@@ -120,7 +120,7 @@ export class MeteoResponseProcessor {
         weather: MeteoQueryResponseType["weatherRange"]
     ) {
 
-        return Object.fromEntries( weather.map( serie => {
+        return Object.fromEntries( weather.data.map( serie => {
             const timedEntries = Object.fromEntries( serie.entries.map( entry => [entry.time, entry] ) );
             return [ serie.source.slug, timedEntries ]
         } ) );
@@ -158,7 +158,7 @@ export class MeteoResponseProcessor {
     protected static getLongestWeatherSerie(
         series: MeteoQueryResponseType["weatherRange"]
     ): WeatherSerie {
-        return series.reduce((state, current) => {
+        return series.data.reduce((state, current) => {
             if (state === undefined)
                 return current;
             if (state.entries.length < current.entries.length)
