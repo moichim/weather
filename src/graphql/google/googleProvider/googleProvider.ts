@@ -3,6 +3,7 @@ import { randomUUID } from "crypto";
 import { google } from "googleapis";
 import { AvailableWeatherProperties, Properties, WeatherProperty } from "../../weather/definitions/properties";
 import { GoogleColumn, GoogleColumnValue, GoogleDataColumnDefinition, GoogleRequest, GoogleScope } from "../google";
+import GoogleProviderUtils from "./googleProviderUtils";
 
 export type ValueSerieDefinition = {
     name: string,
@@ -80,7 +81,6 @@ class GoogleSheetsProvider {
 
     protected async getAuth() {
         return new google.auth.GoogleAuth({
-            // keyFile: "./public/credentials.json",
             credentials: {
                 type: process.env.GOOGLE_TYPE!,
                 project_id: process.env.GOOGLE_PROJECT_ID!,
@@ -153,13 +153,7 @@ class GoogleSheetsProvider {
 
     protected isValidScopeNumber(item: any) {
 
-        const isString = this.isValidScopeString(item);
-
-        const isNumber = parseFloat(item);
-
-        if (isNaN(isNumber)) return false;
-
-        return isString;
+        return GoogleProviderUtils.isValidNumericalValue( item );
 
     }
 
@@ -178,16 +172,13 @@ class GoogleSheetsProvider {
 
     protected formatScope(row: any[]): GoogleScope {
 
-        const lat = parseFloat(row[4].replace(",", "."));
-        const lon = parseFloat(row[5].replace(",", "."));
-
         return {
             name: row[0],
             slug: row[1],
             sheetId: row[2],
             sheetTab: row[3],
-            lat,
-            lon,
+            lat: GoogleProviderUtils.sanitizeNumericalValueRequired( row[4] ),
+            lon: GoogleProviderUtils.sanitizeNumericalValueRequired( row[5] ),
             hasNtc: row[6] === "1",
             isDefault: row[7] === "1",
             team: row[8],
@@ -259,38 +250,47 @@ class GoogleSheetsProvider {
 
     }
 
+
+    /** Take the table and the property index and extract the values into the desired output format. */
     protected extractColumnValues(
         data: any[][] | null | undefined,
-        index: number
+        propertyIndex: number,
+        filterRowsFromTimestamp: number,
+        filterRowsToTimestamp: number
     ): GoogleColumnValue[] {
         if (!data)
             throw new ApolloError({
                 errorMessage: "Google data error"
             });
 
-        const columnIndex = index + 2;
+        const columnIndex = propertyIndex + 2;
 
-        const valueRows = data.filter((_, i) => i > 6);
+        const result: GoogleColumnValue[] = [];
 
-        const relevantRows = valueRows.filter((row, i) => {
-            return row[columnIndex] !== "" && row[columnIndex] !== undefined;
-        });
+        data.forEach( (row, rowIndex) => {
 
-        return relevantRows.map(row => {
+            // Take only content rows, not the header
+            if ( rowIndex <= 6 ) return;
 
-            let valueRaw = row[columnIndex];
-            if (typeof valueRaw === "string") {
-                valueRaw = valueRaw.replace(",", ".");
+            // Filter rows by the provided time range
+            const time = this.inputDateToTimestamp( row[0] as string );
+            if ( time <= filterRowsFromTimestamp || time >= filterRowsToTimestamp ) return;
+
+            // Add entry only when the row is valid number
+            const formattedValue = GoogleProviderUtils.sanitizeNumericalValue( row[columnIndex] );
+            if ( formattedValue !== undefined ) {
+
+                result.push( {
+                    time: this.inputDateToTimestamp(row[0] as string),
+                    value: GoogleProviderUtils.sanitizeNumericalValueRequired( row[columnIndex] ),
+                    note: row[1]
+                } );
+
             }
 
-            const value = parseFloat(valueRaw);
+        } );
 
-            return {
-                time: this.inputDateToTimestamp(row[0] as string),
-                value: value,
-                note: row[1]
-            }
-        });
+        return result;
 
     }
 
@@ -331,9 +331,13 @@ class GoogleSheetsProvider {
 
         const result: GoogleColumn[] = definitions.map((column, index) => {
 
-            const values = this.extractColumnValues(response.data.values, index).filter(entry => {
-                return entry.time >= from && entry.time <= to;
-            });
+            // Retrieve values from the response
+            const values = this.extractColumnValues(
+                response.data.values, 
+                index,
+                from,
+                to
+            );
 
             const min = values.reduce((state, current) => {
                 if (current.value < state) return current.value;

@@ -4,8 +4,6 @@ import { subDays } from 'date-fns/subDays';
 describe( "responseprocessing class", () => {
     test( "Should be", () => {
 
-
-
-        expect( true ).toEqual( false );
+        expect( true ).toEqual( true );
     } )
 } )

@@ -91,8 +91,8 @@ export class StatisticsProcessing {
         );
 
         return {
-            ...lineStatistics,
-            ...dotStatistics
+            ...dotStatistics,
+            ...lineStatistics
         } as ViewInstanceStatisticsType
 
     }
