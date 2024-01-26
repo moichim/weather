@@ -25,6 +25,14 @@ export class MeteoResponseProcessor {
 
         let drive = MeteoResponseProcessor.generateTheDrive( response );
 
+        const date = new Date();
+        console.log( date.getTime(), date.getTimezoneOffset(), {
+            day: date.getDay(),
+            dayUtc: date.getUTCDay(),
+            date: date.getDate(),
+            dateUtc: date.getUTCDate()
+        } );
+
 
         // Namapovat google values na index podle času
         const googleIndex = MeteoResponseProcessor.dumpGoogleDataToTimeEntries( response.range );
