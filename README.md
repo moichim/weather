@@ -56,6 +56,7 @@ npm run dev
 npm run lint
 npm run build
 npm run start
+npm run test
 ```
 
 Deploy commitem do `main`.
