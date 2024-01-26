@@ -56,10 +56,10 @@ type FormattedDate = {
 export const getSelectionRange = () => {
     let min = new Date();
     min = subMonths(min, 3);
-    min.setHours(0);
-    min.setMinutes(0);
-    min.setSeconds(0);
-    min.setMilliseconds(0);
+    min.setUTCHours(0);
+    min.setUTCMinutes(0);
+    min.setUTCSeconds(0);
+    min.setUTCMilliseconds(0);
 
     let max = new Date();
     max = subDays(max, 1);
@@ -79,10 +79,10 @@ export type FormattedDatePair = {
 const roundFromTimestamp = (from: number): FormattedDate => {
     const d = new Date;
     d.setTime(from);
-    d.setHours(0);
-    d.setMinutes(0);
-    d.setSeconds(0);
-    d.setMilliseconds(0);
+    d.setUTCHours(0);
+    d.setUTCMinutes(0);
+    d.setUTCSeconds(0);
+    d.setUTCMilliseconds(0);
     return {
         timestamp: d.getTime(),
         date: d,
@@ -94,10 +94,10 @@ const roundFromTimestamp = (from: number): FormattedDate => {
 const roundToTimestamp = (to: number): FormattedDate => {
     const d = new Date;
     d.setTime(to);
-    d.setHours(24);
-    d.setMinutes(0);
-    d.setSeconds(0);
-    d.setMilliseconds(0);
+    d.setUTCHours(24);
+    d.setUTCMinutes(0);
+    d.setUTCSeconds(0);
+    d.setUTCMilliseconds(0);
     return {
         timestamp: d.getTime(),
         date: d,

@@ -16,10 +16,10 @@ export class OpenMeteoHistoryProvider extends AbstractWeatherProvider {
 
     protected getMaxTo(): number {
         const date = subDays( new Date(), 3 );
-        date.setHours( 23 );
-        date.setMinutes( 59 );
-        date.setSeconds( 0 );
-        date.setMilliseconds( 0 );
+        date.setUTCHours( 23 );
+        date.setUTCMinutes( 59 );
+        date.setUTCSeconds( 0 );
+        date.setUTCMilliseconds( 0 );
         return date.getTime();
     }
 

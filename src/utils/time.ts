@@ -8,10 +8,10 @@ export function stringFromTimestampFrom(timestamp: number) {
 
     const date = new Date;
     date.setTime(timestamp);
-    date.setHours(0);
-    date.setMinutes(0);
-    date.setSeconds(0);
-    date.setMilliseconds(0);
+    date.setUTCHours(0);
+    date.setUTCMinutes(0);
+    date.setUTCSeconds(0);
+    date.setUTCMilliseconds(0);
 
     return format(date, "yyyy-MM-dd");
 }
@@ -20,10 +20,10 @@ export function stringFromTimestampTo(timestamp: number) {
 
     const date = new Date;
     date.setTime(timestamp);
-    date.setHours(23);
-    date.setMinutes(59);
-    date.setSeconds(0);
-    date.setMilliseconds(0);
+    date.setUTCHours(23);
+    date.setUTCMinutes(59);
+    date.setUTCSeconds(0);
+    date.setUTCMilliseconds(0);
 
     return format(date, "yyyy-MM-dd");
 }
@@ -47,10 +47,10 @@ export function stringLabelFromTimestamp(timestamp: number) {
 export function timestampFromFromString(date: string) {
     const d = dateFromString(date);
 
-    d.setHours(0);
-    d.setMinutes(0);
-    d.setSeconds(0);
-    d.setMilliseconds(0);
+    d.setUTCHours(0);
+    d.setUTCMinutes(0);
+    d.setUTCSeconds(0);
+    d.setUTCMilliseconds(0);
 
     return d.getTime();
 }
@@ -58,10 +58,10 @@ export function timestampFromFromString(date: string) {
 export function timestampToFromString(date: string) {
     const d = dateFromString(date);
 
-    d.setHours(23);
-    d.setMinutes(59);
-    d.setSeconds(0);
-    d.setMilliseconds(0);
+    d.setUTCHours(23);
+    d.setUTCMinutes(59);
+    d.setUTCSeconds(0);
+    d.setUTCMilliseconds(0);
 
     return d.getTime();
 }
