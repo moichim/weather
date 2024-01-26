@@ -33,7 +33,7 @@ export class OpenMeteoHistoryProvider extends AbstractWeatherProvider {
 
         if (clampedTo < args.from) return [];
 
-        const from = stringFromTimestamp(args.from + (1000*60*60*24) );
+        const from = stringFromTimestamp(args.from + (1000*60*60*25) );
         const to = stringFromTimestamp( clampedTo );
 
         const params = {
