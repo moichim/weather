@@ -47,7 +47,7 @@ export class OpenmeteoForecastProvider extends AbstractWeatherProvider {
 
     public async doRequest(args: MeteoRequestType) {
 
-        const fromTmp = this.clampFrom( args.from - ( 5 * 60 * 60 * 1000 ) );
+        const fromTmp = this.clampFrom( args.from  );
 
         if ( fromTmp > (new Date).getTime() ) return [];
 
