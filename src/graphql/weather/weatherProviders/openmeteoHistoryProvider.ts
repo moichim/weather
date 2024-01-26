@@ -29,8 +29,12 @@ export class OpenMeteoHistoryProvider extends AbstractWeatherProvider {
 
     public async doRequest(args: MeteoRequestType) {
 
-        const from = stringFromTimestamp(args.from);
-        const to = stringFromTimestamp( this.clampTo( args.to ) );
+        const clampedTo = this.clampTo(args.to);
+
+        if (clampedTo < args.from) return [];
+
+        const from = stringFromTimestamp(args.from - (60*60*1000));
+        const to = stringFromTimestamp( clampedTo );
 
         const params = {
             "latitude": args.lat,

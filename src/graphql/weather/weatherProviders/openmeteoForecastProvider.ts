@@ -32,11 +32,12 @@ export class OpenmeteoForecastProvider extends AbstractWeatherProvider {
 
 
     protected getMinFrom(): number {
-        const date = subDays( new Date(), 2 );
-        date.setHours( 23 );
-        date.setMinutes( 59 );
+        let date = new Date();
+        date.setHours( 24 );
+        date.setMinutes( 0 );
         date.setSeconds( 0 );
         date.setMilliseconds( 0 );
+        date = subDays( date, 3 );
         return date.getTime();
     }
 
@@ -46,9 +47,11 @@ export class OpenmeteoForecastProvider extends AbstractWeatherProvider {
 
     public async doRequest(args: MeteoRequestType) {
 
-        const fromTmp = this.clampFrom( args.from - ( 60 * 60 * 1000 ) );
+        const fromTmp = this.clampFrom( args.from - ( 5 * 60 * 60 * 1000 ) );
 
-        if ( fromTmp < (new Date).getTime() ) return [];
+        if ( fromTmp > (new Date).getTime() ) return [];
+
+        if ( fromTmp > args.to ) return [];
 
         const from = stringFromTimestamp( fromTmp );
         const to = stringFromTimestamp( args.to );

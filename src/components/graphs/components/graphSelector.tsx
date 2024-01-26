@@ -41,19 +41,7 @@ export const GraphSelector: React.FC<GraphInstanceState> = props => {
         >
             {graphState.availableGraphs.map(prop => {
                 return <DropdownItem key={prop.slug}>
-                    <div className="flex w-full">
-                        <div 
-                            style={{width: badgeWidth + "px"}}
-                            className="w-full flex items-center justify-center mr-4"
-                        >
-                            {prop.in.map( s => <div key={s} className="rounded-full" style={{
-                                backgroundColor: Sources.one( s as any ).stroke,
-                                width: itemBargeDimension + "px",
-                                height: itemBargeDimension + "px"
-                            }}></div> )}
-                        </div>
-                        <div>{prop.name}</div>
-                    </div>
+                    {prop.name}
                 </DropdownItem>
             })}
         </DropdownMenu>

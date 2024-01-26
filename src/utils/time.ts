@@ -41,7 +41,7 @@ export function stringFromTimestamp(timestamp: number) {
 export function stringLabelFromTimestamp(timestamp: number) {
     const date = new Date;
     date.setTime(timestamp);
-    return format(date, "d. M. yyyy hh:mm");
+    return format(date, "d. M. yyyy H:mm");
 }
 
 export function timestampFromFromString(date: string) {

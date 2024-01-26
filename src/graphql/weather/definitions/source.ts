@@ -40,7 +40,7 @@ const sources: {
         name: "Open Meteo - předpověď",
         color: "black",
         stroke: "black",
-        description: "Předpověď počasí z veřejně dostupné služby Open Meteo. Od 5 dní zpětně do budoucnosti.",
+        description: "Předpověď počasí z veřejně dostupné služby Open Meteo. Od 3 dní zpětně do budoucnosti.",
         link: "https://open-meteo.com/",
         props: [
             "temperature",
@@ -61,7 +61,7 @@ const sources: {
         name: "Open Meteo - historická data",
         color: "green",
         stroke: "green",
-        description: "Historické údaje ze služby Open Meteo. Maximálně 5 dní nazpět.",
+        description: "Historické údaje ze služby Open Meteo. Maximálně 3 dny nazpět.",
         link: "https://open-meteo.com/",
         props: [
             "temperature",

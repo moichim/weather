@@ -15,21 +15,22 @@ type BufferType = {
     [index: string]: BufferEntryType
 }
 
+const properties = Properties.all();
+
 export class MeteoResponseProcessor {
 
     public static process(
         response: MeteoQueryResponseType
     ) {
 
-        // Najde nejdelší serii
-        const longestSerie = MeteoResponseProcessor.getLongestWeatherSerie(response.weatherRange);
+        let drive = MeteoResponseProcessor.generateTheDrive( response );
+
 
         // Namapovat google values na index podle času
         const googleIndex = MeteoResponseProcessor.dumpGoogleDataToTimeEntries( response.range );
         const weatherIndex = MeteoResponseProcessor.dumpWeatherSerieToTimeEntries( response.weatherRange );
 
         // Iteruje všechny properties a vrátí index namapovaných dat pro graf
-        const properties = Properties.all();
         const graphData = Object.fromEntries( properties.map(property => {
 
             // pro každou property najít její zdroje
@@ -38,8 +39,8 @@ export class MeteoResponseProcessor {
             // pro každou property najít sloupce v Googlu, které sem patří
             const propertyColumns = response.range.data.filter( column => column.in.slug === property.slug );
 
-            // Pro každou property iterovat nejdelší serii
-            const propertyGraphData = longestSerie.entries.map( leadEntry => {
+            // Pro každou property iterovat drive
+            const propertyGraphData = drive.map( leadEntry => {
 
                 // extract leading time
                 const leadTimestamp = leadEntry.time;
@@ -116,6 +117,20 @@ export class MeteoResponseProcessor {
 
     }
 
+    protected static generateTheDrive( response: MeteoQueryResponseType ): {time:number}[] {
+
+        let drive: {
+            time: number
+        }[] = [];
+
+        for ( let i = response.weatherRange.request.from; i < response.weatherRange.request.to; i = i + (1000*60*60) ) {
+            drive.push( {time: i} );
+        }
+
+        return drive;
+
+    }
+
     protected static dumpWeatherSerieToTimeEntries(
         weather: MeteoQueryResponseType["weatherRange"]
     ) {
@@ -153,18 +168,6 @@ export class MeteoResponseProcessor {
 
         return buffer;
 
-    }
-
-    protected static getLongestWeatherSerie(
-        series: MeteoQueryResponseType["weatherRange"]
-    ): WeatherSerie {
-        return series.data.reduce((state, current) => {
-            if (state === undefined)
-                return current;
-            if (state.entries.length < current.entries.length)
-                return current;
-            return state;
-        }, undefined as undefined | WeatherSerie)!
     }
 
 }

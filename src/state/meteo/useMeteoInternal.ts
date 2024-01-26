@@ -50,6 +50,7 @@ export const useMeteoInternal = () => {
         },
 
         ssr: false,
+        nextFetchPolicy: "no-cache",
 
         onError: (e) => {
             console.error("error loading weather data", e, e.graphQLErrors, e.message);
