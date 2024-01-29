@@ -7,13 +7,13 @@ export type MeteoRequestType = GoogleRequest & {
 };
 
 export type MeteoQueryResponseType = {
-  range: GoogleScopeData,
-  weatherRange: WeatherResponse
+  rangeGoogle: GoogleScopeData,
+  rangeMeteo: WeatherResponse
 }
 
 export const METEO_DATA_QUERY = gql`
 query Source($lat: Float!, $lon: Float!, $hasNtc: Boolean!, $from: Float, $to: Float, $scope: String, $sheetId: String!, $sheetTab: String!) {
-  weatherRange(lat: $lat, lon: $lon, hasNtc: $hasNtc, from: $from, to: $to, scope: $scope) {
+  rangeMeteo(lat: $lat, lon: $lon, hasNtc: $hasNtc, from: $from, to: $to, scope: $scope) {
     data {
       source {
         name
@@ -114,7 +114,7 @@ query Source($lat: Float!, $lon: Float!, $hasNtc: Boolean!, $from: Float, $to: F
       to
     }
   }
-  range(lat: $lat, lon: $lon, sheetId: $sheetId, sheetTab: $sheetTab, from: $from, to: $to, scope: $scope) {
+  rangeGoogle(lat: $lat, lon: $lon, sheetId: $sheetId, sheetTab: $sheetTab, from: $from, to: $to, scope: $scope) {
     data {
       name
       slug
@@ -148,7 +148,7 @@ query Source($lat: Float!, $lon: Float!, $hasNtc: Boolean!, $from: Float, $to: F
 export const METEO_RANGE_QUERY = gql`
 
 query Source($lat: Float!, $lon: Float!, $hasNtc: Boolean!, $from: Float, $to: Float, $scope: String, $sheetId: String!, $sheetTab: String!) {
-  weatherRange(lat: $lat, lon: $lon, hasNtc: $hasNtc, from: $from, to: $to, scope: $scope) {
+  rangeMeteo(lat: $lat, lon: $lon, hasNtc: $hasNtc, from: $from, to: $to, scope: $scope) {
     data {
       source {
         name
@@ -249,7 +249,7 @@ query Source($lat: Float!, $lon: Float!, $hasNtc: Boolean!, $from: Float, $to: F
       to
     }
   }
-  range(lat: $lat, lon: $lon, sheetId: $sheetId, sheetTab: $sheetTab, from: $from, to: $to, scope: $scope) {
+  rangeGoogle(lat: $lat, lon: $lon, sheetId: $sheetId, sheetTab: $sheetTab, from: $from, to: $to, scope: $scope) {
     data {
       name
       slug

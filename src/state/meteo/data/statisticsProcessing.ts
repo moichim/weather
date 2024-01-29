@@ -19,12 +19,12 @@ export class StatisticsProcessing {
         response: MeteoQueryResponseType
     ): GraphStatisticsDataType {
 
-        const propertyStatistics = Object.fromEntries(response.weatherRange.data.map(source => {
+        const propertyStatistics = Object.fromEntries(response.rangeMeteo.data.map(source => {
             const statistics = source.statistics;
             return [source.source.slug, statistics]
         }));
 
-        const googleStatistics = Object.fromEntries(response.range.data.map(column => {
+        const googleStatistics = Object.fromEntries(response.rangeGoogle.data.map(column => {
             const stats = {
                 name: column.name,
                 color: column.color,

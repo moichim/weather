@@ -9,7 +9,7 @@ import { MeteoContextProvider } from "@/state/meteo/meteoContext";
 
 export const generateStaticParams = async () => {
 
-    const scopes = await googleSheetsProvider.getAllScopes();
+    const scopes = await googleSheetsProvider.fetchAllScopesDefinitions();
     return scopes;
 
 }
@@ -28,7 +28,7 @@ export async function generateMetadata(
 ): Promise<Metadata> {
 
 
-    const scope = await googleSheetsProvider.getScope(params.slug);
+    const scope = await googleSheetsProvider.fetchScopeDefinition(params.slug);
 
     return {
         title: getMetadataTitle(scope.name),

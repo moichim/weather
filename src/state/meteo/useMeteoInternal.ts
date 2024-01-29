@@ -8,6 +8,7 @@ import { MeteoDataProcessed, MeteoResponseProcessor } from "./data/responseProce
 import { GraphStatisticsDataType, StatisticsProcessing } from "./data/statisticsProcessing";
 import { meteoReducer } from "./reducerInternals/reducer";
 import { useScopeContext } from "../scope/scopeContext";
+import { checkDomainOfScale } from "recharts/types/util/ChartUtils";
 
 /** Hook used by reducer. DO NOT USE IN COMPONENTS! */
 export const useMeteoInternal = () => {

@@ -23,11 +23,13 @@ export class MeteoResponseProcessor {
         response: MeteoQueryResponseType
     ) {
 
+        console.log( response );
+
         let drive = MeteoResponseProcessor.generateTheDrive( response );
 
         // Namapovat google values na index podle času
-        const googleIndex = MeteoResponseProcessor.dumpGoogleDataToTimeEntries( response.range );
-        const weatherIndex = MeteoResponseProcessor.dumpWeatherSerieToTimeEntries( response.weatherRange );
+        const googleIndex = MeteoResponseProcessor.dumpGoogleDataToTimeEntries( response.rangeGoogle );
+        const weatherIndex = MeteoResponseProcessor.dumpWeatherSerieToTimeEntries( response.rangeMeteo );
 
         // Iteruje všechny properties a vrátí index namapovaných dat pro graf
         const graphData = Object.fromEntries( properties.map(property => {
@@ -36,7 +38,7 @@ export class MeteoResponseProcessor {
             const propertySources = property.in;
 
             // pro každou property najít sloupce v Googlu, které sem patří
-            const propertyColumns = response.range.data.filter( column => column.in.slug === property.slug );
+            const propertyColumns = response.rangeGoogle.data.filter( column => column.in.slug === property.slug );
 
             // Pro každou property iterovat drive
             const propertyGraphData = drive.map( leadEntry => {
@@ -122,7 +124,7 @@ export class MeteoResponseProcessor {
             time: number
         }[] = [];
 
-        for ( let i = response.weatherRange.request.from; i < response.weatherRange.request.to; i = i + (1000*60*60) ) {
+        for ( let i = response.rangeMeteo.request.from; i < response.rangeMeteo.request.to; i = i + (1000*60*60) ) {
             drive.push( {time: i} );
         }
 
@@ -131,7 +133,7 @@ export class MeteoResponseProcessor {
     }
 
     protected static dumpWeatherSerieToTimeEntries(
-        weather: MeteoQueryResponseType["weatherRange"]
+        weather: MeteoQueryResponseType["rangeMeteo"]
     ) {
 
         return Object.fromEntries( weather.data.map( serie => {
@@ -142,7 +144,7 @@ export class MeteoResponseProcessor {
     }
 
     protected static dumpGoogleDataToTimeEntries(
-        google: MeteoQueryResponseType["range"]
+        google: MeteoQueryResponseType["rangeGoogle"]
     ) {
 
         let buffer: BufferType = {};

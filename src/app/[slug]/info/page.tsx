@@ -11,7 +11,7 @@ const Map = dynamic(() => import("../../../components/ui/map"), { ssr: false });
 
 export const generateStaticParams = async () => {
 
-    const scopes = await googleSheetsProvider.getAllScopes();
+    const scopes = await googleSheetsProvider.fetchAllScopesDefinitions();
     return scopes;
 
 }
@@ -22,7 +22,7 @@ export async function generateMetadata(
 ): Promise<Metadata> {
 
 
-    const scope = await googleSheetsProvider.getScope(params.slug);
+    const scope = await googleSheetsProvider.fetchScopeDefinition(params.slug);
 
     return {
         title: getMetadataTitle("Informace o měření " + scope.name),
@@ -51,7 +51,7 @@ const Section: React.FC<React.PropsWithChildren> = props => {
 
 const InfoPage: React.FC<ScopePageProps> = async props => {
 
-    const scope = await googleSheetsProvider.getScope(props.params.slug);
+    const scope = await googleSheetsProvider.fetchScopeDefinition(props.params.slug);
 
     return <article className="w-full overflow-hidden">
 

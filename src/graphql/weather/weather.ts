@@ -1,13 +1,11 @@
-import gql from "graphql-tag"
-import { Sources, WeatherSourceType } from "./definitions/source";
-import { Properties } from "./definitions/properties";
-import { Source } from "postcss";
-import { OpenmeteoForecastProvider } from "./weatherProviders/openmeteoForecastProvider";
-import { NtcProvider } from "./weatherProviders/ntcProvider";
-import { NumberDomain } from "recharts/types/util/types";
 import { MeteoRequestType } from "@/state/meteo/data/query";
+import gql from "graphql-tag";
 import { GoogleRequest } from "../google/google";
+import { Properties } from "./definitions/properties";
+import { Sources, WeatherSourceType } from "./definitions/source";
 import { AbstractWeatherProvider } from "./weatherProviders/abstractProvider";
+import { NtcProvider } from "./weatherProviders/ntcProvider";
+import { OpenmeteoForecastProvider } from "./weatherProviders/openmeteoForecastProvider";
 import { OpenMeteoHistoryProvider } from "./weatherProviders/openmeteoHistoryProvider";
 
 export type WeatherEntryMetaType = {
@@ -76,9 +74,7 @@ export type WeatherResponse = {
 export const weatherTypeDefs = gql`
 
     extend type Query {
-        weatherRange(scope: String, lat: Float!, lon: Float!, from:Float,to:Float, hasNtc: Boolean!): WeatherResponse
-        sources: [Source]
-        properties: [Property]
+        rangeMeteo(scope: String, lat: Float!, lon: Float!, from:Float,to:Float, hasNtc: Boolean!): WeatherResponse
     }
 
     type Statistic {
@@ -160,14 +156,14 @@ export const weatherTypeDefs = gql`
 
 `;
 
-const openMeteoForecastProvider = new OpenmeteoForecastProvider;
-const openMeteoHistoryProvider = new OpenMeteoHistoryProvider;
-const ntcProvider = new NtcProvider;
+export const openMeteoForecastProvider = new OpenmeteoForecastProvider;
+export const openMeteoHistoryProvider = new OpenMeteoHistoryProvider;
+export const ntcProvider = new NtcProvider;
 
 export const weatherResolvers = {
 
     Query: {
-        weatherRange: async (
+        rangeMeteo: async (
             parent: any,
             args: MeteoRequestType,
         ): Promise<WeatherResponse> => {

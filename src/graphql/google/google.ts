@@ -50,9 +50,7 @@ export type GoogleScopeData = {
 export const googleTypeDefs = gql`
 
     extend type Query {
-        range( scope: String, lat: Float!, lon: Float!, from:Float, to:Float, sheetId: String!, sheetTab: String! ): GoogleScopeData
-        googleScope( scope: String! ): GoogleScope
-        googleScopes: [GoogleScope]
+        rangeGoogle( scope: String, lat: Float!, lon: Float!, from:Float, to:Float, sheetId: String!, sheetTab: String! ): GoogleScopeData
     }
 
     type GoogleScope {
@@ -73,17 +71,25 @@ export const googleTypeDefs = gql`
         data: [GoogleColumn]
     }
 
+    type GoogleColumnDefinition {
+        name: String!
+        slug: String!
+        color: String!
+        in: Property!
+        description: String
+    }
+
     type GoogleColumn {
         name: String!
         slug: String!
         color: String!
-        in: Property
+        in: Property!
+        description: String
         values: [GoogleColumnValue]
         min: Float
         max: Float
         avg: Float
         count: Float
-        description: String
     }
 
     type GoogleColumnValue {
@@ -107,12 +113,12 @@ export type GoogleRequest = {
 export const googleResolvers = {
 
     Query: {
-        range: async (
+        rangeGoogle: async (
             parent: any,
             args: GoogleRequest
         ) => {
 
-            const data = await googleSheetsProvider.range( args );
+            const data = await googleSheetsProvider.fetchScopeValuesInRange( args );
 
             return {
                 data
@@ -125,10 +131,10 @@ export const googleResolvers = {
                 scope: string
             }
         ) => {
-            return await googleSheetsProvider.getScope( args.scope );
+            return await googleSheetsProvider.fetchScopeDefinition( args.scope );
         },
         googleScopes: async () => {
-            return await googleSheetsProvider.getAllScopes();
+            return await googleSheetsProvider.fetchAllScopesDefinitions();
         }
     }
 
