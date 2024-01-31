@@ -10,9 +10,17 @@ describe( "LrcReader", () => {
 
         await reader.loadFile();
 
+        console.log(reader.getFile());
+
         expect( reader.getErrors().length ).toEqual(0);
 
+        if ( reader.getErrors().length ) {
+            console.log( reader.getErrors() );
+        }
+
         expect(reader.isValid()).toEqual( true );
+
+        
 
     } );
 

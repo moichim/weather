@@ -15,6 +15,9 @@ export const Lrc: React.FC<LrcProps> = props => {
         <div>Signatura: {file?.signature}</div>
         <div>Čas: {file?.timestamp}</div>
         <div>Verze: {file?.toString()}</div>
+        <div>W: {file?.width}</div>
+        <div>H: {file?.height}</div>
+        <div>Počet pixelů: {file?.pixels.length}</div>
     </div>
 
 }

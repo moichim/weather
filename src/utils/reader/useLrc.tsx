@@ -15,11 +15,14 @@ export const useLrc = ( absoluteUrl: string ) => {
             const file = await LrcReader.fromUrl(absoluteUrl);
             if ( file !== null ) {
                 setFile( file );
+                console.log( "file loaded", file );
             }
         }
 
         getFile();
     }, [absoluteUrl] );
+
+    console.log( "outputting file", file );
 
     return file;
 

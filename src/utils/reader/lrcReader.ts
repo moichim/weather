@@ -1,105 +1,49 @@
 import fetch from 'cross-fetch';
 import ThermalFile from './thermalFile';
-
-class LrcFileStatus {
-
-    protected loaded: boolean = false;
-    protected validSignature: boolean = false;
-    protected validVersion: boolean = false;
-    protected validStreamType: boolean = false;
-    protected validUnit: boolean = false;
+import AbstractReader from './AbstractReader';
 
 
-    public constructor(
-        protected readonly file: LrcReader
-    ) {
+export default class LrcReader extends AbstractReader {
 
-    }
-}
+    protected signature?: string;
+    protected version?: number;
+    protected streamType?: number;
+    protected unit?: number;
 
-export default class LrcReader {
 
-    private url: string;
-    private blob!: Blob;
-    private uint8array!: Uint8Array;
-    private errors: string[] = [];
 
-    private signature?: string;
-    private version?: number;
-    private streamType?: number;
-    private unit?: number;
 
-    private width?: number;
-    private height?: number;
 
-    private timestamp?: number;
 
-    private pixels?: number[];
-
-    constructor(url: string) {
-        this.url = url;
-    }
-
-    protected logValidationError(
-        property: string,
-        value: any
-    ) {
-        const msg = `Invalid ${property} of ${this.url}: ${value.toString()}`;
-        this.logError(msg);
-    }
-
-    protected logError(message: string) {
-        console.error(message);
-        this.errors.push(message);
-    }
-
-    protected async setBlob(blob: Blob) {
-        this.blob = blob;
-        this.uint8array = new Uint8Array(await blob.arrayBuffer())
-    }
-
-    protected read8bNumber(index: number): number {
-        return this.uint8array[index];
-    }
-
-    protected read16bNumber(index: number) {
-        return (this.uint8array[index] << 8) | this.uint8array[index + 1]
-    }
-
-    protected read64bNumber(index: number) {
-        const data = this.uint8array.slice(index, index + 8);
-        const seconds = (data[0] << 56) | (data[1] << 48) | (data[2] << 40) | (data[3] << 32) | (data[4] << 24) | (data[5] << 16) | (data[6] << 8) | data[7];
-        const milliseconds = (data[8] << 24) | (data[9] << 16) | (data[10] << 8) | data[11];
-        return seconds * 1000 + milliseconds;
-    }
 
 
     public toFloat32(bytes: Uint8Array): number {
         const value = bytes[0] << 24 | bytes[1] << 16 | bytes[2] << 8 | bytes[3];
+        // const value = bytes[3] << 24 | bytes[2] << 16 | bytes[1] << 8 | bytes[0];
         return value / 0xFFFFFFFF;
-      }
-      
+    }
 
-    protected readTemperatureArray( index: number ) {
-        const data = this.uint8array.slice( index );
+
+    protected readTemperatureArray(index: number) {
+        const data = this.uint8array.slice(index);
         const floatArray = new Array<number>();
         for (let i = 0; i < data.length / 4; i++) {
             floatArray[i] = this.toFloat32(data.subarray(4 * i, 4 * i + 4));
-          }
-          return floatArray//.map(n=>parseFloat( n.toPrecision(8) ));
+        }
+        return floatArray//.map(n=>parseFloat( n.toPrecision(8) ));
     }
 
-    protected async readString(startIndex: number, stringLength: number): Promise<string> {
-        return await this.blob.slice(startIndex, stringLength).text();
-    }
 
-    public static async fromUrl( absoluteUrl: string ) {
 
-        const reader = new LrcReader( absoluteUrl );
+    public static async fromUrl(absoluteUrl: string) {
+
+        const reader = new LrcReader(absoluteUrl);
 
         await reader.loadFile();
 
-        return reader.getFile();
+        const file = reader.getFile();
+
+        return file;
 
     }
 
@@ -107,19 +51,21 @@ export default class LrcReader {
 
         const blob = await fetch(this.url)
             .then(response => {
-                return response.blob()
+                const b = response.blob();
+                return b;
             })
-            .catch(e => {
-                console.error(e);
-                throw e;
-            });
 
         if (blob === undefined)
-            throw new Error("File was not found!!");
+            throw new Error(`File '${this.url}' was not found!!`);
 
-        this.setBlob(blob);
+        await this.setBlob(blob);
 
         await this.parseFile();
+
+        // return this;
+
+        return this;
+
     }
 
     protected async parseFile() {
@@ -127,10 +73,7 @@ export default class LrcReader {
         this.parseVersion();
         this.parseStreamType();
         this.parseUnit();
-        this.parseWidth();
-        this.parseHeight();
-        this.parseTimestamp();
-        this.parsePixels();
+        this.parseBaseAttributes();
     }
 
 
@@ -172,41 +115,56 @@ export default class LrcReader {
     }
 
     // Width
-    protected isValidWidth = (value: number | undefined) => Number.isInteger(value);
-    protected parseWidth() {
-        const value = this.read16bNumber(16);
-        if (!this.isValidWidth(value))
-            this.logValidationError("width", value);
-        this.width = value;
+    protected getWidth(): number {
+        return this.read16bNumber(17);
     }
 
     // Height
-    protected isValidHeight = (value: number | undefined) => Number.isInteger(value);
-    protected parseHeight() {
-        const value = this.read16bNumber(18);
-        if (!this.isValidHeight(value))
-            this.logValidationError("height", value);
-        this.height = value;
+    protected getHeight(): number {
+        return this.read16bNumber(19);
     }
 
     // Timestamp
-    protected isValidTimestamp = (value: number|undefined) => Number.isInteger(value);
-    protected parseTimestamp() {
-        const value = this.read64bNumber(24);
-        if (!this.isValidHeight(value))
-            this.logValidationError("timestamp", value);
-        this.timestamp = value;
+    protected getTimestamp(): number {
+
+        const big = this.data.getBigInt64(25, true);
+
+        const UnixEpoch = BigInt.asUintN(64,BigInt( 62135596800000 ));
+        const TicksPerMillisecond = BigInt(10000);
+        const TicksPerDay = BigInt(24 * 60 * 60 * 1000) * TicksPerMillisecond;
+        const TicksCeiling = BigInt(0x4000000000000000);
+        const LocalMask = BigInt(0x8000000000000000);
+        const TicksMask = BigInt(0x3FFFFFFFFFFFFFFF);
+
+
+        let ticks = big & TicksMask;
+
+        console.log( ticks );
+
+        const localTime = big & LocalMask;
+
+        if (localTime) {
+
+            if (ticks > TicksCeiling - TicksPerDay) {
+                ticks -= TicksCeiling;
+            }
+            if (ticks < 0) {
+                ticks += TicksPerDay;
+            }
+
+        }
+
+        const result = ticks / TicksPerMillisecond - UnixEpoch;
+
+        return Number(BigInt.asUintN( 64, result ));
+
+
+        return this.read64bNumber(24);
     }
 
     // Pixels
-    protected isValidPixels = ( value: number[]|undefined ) => {
-        return value !== undefined && value.length === (this.width! * this.height!)
-    }
-    protected parsePixels() {
-        const value = this.readTemperatureArray(82);
-        // console.log( value, value.length, this.width! * this.height! );
-
-        this.pixels = value;
+    protected getPixels() {
+        return this.readTemperatureArray(82);
     }
 
 
@@ -216,13 +174,7 @@ export default class LrcReader {
             && this.isValidStreamType(this.streamType)
             && this.isValidVersion(this.version)
             && this.isValidUnit(this.unit)
-            && this.isValidWidth(this.width)
-            && this.isValidHeight(this.height)
-            && this.isValidTimestamp( this.timestamp );
-    }
-
-    public getErrors() {
-        return this.errors;
+            && this.isValidBase();
     }
 
     getFile() {
