@@ -26,11 +26,13 @@ export default abstract class AbstractReader {
     // Shared parsing & validation
 
     /** Parsing of all common attributes */
-    protected parseBaseAttributes() {
+    protected async parseBaseAttributes() {
         this.parseWidth();
         this.parseHeight();
         this.parseTimestamp();
-        this.parsePixels();
+        await this.parsePixels();
+        this.parseMin();
+        this.parseMax();
     }
 
 
@@ -40,7 +42,9 @@ export default abstract class AbstractReader {
             && this.isValidTimestamp( this.timestamp )
             && this.isValidWidth( this.width )
             && this.isValidHeight( this.height )
-            && this.isValidPixels( this.pixels );
+            && this.isValidPixels( this.pixels )
+            && this.isValidMin( this.min )
+            && this.isValidMax( this.max );
     }
 
 
@@ -84,15 +88,37 @@ export default abstract class AbstractReader {
 
     // Common data parsing
     protected pixels?: number[];
-    protected abstract getPixels(): number[];
+    protected abstract getPixels(): Promise<number[]>;
     protected isValidPixels = ( value: number[]|undefined ) => {
         return value !== undefined && value.length === (this.width! * this.height!)
     }
-    protected parsePixels() {
-        const value = this.getPixels();
+    protected async parsePixels() {
+        const value = await this.getPixels();
         // console.log( value, value.length, this.width! * this.height! );
 
         this.pixels = value;
+    }
+
+    // Min
+    protected min?: number;
+    protected isValidMin = (value: number | undefined) => value !== undefined;
+    protected abstract getMin(): number;
+    protected parseMin() {
+        const value = this.getMin();
+        if (!this.isValidMin(value))
+            this.logValidationError("min", value);
+        this.min = value;
+    }
+
+    // MAx
+    protected max?: number;
+    protected isValidMax = (value: number | undefined) => value !== undefined;
+    protected abstract getMax(): number;
+    protected parseMax() {
+        const value = this.getMax();
+        if (!this.isValidMax(value))
+            this.logValidationError("max", value);
+        this.max = value;
     }
 
 
@@ -134,6 +160,7 @@ export default abstract class AbstractReader {
     protected blob!: Blob;
     protected data!: DataView;
     protected uint8array!: Uint8Array;
+    protected float32array!: Float32Array;
     protected async setBlob(
         blob: Blob
     ) {
@@ -143,6 +170,8 @@ export default abstract class AbstractReader {
 
         this.data = new DataView(buffer);
         this.uint8array = new Uint8Array(buffer);
+
+        this.float32array = new Float32Array(buffer.slice(82));
     }
 
     protected async readString(startIndex: number, stringLength: number): Promise<string> {
@@ -161,18 +190,12 @@ export default abstract class AbstractReader {
     protected read64bNumber(index: number) {
 
         const big = this.data.getBigUint64( index );
-        console.log( big );
+        // console.log( big );
 
         const epoch = new Date;
         epoch.setUTCFullYear(0, 0, 0);
         epoch.setUTCHours(0,0,0);
         const e = BigInt( epoch.getTime() );
-        console.log( {
-            raw: big,
-            epochBig: e,
-            epoch: epoch.getTime(),
-            result: big - e
-        } );
 
         const data = this.uint8array.slice(index, index + 8);
         const seconds = (data[0] << 56) | (data[1] << 48) | (data[2] << 40) | (data[3] << 32) | (data[4] << 24) | (data[5] << 16) | (data[6] << 8) | data[7];

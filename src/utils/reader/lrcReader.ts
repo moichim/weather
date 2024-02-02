@@ -3,36 +3,28 @@ import ThermalFile from './thermalFile';
 import AbstractReader from './AbstractReader';
 
 
+/**
+ * 0  - 4 bity signature
+ * 4  - 1 bit version
+ * 5  - 10 bitů přeskočeno
+ * 14 - 1 bit streamType
+ * 15 - 1 bit streamUnits
+ * 17 - 2 bity width
+ * 19 - 2 bity height
+ * 21 - 4 bity přeskočeno
+ * 25 - 8 bitů timestamp
+ * 33 - 4 bity min
+ * 37 - 4 bity max
+ * 41 - 41 bitů přeskočeno
+ * 82 - začátek dat
+ */
+
 export default class LrcReader extends AbstractReader {
 
     protected signature?: string;
     protected version?: number;
     protected streamType?: number;
     protected unit?: number;
-
-
-
-
-
-
-
-
-    public toFloat32(bytes: Uint8Array): number {
-        const value = bytes[0] << 24 | bytes[1] << 16 | bytes[2] << 8 | bytes[3];
-        // const value = bytes[3] << 24 | bytes[2] << 16 | bytes[1] << 8 | bytes[0];
-        return value / 0xFFFFFFFF;
-    }
-
-
-    protected readTemperatureArray(index: number) {
-        const data = this.uint8array.slice(index);
-        const floatArray = new Array<number>();
-        for (let i = 0; i < data.length / 4; i++) {
-            floatArray[i] = this.toFloat32(data.subarray(4 * i, 4 * i + 4));
-        }
-        return floatArray//.map(n=>parseFloat( n.toPrecision(8) ));
-    }
-
 
 
     public static async fromUrl(absoluteUrl: string) {
@@ -62,8 +54,6 @@ export default class LrcReader extends AbstractReader {
 
         await this.parseFile();
 
-        // return this;
-
         return this;
 
     }
@@ -73,7 +63,7 @@ export default class LrcReader extends AbstractReader {
         this.parseVersion();
         this.parseStreamType();
         this.parseUnit();
-        this.parseBaseAttributes();
+        await this.parseBaseAttributes();
     }
 
 
@@ -139,8 +129,6 @@ export default class LrcReader extends AbstractReader {
 
         let ticks = big & TicksMask;
 
-        console.log( ticks );
-
         const localTime = big & LocalMask;
 
         if (localTime) {
@@ -162,11 +150,45 @@ export default class LrcReader extends AbstractReader {
         return this.read64bNumber(24);
     }
 
+    public toFloat32(bytes: Uint8Array): number {
+        const value = bytes[0] << 24 | bytes[1] << 16 | bytes[2] << 8 | bytes[3];
+        // const value = bytes[3] << 24 | bytes[2] << 16 | bytes[1] << 8 | bytes[0];
+        return value / 0xFFFFFFFF;
+    }
+
+
+    protected async readTemperatureArray(index: number) {
+
+        const buffer = await this.blob.arrayBuffer();
+
+        const array = new Float32Array( buffer.slice( index ) );
+        const view = new DataView( buffer.slice( index ) );
+
+        const floatArray = new Array<number>( );
+
+        console.log( view.byteLength );
+
+        for (let i = 0; i < array.length; i++) {
+            floatArray[i] = array[ i ];
+            // floatArray[i] = view.getFloat32( i, true );
+        }
+
+        return floatArray
+    }
+
     // Pixels
     protected getPixels() {
         return this.readTemperatureArray(82);
     }
 
+    // Min
+    protected getMin(): number {
+        return this.data.getFloat32(33, true);
+    }
+
+    protected getMax(): number {
+        return this.data.getFloat32(37, true);
+    }
 
     isValid(): boolean {
         return this.errors.length === 0
@@ -178,8 +200,10 @@ export default class LrcReader extends AbstractReader {
     }
 
     getFile() {
-        if (!this.isValid())
+        if (!this.isValid()) {
+            console.log( this.getErrors() );
             return null;
+        }
         return new ThermalFile(
             this.url,
             this.signature!,
@@ -187,7 +211,9 @@ export default class LrcReader extends AbstractReader {
             this.width!,
             this.height!,
             this.timestamp!,
-            this.pixels!
+            this.pixels!,
+            this.min!,
+            this.max!
         );
     }
 

@@ -22,8 +22,6 @@ export const useLrc = ( absoluteUrl: string ) => {
         getFile();
     }, [absoluteUrl] );
 
-    console.log( "outputting file", file );
-
     return file;
 
 }
