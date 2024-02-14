@@ -1,11 +1,16 @@
 import { Lrc } from "@/components/thermogram/lrc";
-import { SAMPLE_URL } from "@/utils/reader/lrcReader.test";
+import { LrcContainer } from "@/components/thermogram/lrcContainer";
+import { ThermalContextProvider } from "@/state/thermal/thermalContext";
 
 export default async function Home() {
   
     return <div className="">
+      <ThermalContextProvider>
       
-      <Lrc url="http://localhost:3000/sample.lrc" />
+        <LrcContainer url="http://localhost:3000/sample.lrc" />
+        <LrcContainer url="http://localhost:3000/sample2.lrc" />
+      
+      </ThermalContextProvider>
   
     </div>;
   

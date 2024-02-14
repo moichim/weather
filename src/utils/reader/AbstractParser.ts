@@ -1,24 +1,33 @@
 import ThermalFile from "./thermalFile";
 
-export default abstract class AbstractReader {
+export default abstract class AbstractParser {
 
     protected url: string;
 
-    constructor(url: string) {
+    public constructor(
+        url: string,
+        blob: Blob
+    ) {
         this.url = url;
+        this.blob = blob;
     }
 
-    /** Load the file from the given URL. */
-    public abstract loadFile(): void;
+
+    /** The only public endpoint. This method does all the business. */
+    public async parse(): Promise<ThermalFile|null> {
+        await this.init();
+        await this.parseFile();
+        return this.getThermalFile();
+    }
 
     /** Parse the file once it is loaded. Log errors in the process. */
-    protected abstract parseFile(): void;
+    protected abstract parseFile(): Promise<void>;
 
     /** Checks if the file is valid. Must be called after parsing. */
-    protected abstract isValid(): boolean;
+    public abstract isValid(): boolean;
 
     /** Create an instance of Thermal file (if the file is valid). */
-    public abstract getFile(): ThermalFile | null;
+    protected abstract getThermalFile(): ThermalFile | null;
 
 
 
@@ -161,17 +170,16 @@ export default abstract class AbstractReader {
     protected data!: DataView;
     protected uint8array!: Uint8Array;
     protected float32array!: Float32Array;
-    protected async setBlob(
-        blob: Blob
-    ) {
-        this.blob = blob;
+    protected async init() {
 
-        const buffer = await blob.arrayBuffer();
+        const buffer = await this.blob.arrayBuffer();
 
         this.data = new DataView(buffer);
         this.uint8array = new Uint8Array(buffer);
 
         this.float32array = new Float32Array(buffer.slice(82));
+
+        return this;
     }
 
     protected async readString(startIndex: number, stringLength: number): Promise<string> {

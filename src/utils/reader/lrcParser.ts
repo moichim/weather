@@ -1,6 +1,6 @@
 import fetch from 'cross-fetch';
 import ThermalFile from './thermalFile';
-import AbstractReader from './AbstractReader';
+import AbstractParser from './AbstractParser';
 
 
 /**
@@ -19,44 +19,13 @@ import AbstractReader from './AbstractReader';
  * 82 - začátek dat
  */
 
-export default class LrcReader extends AbstractReader {
+export default class LrcParser extends AbstractParser {
 
     protected signature?: string;
     protected version?: number;
     protected streamType?: number;
     protected unit?: number;
 
-
-    public static async fromUrl(absoluteUrl: string) {
-
-        const reader = new LrcReader(absoluteUrl);
-
-        await reader.loadFile();
-
-        const file = reader.getFile();
-
-        return file;
-
-    }
-
-    async loadFile() {
-
-        const blob = await fetch(this.url)
-            .then(response => {
-                const b = response.blob();
-                return b;
-            })
-
-        if (blob === undefined)
-            throw new Error(`File '${this.url}' was not found!!`);
-
-        await this.setBlob(blob);
-
-        await this.parseFile();
-
-        return this;
-
-    }
 
     protected async parseFile() {
         await this.parseSignature();
@@ -166,8 +135,6 @@ export default class LrcReader extends AbstractReader {
 
         const floatArray = new Array<number>( );
 
-        console.log( view.byteLength );
-
         for (let i = 0; i < array.length; i++) {
             floatArray[i] = array[ i ];
             // floatArray[i] = view.getFloat32( i, true );
@@ -199,7 +166,7 @@ export default class LrcReader extends AbstractReader {
             && this.isValidBase();
     }
 
-    getFile() {
+    getThermalFile() {
         if (!this.isValid()) {
             console.log( this.getErrors() );
             return null;
