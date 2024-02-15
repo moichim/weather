@@ -1,7 +1,7 @@
 import { Reducer } from "react";
 import { ThermalStorageType } from "./storage";
 import { AvailableThermalActions, ThermalActions } from "./actions";
-import ThermalFile from "@/utils/reader/thermalFile";
+import ThermalFile from "@/thermal/reader/thermalFile";
 
 
 const calculateMinMax = (
@@ -78,19 +78,19 @@ export const thermalReducer: Reducer<ThermalStorageType, AvailableThermalActions
                     from: action.payload.file.min,
                     to: action.payload.file.max,
                     files: {
-                        [action.payload.file.url]: action.payload.file
-                    }
+                        [action.payload.file.id]: action.payload.file
+                    },
                 }
             }
 
             // otherwise calculate new values
 
-            const filesWithNewOne = {
+            const filesByPathWithNewOne = {
                 ...state.files,
-                [action.payload.file.url]: action.payload.file
+                [action.payload.file.id]: action.payload.file
             }
 
-            const minMaxWithNewOne = calculateMinMax(Object.values(filesWithNewOne));
+            const minMaxWithNewOne = calculateMinMax(Object.values(filesByPathWithNewOne));
 
             const fromToWithNewOne = calculateFromTo( minMaxWithNewOne, state.from, state.to );
 
@@ -98,20 +98,20 @@ export const thermalReducer: Reducer<ThermalStorageType, AvailableThermalActions
                 ...state,
                 ...minMaxWithNewOne,
                 ...fromToWithNewOne,
-                files: filesWithNewOne
-            }
+                files: filesByPathWithNewOne,
+            } as ThermalStorageType
 
             return resultWithNewOne;
 
-        case ThermalActions.REMOVE_FILE:
+        case ThermalActions.REMOVE_FILE_BY_ID:
 
-            const filesWithoutTheOne = Object.fromEntries( Object.entries( state.files ).filter( ( [key, value] ) => {
+            const filesByPathWithoutTheOne = Object.fromEntries( Object.entries( state.files ).filter( ( [key, value] ) => {
                 return key !== action.payload.id
             } ) );
 
             // if there is no file, reset the storage
 
-            if ( Object.values( filesWithoutTheOne ).length === 0 ) {
+            if ( Object.values( filesByPathWithoutTheOne ).length === 0 ) {
                 return {
                     ...state,
                     min: undefined,
@@ -121,7 +121,7 @@ export const thermalReducer: Reducer<ThermalStorageType, AvailableThermalActions
                 }
             }
 
-            const minMaxWithoutNewOne = calculateMinMax( Object.values( filesWithoutTheOne ) );
+            const minMaxWithoutNewOne = calculateMinMax( Object.values( filesByPathWithoutTheOne ) );
 
             const fromToWithoutNewOne = calculateFromTo( minMaxWithoutNewOne, state.from, state.to );
 
@@ -129,7 +129,19 @@ export const thermalReducer: Reducer<ThermalStorageType, AvailableThermalActions
                 ...state,
                 ...minMaxWithoutNewOne,
                 ...fromToWithoutNewOne,
-                files: filesWithoutTheOne
+                files: filesByPathWithoutTheOne,
+            } as ThermalStorageType
+
+        case ThermalActions.SET_RANGE:
+
+            Object.values( state.files ).forEach( file => {
+                file.from = action.payload.from,
+                file.to = action.payload.to
+            } );
+            return {
+                ...state,
+                from: action.payload.from,
+                to: action.payload.to,
             }
 
     }

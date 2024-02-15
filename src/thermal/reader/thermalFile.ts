@@ -1,4 +1,5 @@
-import { IRON, ThermalPalettes } from "@/components/thermogram/palettes";
+import { IRON, ThermalPalettes } from "@/thermal/components/instance/palettes";
+import {v4 as uuidv4} from 'uuid';
 
 type ThermalMouseEvent = MouseEvent & {
     layerX: number,
@@ -7,8 +8,11 @@ type ThermalMouseEvent = MouseEvent & {
 
 export default class ThermalFile {
 
+    public readonly id: string;
+
+    // The container is used to store cursor data as data- atributes
     public container: HTMLDivElement | null = null;
-    public canvas: HTMLCanvasElement | null = null;
+    protected canvas: HTMLCanvasElement | null = null;
     protected context: CanvasRenderingContext2D | null = null;
 
     protected palette = ThermalPalettes.IRON;
@@ -66,11 +70,11 @@ export default class ThermalFile {
 
 
     // CURSOR
-    public _cursorX: number|undefined = undefined;
-    protected set cursorX(value:number|undefined) {
+    public _cursorX: number | undefined = undefined;
+    protected set cursorX(value: number | undefined) {
         this._cursorX = value;
-        if ( this.container ) {
-            this.container.dataset.x = value 
+        if (this.container) {
+            this.container.dataset.x = value
                 ? value?.toString()
                 : ""
         }
@@ -78,12 +82,12 @@ export default class ThermalFile {
     public get cursorX() {
         return this._cursorX;
     }
-    
-    public _cursorY: number|undefined = undefined;
-    protected set cursorY(value:number|undefined) {
+
+    public _cursorY: number | undefined = undefined;
+    protected set cursorY(value: number | undefined) {
         this._cursorY = value;
-        if ( this.container ) {
-            this.container.dataset.y = value 
+        if (this.container) {
+            this.container.dataset.y = value
                 ? value?.toString()
                 : ""
         }
@@ -92,11 +96,11 @@ export default class ThermalFile {
         return this._cursorY;
     }
 
-    public _cursorValue: number|undefined = undefined;
-    protected set cursorValue(value:number|undefined) {
+    public _cursorValue: number | undefined = undefined;
+    protected set cursorValue(value: number | undefined) {
         this._cursorValue = value;
-        if ( this.container ) {
-            this.container.dataset.value = value 
+        if (this.container) {
+            this.container.dataset.value = value
                 ? value?.toString()
                 : ""
         }
@@ -117,8 +121,10 @@ export default class ThermalFile {
         public readonly timestamp: number,
         public readonly pixels: number[],
         public readonly min: number,
-        public readonly max: number
+        public readonly max: number,
+        id?: string
     ) {
+        this.id = id ? id : uuidv4();
     }
 
     /** Bind the class to the canvas element. */
@@ -126,13 +132,17 @@ export default class ThermalFile {
         parent: HTMLDivElement
     ) {
 
-        if ( this.container ) {
+        if (this.container) {
             return;
         }
 
         this.container = parent;
 
-        const canvas = document.createElement( "canvas" );
+        if ( this.container.hasChildNodes() ) {
+            return;
+        }
+
+        const canvas = document.createElement("canvas");
         canvas.width = this.width;
         canvas.height = this.height;
         canvas.style.padding = "0px";
@@ -146,7 +156,7 @@ export default class ThermalFile {
         this.canvas = canvas;
         this.context = canvas.getContext("2d");
 
-        this.container.appendChild( this.canvas );
+        this.container.appendChild(this.canvas);
 
     }
 
@@ -165,33 +175,29 @@ export default class ThermalFile {
                 const client = this.width;
                 const parent = this.container?.clientWidth;
 
-                if ( client && parent ) {
+                if (client && parent) {
 
                     const aspect = client / parent;
 
-                console.log( this.width, aspect );
+                    const e = event as ThermalMouseEvent;
 
-                const e = event as ThermalMouseEvent;
+                    const x = Math.round(e.layerX * aspect);
+                    const y = Math.round(e.layerY * aspect);
 
-                console.log( event );
+                    const index = x + (y * this.width);
+                    const value = this.pixels[index];
 
-                const x = Math.round( e.layerX * aspect);
-                const y = Math.round( e.layerY * aspect);
+                    if (x !== this.cursorX)
+                        this.cursorX = x;
+                    if (y !== this.cursorY)
+                        this.cursorY = y;
 
-                const index = x + (y * this.width);
-                const value = this.pixels[ index ];
-
-                if ( x !== this.cursorX ) 
-                    this.cursorX = x;
-                if ( y !== this.cursorY )
-                    this.cursorY = y;
-
-                if ( value !== this.cursorValue )
-                    this.cursorValue = value;
+                    if (value !== this.cursorValue)
+                        this.cursorValue = value;
 
                 }
 
-                
+
 
             }
 
@@ -202,19 +208,19 @@ export default class ThermalFile {
             }
 
         } else {
-            console.info( "canvas ještě není ready" );
+            console.info("canvas ještě není ready");
         }
 
     }
 
     public update() {
-        
+
         if (this.canvas) {
 
             this.drawEverything();
 
         }
-        
+
     }
 
     protected drawEverything() {
@@ -232,9 +238,9 @@ export default class ThermalFile {
 
                     // Clamp temperature to the displayedRange
                     let temperature = this.pixels[index];
-                    if ( temperature < this.from )
+                    if (temperature < this.from)
                         temperature = this.from;
-                    if ( temperature > this.to )
+                    if (temperature > this.to)
                         temperature = this.to;
 
                     const temperatureRelative = temperature - this.from;

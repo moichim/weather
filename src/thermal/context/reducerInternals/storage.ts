@@ -1,4 +1,4 @@
-import ThermalFile from "@/utils/reader/thermalFile"
+import ThermalFile from "@/thermal/reader/thermalFile"
 
 export type ThermalStorageType = {
 
@@ -10,7 +10,7 @@ export type ThermalStorageType = {
 
     files: {
         [index: string]: ThermalFile
-    }
+    },
 
 }
 

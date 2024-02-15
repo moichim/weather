@@ -1,7 +1,6 @@
 "use client";
 
 import { PropsWithChildren, createContext, useContext } from "react";
-import { ThermalStorageType, thermalStorageDefaults } from "./reducerInternals/storage";
 import { UseThermalInternalReturnValue, useThermalInternal, useThermalInternalDefault } from "./useThermalInternal";
 
 const ThermalContext = createContext<UseThermalInternalReturnValue>(useThermalInternalDefault);
