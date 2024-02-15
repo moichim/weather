@@ -5,5 +5,5 @@ export const ThermalObserverDisplay: React.FC<ThermalInstanceHook["observer"]> =
     if (!props.x || !props.y || !props.value) {
         return <></>
     }
-    return <div className={"text-small"}>{props.value.toFixed(3)} C</div>
+    return <div className={"text-small"}>{props.value.toFixed(3)} °C</div>
 }
