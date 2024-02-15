@@ -16,7 +16,7 @@ export const useThermalObserver = (
 
     useEffect(() => {
 
-        if (renderingContainer.current === null)
+        if (renderingContainer.current === null || instance === undefined)
             return;
 
 
@@ -24,37 +24,35 @@ export const useThermalObserver = (
 
             const getValueInt = (mutation: MutationRecord) => {
 
-                const value = mutation.oldValue ? parseInt( mutation.oldValue ) : undefined;
+                const element = document.getElementById(  `thermal_image_${instance.id}` );
 
-                return value;
+                if ( element !== null ) {
+                    const rawValue = element.getAttribute( mutation.attributeName! );
+                    if ( rawValue )
+                    return parseInt( rawValue );
+                }
 
-                // const value = parseInt(mutation.target.attributes[mutation.attributeName].value); // eslint-disable-line
+                return undefined;
 
-                // return isNaN(value) ? undefined : value;
             };
 
             const getValueFloat = (mutation: MutationRecord) => {
 
-                if (mutation.type !== "attributes")
-                    return undefined;
+                const element = document.getElementById(  `thermal_image_${instance.id}` );
 
-                const value = mutation.oldValue ? parseFloat( mutation.oldValue ) : undefined;
+                if ( element !== null ) {
+                    const rawValue = element.getAttribute( mutation.attributeName! );
+                    if ( rawValue )
+                    return parseFloat( rawValue );
+                }
 
-                return value;
-                // parseFloat(mutation.target.attributes[mutation.attributeName].value); // eslint-disable-line
-
-                // return isNaN(value) ? undefined : value;
+                return undefined;
             };
 
             mutations.forEach(mutation => {
 
 
                 if (mutation.type === "attributes") {
-
-                    console.log( 
-                        mutation.attributeName, 
-                        mutation.type 
-                    );
 
                     if (mutation.attributeName === "data-x") {
 
@@ -91,7 +89,7 @@ export const useThermalObserver = (
 
         return () => observer.disconnect();
 
-    }, [renderingContainer]);
+    }, [renderingContainer, instance]);
 
     return {
         x,

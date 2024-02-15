@@ -6,6 +6,7 @@ type ThermalMouseEvent = MouseEvent & {
     layerY: number
 }
 
+/** Stores data of a thermal file and handles the canvas drawing */
 export default class ThermalFile {
 
     public readonly id: string;
@@ -137,6 +138,8 @@ export default class ThermalFile {
         }
 
         this.container = parent;
+
+        this.container.setAttribute( "id", `thermal_image_${this.id}` );
 
         if ( this.container.hasChildNodes() ) {
             return;

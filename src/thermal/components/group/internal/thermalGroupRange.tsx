@@ -11,9 +11,7 @@ export const ThermalGroupRange = () => {
     if ( !context.state.max || !context.state.min || !context.state.from || !context.state.to ) 
         return <></>;
 
-    console.log( context.state );
-
-    return <>
+    return <div className="py-6">
 
         <Slider 
             label="Teplotní škála"
@@ -29,6 +27,6 @@ export const ThermalGroupRange = () => {
 
         />
 
-    </>
+    </div>
 
 }

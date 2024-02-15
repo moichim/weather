@@ -8,12 +8,12 @@ export default async function Home() {
       <ThermalContextProvider>
 
         <ThermalGroup  files={[
-          "https://localhost:3000/sample.lrc",
-          "https://localhost:3000/sample2.lrc"
+          "/sample.lrc",
+          "/sample2.lrc",
+          "/sample3.lrc",
+          "/sample4.lrc",
+          "/sample5.lrc",
         ]} />
-      
-        <ThermalImage url="https://localhost:3000/sample.lrc" />
-        <ThermalImage url="https://localhost:3000/sample2.lrc" originalSize={false}/>
       
       </ThermalContextProvider>
   
