@@ -132,9 +132,9 @@ export const GraphTour: React.FC = () => {
     const queriedProperties: {
         name: string, color: string, in: string
     }[] = useMemo(() => {
-        if (response === undefined)
+        if (response === undefined || response.rangeGoogle === null)
             return [];
-        return response.range.data.map(property => ({
+        return response.rangeGoogle.data.map(property => ({
             name: property.name,
             color: property.color,
             in: property.in.name ?? property.in.slug
@@ -146,7 +146,7 @@ export const GraphTour: React.FC = () => {
     }[] = useMemo(() => {
         if (response === undefined)
             return [];
-        return response.weatherRange.data.map(source => ({
+        return response.rangeMeteo.data.map(source => ({
             name: source.source.name,
             color: source.source.color,
             description: source.source.description,

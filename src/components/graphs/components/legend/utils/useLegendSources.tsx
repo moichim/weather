@@ -10,7 +10,7 @@ export const useLegendSources = () => {
         if (response === undefined)
             return [];
 
-        return response.weatherRange.data.map(source => ({
+        return response.rangeMeteo.data.map(source => ({
             name: source.source.name,
             color: source.source.color,
             description: source.source.description,

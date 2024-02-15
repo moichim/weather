@@ -6,7 +6,7 @@ import { googleSheetsProvider } from '@/graphql/google/googleProvider/googleProv
 
 export default async function Home() {
 
-  const data = await googleSheetsProvider.getAllScopes();
+  const data = await googleSheetsProvider.fetchAllScopesDefinitions();
 
   return <div className="bg-foreground pb-20">
     

@@ -13,7 +13,7 @@ export const Graphs: React.FC = () => {
 
     return <div>
 
-            <GraphTour />
+<GraphTour />
             
             <div id="one" className="w-full h-full bg-gray-200 pb-[10rem] pt-3 min-h-full" >
 

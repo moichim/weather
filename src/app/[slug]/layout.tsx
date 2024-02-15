@@ -10,10 +10,12 @@ import { MeteoContextProvider } from "@/state/meteo/meteoContext";
 
 type ScopeLayoutProps = PropsWithChildren & ScopePageProps;
 
+
+/** @todo Should not use the meteo context at all! */
 const ScopeLayout: React.FC<ScopeLayoutProps> = async ({ ...props }) => {
 
-    const allScopes = await googleSheetsProvider.getAllScopes();
-    const scope = allScopes.find(s => s.slug === props.params.slug);
+    const allScopes = await googleSheetsProvider.fetchAllScopesDefinitions();
+    const scope = allScopes.find(s => s.slug === props.params.slug)!;
 
     if (scope === undefined)
         notFound();
@@ -22,7 +24,6 @@ const ScopeLayout: React.FC<ScopeLayoutProps> = async ({ ...props }) => {
         <MeteoContextProvider>
             <GraphContextProvider>
                 <DisplayContextProvider>
-
                     <header className="fixed w-0 h-0 top-5 left-5 z-[20]">
                         <ScopeHeading {...scope} />
                     </header>
@@ -33,7 +34,6 @@ const ScopeLayout: React.FC<ScopeLayoutProps> = async ({ ...props }) => {
                 </DisplayContextProvider>
             </GraphContextProvider>
         </MeteoContextProvider>
-
     </ScopeContextProvider>
 }
 

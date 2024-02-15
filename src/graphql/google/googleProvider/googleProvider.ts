@@ -45,19 +45,22 @@ class GoogleSheetsProvider {
 
     protected static CONFIG_TAB_NAME = "Config";
 
-    protected static DATA_TAB_NAME = "Data";
 
     public readonly ID: string;
     protected cachedResult: {
         [index: string]: GoogleScope
     } = {};
 
+
     protected storeCachedResults(scopes: GoogleScope[]) {
         this.cachedResult = Object.fromEntries(scopes.map(s => [s.slug, s]));
     }
+
+
     protected storeCachedResult(scope: GoogleScope) {
         this.cachedResult[scope.slug] = scope;
     }
+
 
     protected getCachedResult(slug: string) {
         return Object.keys(this.cachedResult).includes(slug)
@@ -65,19 +68,23 @@ class GoogleSheetsProvider {
             : undefined;
     }
 
+
     protected getCachedResults() {
         return Object.entries(this.cachedResult).length > 0
             ? Object.values(this.cachedResult)
             : undefined;
     }
 
+
     public constructor() {
         this.ID = randomUUID();
     }
 
+
     protected static getInstance() {
         return googleSheetsProvider;
     }
+
 
     protected async getAuth() {
         return new google.auth.GoogleAuth({
@@ -97,6 +104,7 @@ class GoogleSheetsProvider {
         });
     }
 
+
     protected async getDocsClient() {
         const auth = await this.getAuth();
 
@@ -105,6 +113,7 @@ class GoogleSheetsProvider {
             auth: auth
         });
     }
+
 
     protected async getSheetsClient() {
 
@@ -116,82 +125,11 @@ class GoogleSheetsProvider {
         });
     }
 
-    protected formatQueryRange(
-        range: string,
-        sheet: string = GoogleSheetsProvider.CONFIG_TAB_NAME
-    ): string {
-        return `${sheet}!${range}`
-    }
-
-    protected inputDateToString(
-        input: string
-    ): string {
-
-        const [day, hours] = input.split(" ");
-
-        const [D, M, Y] = day.split(".");
-        const [H, m] = hours.split(":");
-
-        return `${Y}-${M}-${D} ${H}:${m}`;
-
-    }
-
-    protected inputDateToDate(input: string): Date {
-        return new Date(this.inputDateToString(input));
-    }
-
-    protected inputDateToTimestamp(input: string): number {
-        return this.inputDateToDate(input).getTime();
-    }
-
-    protected isValidScopeString(item: any) {
-        const result = typeof item === "string"
-            && item !== "";
-
-        return result;
-    }
-
-    protected isValidScopeNumber(item: any) {
-
-        return GoogleProviderUtils.isValidNumericalValue( item );
-
-    }
-
-    protected isValidScope(slug: string, row: any[]) {
-        return this.isValidScopeString(row[0])
-            && this.isValidScopeString(row[1])
-            && this.isValidScopeString(row[2])
-            && this.isValidScopeString(row[3])
-            && this.isValidScopeNumber(row[4])
-            && this.isValidScopeNumber(row[5])
-            && this.isValidScopeString(row[6])
-            && this.isValidScopeString(row[7])
-            && this.isValidScopeString(row[8])
-            && this.isValidScopeString(row[9])
-    }
-
-    protected formatScope(row: any[]): GoogleScope {
-
-        return {
-            name: row[0],
-            slug: row[1],
-            sheetId: row[2],
-            sheetTab: row[3],
-            lat: GoogleProviderUtils.sanitizeNumericalValueRequired( row[4] ),
-            lon: GoogleProviderUtils.sanitizeNumericalValueRequired( row[5] ),
-            hasNtc: row[6] === "1",
-            isDefault: row[7] === "1",
-            team: row[8],
-            locality: row[9],
-            description: row[10]
-        }
-    }
-
 
     /** @deprecated Should use instances or be releted */
-    public async getScope(scope: string) {
+    public async fetchScopeDefinition(scope: string) {
 
-        const scopes = await this.getAllScopes();
+        const scopes = await this.fetchAllScopesDefinitions();
 
         const result = scopes.find(row => row.slug === scope);
 
@@ -204,7 +142,7 @@ class GoogleSheetsProvider {
 
     }
 
-    public async getAllScopes(): Promise<GoogleScope[]> {
+    public async fetchAllScopesDefinitions(): Promise<GoogleScope[]> {
 
         const cached = this.getCachedResults();
 
@@ -215,12 +153,12 @@ class GoogleSheetsProvider {
         const api = await this.getSheetsClient();
         const response = await api.spreadsheets.values.get({
             spreadsheetId: GoogleSheetsProvider.CONFIG_SHEET_ID,
-            range: this.formatQueryRange("A2:Z", "Config")
+            range: GoogleProviderUtils.formatQueryRange("A2:Z", "Config")
         });
 
-        const correctRows = response.data.values!.filter(row => this.isValidScope(row[1], row));
+        const correctRows = response.data.values!.filter(row => GoogleProviderUtils.isValidScopeDefinition(row));
 
-        const scopes = correctRows.map(row => this.formatScope(row));
+        const scopes = correctRows.map(row => GoogleProviderUtils.parseScopeDefinition(row));
 
         this.storeCachedResults(scopes);
 
@@ -228,103 +166,20 @@ class GoogleSheetsProvider {
 
     }
 
-    protected extractColumnDefinitionFromResponseData(
-        data: any[][] | null | undefined,
-        index: number
-    ): GoogleDataColumnDefinition {
-
-        if (!data)
-            throw new ApolloError({
-                errorMessage: "Google data error"
-            });
-
-        const columnIndex = index + 2;
-
-        return {
-            name: data[1][columnIndex] as string,
-            slug: data[0][columnIndex] as string,
-            in: Properties.one(data[2][columnIndex] as AvailableWeatherProperties),
-            description: data[3][columnIndex] as string | undefined,
-            color: data[4][columnIndex] as string,
-        }
-
-    }
-
-
-    /** Take the table and the property index and extract the values into the desired output format. */
-    protected extractColumnValues(
-        data: any[][] | null | undefined,
-        propertyIndex: number,
-        filterRowsFromTimestamp: number,
-        filterRowsToTimestamp: number
-    ): GoogleColumnValue[] {
-        if (!data)
-            throw new ApolloError({
-                errorMessage: "Google data error"
-            });
-
-        const columnIndex = propertyIndex + 2;
-
-        const result: GoogleColumnValue[] = [];
-
-        data.forEach( (row, rowIndex) => {
-
-            // Take only content rows, not the header
-            if ( rowIndex <= 6 ) return;
-
-            // Filter rows by the provided time range
-            const time = this.inputDateToTimestamp( row[0] as string );
-            if ( time <= filterRowsFromTimestamp || time >= filterRowsToTimestamp ) return;
-
-            // Add entry only when the row is valid number
-            const formattedValue = GoogleProviderUtils.sanitizeNumericalValue( row[columnIndex] );
-            if ( formattedValue !== undefined ) {
-
-                result.push( {
-                    time: this.inputDateToTimestamp(row[0] as string),
-                    value: GoogleProviderUtils.sanitizeNumericalValueRequired( row[columnIndex] ),
-                    note: row[1]
-                } );
-
-            }
-
-        } );
-
-        return result;
-
-    }
-
-    protected extractColumnDefinitions(data: any[][] | null | undefined): GoogleDataColumnDefinition[] {
-
-        if (!data)
-            throw new ApolloError({
-                errorMessage: "Google data error"
-            });
-
-        const columnsCount = data[0].filter((_, index) => index > 1).length;
-
-        const defs: GoogleDataColumnDefinition[] = [];
-
-        for (let i = 0; i < columnsCount; i++) {
-            defs.push(this.extractColumnDefinitionFromResponseData(data, i));
-        }
-
-        return defs;
-
-    }
-
     /** @deprecated Should know sheet ID from the context */
-    public async range(args: GoogleRequest): Promise<any> {
+    public async fetchScopeValuesInRange(
+        args: GoogleRequest
+    ): Promise<any> {
 
         const sheetId = args.sheetId;
 
         const api = await this.getSheetsClient();
         const response = await api.spreadsheets.values.get({
             spreadsheetId: sheetId,
-            range: this.formatQueryRange("A1:Z", args.sheetTab)
+            range: GoogleProviderUtils.formatQueryRange("A1:Z", args.sheetTab)
         });
 
-        const definitions = this.extractColumnDefinitions(response.data.values);
+        const definitions = GoogleProviderUtils.extractAllColumnDefinitionsFromResponse(response.data.values);
 
         const from = args.from;
         const to = args.to;
@@ -332,8 +187,8 @@ class GoogleSheetsProvider {
         const result: GoogleColumn[] = definitions.map((column, index) => {
 
             // Retrieve values from the response
-            const values = this.extractColumnValues(
-                response.data.values, 
+            const values = GoogleProviderUtils.extractSingleColumnValuesFromResponse(
+                response.data.values,
                 index,
                 from,
                 to
@@ -365,6 +220,20 @@ class GoogleSheetsProvider {
 
         return result;
 
+    }
+
+    public async fetchScopeColumnDefinitions(
+        sheetId: string,
+        sheetTab: string
+    ): Promise<GoogleDataColumnDefinition[]> {
+
+        const api = await this.getSheetsClient();
+        const response = await api.spreadsheets.values.get({
+            spreadsheetId: sheetId,
+            range: GoogleProviderUtils.formatQueryRange("A1:Z", sheetTab)
+        });
+
+        return GoogleProviderUtils.extractAllColumnDefinitionsFromResponse(response.data.values);
     }
 
 

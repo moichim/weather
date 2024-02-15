@@ -19,7 +19,7 @@ export const useLegendColumns = () => {
         if (response === undefined)
             return {};
 
-        const reduced = response.range.data.reduce((state, current) => {
+        const reduced = response.rangeGoogle.data.reduce((state, current) => {
 
             const newState = { ...state };
 
