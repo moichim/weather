@@ -1,22 +1,28 @@
+import { ContextDebugger } from "@/thermal/components/ContextDebugger";
 import { ThermalGroup } from "@/thermal/components/group/thermalGroup";
 import { ThermalImage } from "@/thermal/components/instance/thermalImage";
 import { ThermalContextProvider } from "@/thermal/context/thermalContext";
+import { ThermalContextNewProvider } from "@/thermal/context/thermalContextNew";
 
 export default async function Home() {
-  
-    return <div className="">
-      <ThermalContextProvider>
 
-        <ThermalGroup  files={[
-          "http://localhost:3000/sample.lrc",
-          "http://localhost:3000/sample2.lrc"
+  return <div className="">
+      <ThermalContextNewProvider>
+
+      {/*
+        <ThermalGroup files={[
+          "/sample.lrc",
+          "/sample2.lrc",
+          "/sample3.lrc",
+          "/sample4.lrc",
+          "/sample5.lrc",
         ]} />
-      
-        <ThermalImage url="http://localhost:3000/sample.lrc" />
-        <ThermalImage url="http://localhost:3000/sample2.lrc" originalSize={false}/>
-      
-      </ThermalContextProvider>
-  
-    </div>;
-  
-  }
+        */}
+
+        <ContextDebugger />
+
+      </ThermalContextNewProvider>
+
+  </div>;
+
+}

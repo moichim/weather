@@ -1,5 +1,12 @@
 import ThermalFile from "@/thermal/reader/thermalFile"
 
+enum ThermalImageLoadingState {
+    LOADING = 0,
+    PENDING = 1,
+    LOADED = 2,
+    ERROR = 3
+}
+
 export type ThermalStorageType = {
 
     min: number | undefined,
@@ -12,6 +19,13 @@ export type ThermalStorageType = {
         [index: string]: ThermalFile
     },
 
+    loading: {
+        [index: string]: {
+            path: string,
+            status: ThermalImageLoadingState
+        }
+    }
+
 }
 
 export const thermalStorageDefaults: ThermalStorageType = {
@@ -19,5 +33,6 @@ export const thermalStorageDefaults: ThermalStorageType = {
     max: undefined,
     from: undefined,
     to: undefined,
-    files: {}
+    files: {},
+    loading: {}
 }

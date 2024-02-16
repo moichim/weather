@@ -5,7 +5,12 @@ export enum ThermalActions {
     ADD_FILE = 1,
     REMOVE_FILE_BY_ID = 2,
 
-    SET_RANGE = 3
+    SET_RANGE = 3,
+
+    LOADING_REGISTER = 4,
+    LOADING_START = 5,
+    LOADING_FINISH = 6,
+    LOADING_ERROR = 7
 
 }
 
@@ -20,7 +25,7 @@ type ThermalActionBase<P extends ThermalPayloadBase = AvailableThermalActions> =
 
 
 
-// LOAD FILE
+// LOADING SUCCESS
 
 type AddFilePayload = ThermalPayloadBase & {
     file: ThermalFile
