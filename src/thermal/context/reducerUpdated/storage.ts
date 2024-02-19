@@ -2,10 +2,10 @@ import {ThermalFileInstance} from "@/thermal/reader/ThermalFileInstance"
 import {ThermalFileSource} from "@/thermal/reader/ThermalFileSource"
 
 export enum ThermalImageLoadingState {
-    LOADING = 0,
-    PENDING = 1,
-    LOADED = 2,
-    ERROR = 3
+    LOADING = "FIRED",
+    PENDING = "PENDING",
+    LOADED = "LOADED",
+    ERROR = "ERROR"
 }
 
 export type ThermalGroupType = {
@@ -20,7 +20,7 @@ export type ThermalGroupType = {
 
     bypass: boolean,
 
-    instancesById: {
+    instancesByUrl: {
         [index:string]: ThermalFileInstance
     },
 
@@ -28,7 +28,7 @@ export type ThermalGroupType = {
 
 }
 
-type ThermalRequestType = {
+export type ThermalRequestType = {
 
     url: string,
     status: ThermalImageLoadingState,
@@ -48,6 +48,14 @@ type ThermalResultRegistryType = {
     }
 }
 
+type ThermalResultType = {
+    url: string,
+    groupId: string,
+    fileId: string,
+    file: ThermalFileSource,
+    request: ThermalRequestType
+}
+
 export type ThermalStorageNew = {
 
     min: number|undefined,
@@ -61,6 +69,10 @@ export type ThermalStorageNew = {
     requestsFiredByUrl: ThermalRequestRegistryType,
 
     requestsPendingByUrl: ThermalRequestRegistryType,
+
+    resultsByPath: {
+        [index:string]: ThermalResultType,
+    },
 
     registryByUrl: {
         [index:string]: ThermalResultRegistryType
@@ -80,6 +92,7 @@ export const thermalStorageNewDefaults: ThermalStorageNew = {
     requestedUrls: [],
     requestsFiredByUrl: {},
     requestsPendingByUrl: {},
+    resultsByPath: {},
     registryByUrl: {},
     groups: {}
 }

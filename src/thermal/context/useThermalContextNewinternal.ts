@@ -22,25 +22,24 @@ export const useThermalContextNewInternal = () => {
 
             const file = await ThermalLoader.fromUrl( url );
 
-            if ( file )
-
+            if ( file ) {
+                console.log( "Načten soubor", file );
                 dispatch( ThermalActionsNewFactory.globalLoadFileSuccess( url, file ) );
+            }
 
         }
+
+        console.log("wtf", state.requestsFiredByUrl);
 
         Object.keys( state.requestsFiredByUrl ).forEach( (url) => {
 
             dispatch( ThermalActionsNewFactory.globalLoadFileSetPending( url ) );
 
+            console.log( "requestsFiredByUrlChanged", state );
             startFileLoading( url );
         } );
 
     }, [state.requestsFiredByUrl, dispatch] );
-
-    // Run load in the new pending
-    useEffect( () => {
-
-    }, [state.requestsPendingByUrl] );
 
 
     return {

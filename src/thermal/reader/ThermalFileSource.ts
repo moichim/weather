@@ -1,6 +1,7 @@
 import { IRON, ThermalPalettes } from "@/thermal/components/instance/palettes";
 import {v4 as uuidv4} from 'uuid';
 import {ThermalFileInstance} from "./ThermalFileInstance";
+import ThermalFile from "./thermalFile";
 
 type ThermalMouseEvent = MouseEvent & {
     layerX: number,
@@ -8,23 +9,7 @@ type ThermalMouseEvent = MouseEvent & {
 }
 
 /** Stores data of a thermal file and handles the canvas drawing */
-export class ThermalFileSource {
-
-
-
-
-    public constructor(
-        public readonly url: string,
-        public readonly signature: string,
-        public readonly unit: number,
-        public readonly width: number,
-        public readonly height: number,
-        public readonly timestamp: number,
-        public readonly pixels: number[],
-        public readonly min: number,
-        public readonly max: number,
-    ) {
-    }
+export class ThermalFileSource extends ThermalFile {
 
     public createInstance(
         groupId: string,

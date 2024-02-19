@@ -79,6 +79,7 @@ type GroupStartLoadingFileAction = ThermalGlobalActionBase<GroupStartLoadingFile
 type GlobalSetFileLoadedPayload = ThermalGlobalPayloadBase & { url: string, file: ThermalFileSource }
 type GlobalSetFileLoadedAction = ThermalGlobalActionBase<GlobalSetFileLoadedPayload> & { type: ThermalActionsNew.LOADING_SUCCESS }
 
+
 // Set file error
 type GlobalSetFileErrorPayload = ThermalGlobalPayloadBase & { url: string }
 type GlobalSetFileErrorAction = ThermalGlobalActionBase<GlobalSetFileErrorPayload> & { type: ThermalActionsNew.LOADING_ERROR }

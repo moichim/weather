@@ -4,6 +4,14 @@ import { AvailableThermalActions, ThermalActionsNew } from "./actions";
 import { current } from "tailwindcss/colors";
 import { ThermalFileInstance } from "@/thermal/reader/ThermalFileInstance";
 
+
+const calculateMinMaxUponAdding = (
+    
+) => {
+
+}
+
+
 export const thermalReducerNew: Reducer<ThermalStorageNew, AvailableThermalActions> = (
     state,
     action
@@ -30,7 +38,7 @@ export const thermalReducerNew: Reducer<ThermalStorageNew, AvailableThermalActio
                         to: undefined,
                         cursorX: undefined,
                         cursorY: undefined,
-                        instancesById: {},
+                        instancesByUrl: {},
                         requests: {}
                     } as ThermalGroupType
                 }
@@ -51,7 +59,7 @@ export const thermalReducerNew: Reducer<ThermalStorageNew, AvailableThermalActio
                     group.from = globalSetRangeFrom;
                     group.to = globalSetRangeTo;
                     if (globalSetRangeFrom && globalSetRangeTo) {
-                        Object.values(group.instancesById).forEach(file => {
+                        Object.values(group.instancesByUrl).forEach(file => {
                             file.from = globalSetRangeFrom;
                             file.to = globalSetRangeTo
                         });
@@ -157,7 +165,8 @@ export const thermalReducerNew: Reducer<ThermalStorageNew, AvailableThermalActio
                     loadingStartExistingRegistryEntry.instancesByGroupId[action.payload.groupId] = loadingStartNewInstance;
 
                     // Add the instance to the group
-                    loadingStartGroups[action.payload.groupId].instancesById[loadingStartNewInstance.id] = loadingStartNewInstance;
+                    loadingStartGroups[action.payload.groupId].instancesByUrl[loadingStartNewInstance.id] = loadingStartNewInstance;
+                    loadingStartGroups[action.payload.groupId].min = 0;
 
                 }
 
@@ -262,7 +271,7 @@ export const thermalReducerNew: Reducer<ThermalStorageNew, AvailableThermalActio
                     existingSource.instancesByGroupId[groupId] = newInstance;
 
                     // Add the item to the group
-                    loadingSuccessGroups[groupId].instancesById[newInstance.id] = newInstance;
+                    loadingSuccessGroups[groupId].instancesByUrl[newInstance.id] = newInstance;
 
                 });
 

@@ -8,7 +8,7 @@ type ThermalMouseEvent = MouseEvent & {
 }
 
 /** Stores data of a thermal file and handles the canvas drawing */
-export class ThermalFileInstance extends ThermalFileSource {
+export class ThermalFileInstance extends ThermalFile {
 
     // The container is used to store cursor data as data- atributes
     public container: HTMLDivElement | null = null;
@@ -160,6 +160,28 @@ export class ThermalFileInstance extends ThermalFileSource {
             groupId,
             frameId
         );
+    }
+
+    public static fromSourceWithIndexedName(
+        groupId: string,
+        files: { [index:string]: ThermalFileInstance },
+        source: ThermalFileSource
+    ) {
+
+        return new ThermalFileInstance(
+            source.url,
+            source.signature,
+            source.unit,
+            source.width,
+            source.height,
+            source.timestamp,
+            source.pixels,
+            source.min,
+            source.max,
+            groupId,
+            `file_${groupId}_${Object.values( files ).length.toString()}`
+        );
+
     }
 
     /** Bind the class to the canvas element. */
