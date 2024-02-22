@@ -1,7 +1,7 @@
 import { ThermalFileSource } from "@/thermal/reader/ThermalFileSource";
 import { ThermoGroup, ThermoStorageType, thermoGroupFactory } from "./storage"
 import { CSSProperties, Reducer } from "react";
-import { AvailableThermoActions, CursorSetterType, ThermoActions } from "./actions";
+import { AvailableThermoActions, CursorSetterType, RangeSetterType, ThermoActions } from "./actions";
 import { ThermalFileInstance } from "@/thermal/reader/ThermalFileInstance";
 import { calculateMinMax } from "./reducerUtils/numericalValues";
 
@@ -242,7 +242,43 @@ const groupSetCursor = (
         return {
             ...restOfTheState,
             groups: {
-                ...remainingGroups,
+                ...state.groups,
+                [groupId]: newGroup
+            }
+        }
+
+    }
+
+}
+
+const groupSetRange = (
+    state: ThermoStorageType,
+    groupId: string,
+    range: RangeSetterType
+): ThermoStorageType => {
+
+    if (state.groups[groupId] === undefined) {
+        return state;
+    } else {
+
+        console.log( range );
+
+        const { groups: newGroups, ...restOfTheState } = state;
+
+        const { [groupId]: { ...newGroup }, ...remainingGroups } = newGroups;
+
+        newGroup.from = range.to;
+        newGroup.to = range.to;
+
+        // Update the group of every item except the currently hovering one
+        Object.values(newGroup.instancesByPath).forEach(instance => {
+            instance.setRangeFromTheOutside(range.from, range.to);
+        });
+
+        return {
+            ...restOfTheState,
+            groups: {
+                ...state.groups,
                 [groupId]: newGroup
             }
         }
@@ -272,6 +308,9 @@ export const theRehookReducer: Reducer<ThermoStorageType, AvailableThermoActions
 
         case ThermoActions.GROUP_SET_CURSOR:
             return groupSetCursor(state, action.payload.groupId, action.payload.cursor);
+
+        case ThermoActions.GROUP_SET_RANGE:
+            return groupSetRange(state, action.payload.groupId, action.payload.range);
 
     }
 

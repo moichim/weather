@@ -4,6 +4,7 @@ import { UseThermoInstanceType } from "@/thermal/hooks/useThermoInstanceObserver
 import { ThermalFileInstance } from "@/thermal/reader/ThermalFileInstance"
 import { CSSProperties, forwardRef, useMemo } from "react"
 import { ThermalInstanceCursorMirror } from "./thermalCanvasCursorMirror"
+import { cn } from "@nextui-org/react";
 
 export type ThermalContainerProps = {
     originalSize?: boolean,
@@ -36,7 +37,10 @@ const ThermalCanvasContainer = forwardRef<
     }, [originalSize, containerStyles, file]);
 
     return <div
-        className="thermalCanvasContainer"
+        className={cn(
+            "thermalCanvasContainer m-0 p-0",
+            props.containerClass
+        )}
         style={style}
         ref={ref}
     >

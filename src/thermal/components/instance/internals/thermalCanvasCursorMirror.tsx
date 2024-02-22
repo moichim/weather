@@ -30,9 +30,8 @@ export const ThermalInstanceCursorMirror: React.FC<ThermalInstanceCursorMirrorPr
             style={{
                 width: "1px",
                 height: "100%",
-                backgroundColor: "white",
+                backdropFilter: "invert(100)",
                 top: 0,
-                opacity: .5,
                 left: props.mirrorX,
                 content: "",
                 position: "absolute"
@@ -43,8 +42,7 @@ export const ThermalInstanceCursorMirror: React.FC<ThermalInstanceCursorMirrorPr
             style={{
                 width: "100%",
                 height: "1px",
-                backgroundColor: "white",
-                opacity: .5,
+                backdropFilter: "invert(100)",
                 top: props.mirrorY,
                 left: 0,
                 content: "",
@@ -67,11 +65,12 @@ export const ThermalInstanceCursorMirror: React.FC<ThermalInstanceCursorMirrorPr
             <div
                 style={{
                     position: "absolute",
-                    padding: "5px 7px",
+                    padding: "2px 3px",
                     backgroundColor: "rgba(0,0,0,0.5)",
                     color: "white",
                     borderRadius: "5px",
                     whiteSpace: "nowrap",
+                    fontSize: "small",
                     ...props.labelStyle
                 }}
             >

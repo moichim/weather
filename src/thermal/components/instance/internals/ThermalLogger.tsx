@@ -9,7 +9,7 @@ export const ThermalInstanceLogger: React.FC<UseThermoInstanceType> = props => {
         x: {props.x},
         y: {props.y},
         <div>value: {props.value ? props.value.toFixed(3) : undefined}</div>
-        <div>{props.mirrorX} {props.mirrorY}</div>
+        <div>mirrorX: {props.mirrorX}, mirrorY: {props.mirrorY}</div>
     </div>
 
 }

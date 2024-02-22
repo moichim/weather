@@ -16,8 +16,7 @@ export const ThermalInstance: React.FC<ThermalNinstanceProps> = props => {
 
     const observer = useThermoInstanceObserver( props.file, containerReference );
 
-    return <div className="p-2 bg-gray-200 inline-block">
-        <ThermalCanvasContainer 
+    return <ThermalCanvasContainer 
             file={props.file} 
             ref={containerReference}
             observer={observer}
@@ -25,7 +24,5 @@ export const ThermalInstance: React.FC<ThermalNinstanceProps> = props => {
             originalSize={props.originalSize}
             containerClass={props.containerClass}
         ></ThermalCanvasContainer>
-        <ThermalInstanceLogger {...observer}/>
-    </div>
 
 }

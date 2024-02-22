@@ -6,10 +6,11 @@ export enum ThermoActions {
     INSTANTIATE_SOURCE_IN_GROUP = 2,
     INSTANTIATE_SOURCE_IN_MULTIPLE_GROUPS = 3,
 
-    GROUP_SET_CURSOR = 4
+    GROUP_SET_CURSOR = 4,
+    GROUP_SET_RANGE = 5
 }
 
-type RangeSetterType = { from: number, to: number } | { from: undefined, to: undefined }
+export type RangeSetterType = { from: number, to: number } | { from: undefined, to: undefined }
 export type CursorSetterType = { x: number, y: number } | { x: undefined, y: undefined }
 
 
@@ -65,6 +66,13 @@ type GroupSetCursorPayload = ThermalGroupPayloadBase & {
 }
 type GroupSetCursorAction = ThermalGroupActionBase<GroupSetCursorPayload> & {
     type: ThermoActions.GROUP_SET_CURSOR
+}
+
+type GroupSetRangePayload = ThermalGroupPayloadBase & {
+    range: RangeSetterType
+}
+type GroupSetRangeAction = ThermalGroupActionBase<GroupSetRangePayload> & {
+    type: ThermoActions.GROUP_SET_RANGE
 }
 
 export class ThermoActionsFactory {
@@ -134,6 +142,19 @@ export class ThermoActionsFactory {
         }
     }
 
+    public static groupSetRange(
+        groupId: string,
+        range: RangeSetterType
+    ): GroupSetRangeAction {
+        return {
+            type: ThermoActions.GROUP_SET_RANGE,
+            payload: {
+                groupId,
+                range
+            }
+        }
+    }
+
 
 }
 
@@ -151,4 +172,5 @@ export type AvailableThermoActions = GroupInitAction
     | GroupInstantiateFileAction
     | GlobalRegisterSourceAction
     | GlobalInstantiateSourceToGroupsAction
-    | GroupSetCursorAction;
+    | GroupSetCursorAction
+    | GroupSetRangeAction;

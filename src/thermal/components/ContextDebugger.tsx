@@ -1,39 +1,35 @@
 "use client"
 
-import { useEffect, useState } from "react";
-import { ThermalNGroup } from "./group/ThermalNgroup";
+import { useMemo, useState } from "react";
 import { useThermoContext } from "../context/thermoContext";
+import { ThermalGroup } from "./group/ThermalGroup";
 
 export const ContextDebugger: React.FC = () => {
 
-    const context = useThermoContext();
+    const groups = useMemo( () => {
 
-    const [ secondGroupUrls, setSecondGroupUrls ] = useState<string[]>( [] );
+        const max = 10;
 
-    useEffect( () => {
+        const groups = {
+            a: [] as string[],
+            b: [] as string[],
+            c: [] as string[]
+        }
 
-        const timeout = setTimeout( () => setSecondGroupUrls( ["/sample.lrc","/sample3.lrc"] ), 1000 );
+        for ( let i = 1; i <= max; i++ ) {
+            groups.a.push( `/samples/${i}/a.lrc` );
+            groups.b.push( `/samples/${i}/b.lrc` );
+            groups.c.push( `/samples/${i}/c.lrc` );
+        }
 
-        return () => clearTimeout( timeout );
+        return groups;
 
     }, [] );
 
-    useEffect( () => {
-
-        const timeout = setTimeout( () => setSecondGroupUrls( ["/sample.lrc","/sample2.lrc", "/sample3.lrc"] ), 5000 );
-
-        return () => clearTimeout( timeout );
-
-    }, [] );
-
-
-    useEffect( () => {
-        // console.log( context.state );
-    }, [context.state] );
 
     return <>
-        <ThermalNGroup name="firstGroup" urls={["/sample.lrc"]}/>
-        <ThermalNGroup name="fourthGroup" urls={secondGroupUrls}/>
+
+        {Object.entries( groups ).map( ([key,urls]) => <ThermalGroup key={key} name={key} urls={urls} /> )}
     </>
 
 }

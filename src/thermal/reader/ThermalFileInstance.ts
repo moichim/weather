@@ -1,11 +1,18 @@
-import { IRON, ThermalPalettes } from "@/thermal/components/instance/palettes";
+import { IRON, PALETTE, ThermalPalettes } from "@/thermal/components/instance/palettes";
 import { ThermalFileSource } from "./ThermalFileSource";
 import ThermalFile from "./thermalFile";
+import EventEmitter from "events";
 
 type ThermalMouseEvent = MouseEvent & {
     layerX: number,
     layerY: number
 }
+
+export interface UserInteractionEvent extends Event {
+    target: ThermalFileInstance,
+    data?: any
+}
+  
 
 /** Stores data of a thermal file and handles the canvas drawing */
 export class ThermalFileInstance extends ThermalFile {
@@ -74,11 +81,7 @@ export class ThermalFileInstance extends ThermalFile {
     protected _cursorX: number | undefined = undefined;
     protected set cursorX(value: number | undefined) {
         this._cursorX = value;
-        if (this.container) {
-            this.container.dataset.x = value
-                ? value?.toString()
-                : ""
-        }
+        //this.interact();
     }
     public get cursorX() {
         return this._cursorX;
@@ -87,11 +90,7 @@ export class ThermalFileInstance extends ThermalFile {
     protected _cursorY: number | undefined = undefined;
     protected set cursorY(value: number | undefined) {
         this._cursorY = value;
-        if (this.container) {
-            this.container.dataset.y = value
-                ? value?.toString()
-                : ""
-        }
+        //this.interact();
     }
     public get cursorY() {
         return this._cursorY;
@@ -100,11 +99,7 @@ export class ThermalFileInstance extends ThermalFile {
     protected _cursorValue: number | undefined = undefined;
     protected set cursorValue(value: number | undefined) {
         this._cursorValue = value;
-        if (this.container) {
-            this.container.dataset.value = value
-                ? value?.toString()
-                : ""
-        }
+        // this.interact();
     }
     public get cursorValue() {
         return this._cursorValue;
@@ -114,14 +109,12 @@ export class ThermalFileInstance extends ThermalFile {
     public get hover() {
         return this._hover;
     }
-    protected set hover( value: boolean ) {
-        if ( this.container ) {
-            this.container.dataset.hover = value ? "on" : "off";
-        }
+    protected set hover(value: boolean) {
+        // this.interact();
         this._hover = value;
     }
 
-    
+
 
 
     public readonly id: string;
@@ -178,7 +171,7 @@ export class ThermalFileInstance extends ThermalFile {
 
     public static fromSourceWithIndexedName(
         groupId: string,
-        files: { [index:string]: ThermalFileInstance },
+        files: { [index: string]: ThermalFileInstance },
         source: ThermalFileSource
     ) {
 
@@ -193,7 +186,7 @@ export class ThermalFileInstance extends ThermalFile {
             source.min,
             source.max,
             groupId,
-            `file_${groupId}_${Object.values( files ).length.toString()}`
+            `file_${groupId}_${Object.values(files).length.toString()}`
         );
 
     }
@@ -204,27 +197,28 @@ export class ThermalFileInstance extends ThermalFile {
     ) {
 
         if (this.container) {
-            console.info( "Instance", this.id, "already has a container!" );
+            console.info("Instance", this.id, "already has a container!");
             return;
         }
 
         this.container = container;
 
-        const wrapper = this.container.getElementsByClassName( "thermalCanvasWrapper" )[0];
-        console.log( wrapper );
+        const wrapper = this.container.getElementsByClassName("thermalCanvasWrapper")[0];
 
-        if ( !wrapper ) {
+
+        if (!wrapper) {
             return;
         }
 
         this.wrapper = wrapper as HTMLDivElement;
 
-        if ( this.container.hasChildNodes() ) {
+        if (this.container.hasChildNodes()) {
             // return;
         }
 
-        this.container.setAttribute( "id", `thermal_image_${this.id}` );
+        this.container.setAttribute("id", `thermal_image_${this.id}`);
         this.container.dataset.binded === "true";
+        this.container.style.zIndex = "100";
 
         const canvas = document.createElement("canvas");
         canvas.width = this.width;
@@ -245,7 +239,7 @@ export class ThermalFileInstance extends ThermalFile {
     }
 
     protected getPalette(): string[] {
-        return IRON;
+        return PALETTE;
     }
 
     public initialise() {
@@ -263,24 +257,37 @@ export class ThermalFileInstance extends ThermalFile {
 
                     const aspect = client / parent;
 
-                    const e = event as ThermalMouseEvent;
+                    const x = Math.round(event.offsetX * aspect);
+                    const y = Math.round(event.offsetY * aspect);
 
-                    const x = Math.round(e.layerX * aspect);
-                    const y = Math.round(e.layerY * aspect);
+                    /** @todo A bit hacky prevention of strange behavious */
+                    if ( x === 0 || y === 0 )
+                        return ;
 
-                    const value = this.getValueAtCoordinate( x, y );
+                    if ( x < 10 || y < 10 ) {
+
+                        if ( this.cursorX !== undefined && this.cursorY !== undefined ) {
+                            if (
+                                Math.abs( x - this.cursorX ) < 3
+                                || Math.abs( y - this.cursorY ) < 3
+                            ) {
+                                this.setCursorFromTheInside(x, y);
+                            }
+                        } else {
+                            this.setCursorFromTheInside(x, y);
+                        }
+
+                        return;
+                    }
+
+                    /** @todo Here ends the hack */
 
 
-                    if (x !== this.cursorX)
-                        this.cursorX = x;
-                    if (y !== this.cursorY)
-                        this.cursorY = y;
+                    this.setCursorFromTheInside(x, y);
 
-                    if (value !== this.cursorValue)
-                        this.cursorValue = value;
+                    return;
 
-                    if ( this.hover === false )
-                        this.hover = true;
+                    
 
                 }
 
@@ -289,11 +296,13 @@ export class ThermalFileInstance extends ThermalFile {
             }
 
             this.container.onmouseleave = () => {
+
                 this.cursorX = undefined;
                 this.cursorY = undefined;
                 this.cursorValue = undefined;
-                if ( this.hover === true )
-                    this.hover = false;
+                this.hover = false;
+
+                this.emitInnerChange();
             }
 
         } else {
@@ -303,11 +312,11 @@ export class ThermalFileInstance extends ThermalFile {
     }
 
     protected getValueAtCoordinate(
-        x: number|undefined,
-        y: number|undefined
+        x: number | undefined,
+        y: number | undefined
     ) {
 
-        if ( x === undefined || y === undefined ) {
+        if (x === undefined || y === undefined) {
             return undefined;
         }
 
@@ -317,19 +326,62 @@ export class ThermalFileInstance extends ThermalFile {
 
     }
 
+    protected setCursorFromTheInside(
+        x: number | undefined,
+        y: number | undefined
+    ) {
+        if (x !== undefined && y !== undefined) {
+            this.hover = true;
+            this.cursorX = x;
+            this.cursorY = y;
+            this.cursorValue = this.getValueAtCoordinate(x, y);
+        } else {
+            this.hover = false;
+            this.cursorX = undefined;
+            this.cursorY = undefined;
+            this.cursorValue = undefined;
+        }
+
+        this.emitInnerChange();
+
+    }
+
     public setCursorFromOutside(
-        x: number|undefined,
-        y: number|undefined
+        x: number | undefined,
+        y: number | undefined
     ) {
 
-        if ( this.hover === true ) {
+        if (this.hover === true) {
             return;
         }
 
         this.cursorX = x;
         this.cursorY = y;
-        this.cursorValue = this.getValueAtCoordinate( x, y );
+        this.cursorValue = this.getValueAtCoordinate(x, y);
 
+        this.emitOuterChange();
+
+    }
+
+    public setRangeFromTheOutside(
+        from: number | undefined,
+        to: number | undefined
+    ) {
+
+        if ( from === undefined || to === undefined ) {
+            this.range = [ this.min, this.max ];
+        } else {
+            this.range = [ from, to ];
+        }
+
+    }
+
+    protected emitInnerChange = () => {
+        this.dispatchEvent(new Event("userinteraction"));
+    }
+
+    protected emitOuterChange = () => {
+        this.dispatchEvent(new Event("godinteraction"));
     }
 
     public update() {

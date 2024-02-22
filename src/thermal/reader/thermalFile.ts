@@ -1,6 +1,5 @@
-
 /** A foundation for thermal file sources and instances. */
-export default abstract class ThermalFile {
+export default abstract class ThermalFile extends EventTarget {
 
     public constructor(
         public readonly url: string,
@@ -13,6 +12,7 @@ export default abstract class ThermalFile {
         public readonly min: number,
         public readonly max: number,
     ) {
+        super();
     }
 
     public getMinMax() {

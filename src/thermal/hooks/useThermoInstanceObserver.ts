@@ -1,6 +1,6 @@
 "use client";
 
-import { ThermalFileInstance } from "@/thermal/reader/ThermalFileInstance";
+import { ThermalFileInstance, UserInteractionEvent } from "@/thermal/reader/ThermalFileInstance";
 import { RefObject, useEffect, useState } from "react";
 import { useThermoGroupObserver } from "./useThermoGroupObserver";
 
@@ -9,16 +9,11 @@ export const useThermoInstanceObserver = (
     renderingContainer: RefObject<HTMLDivElement>
 ) => {
 
-    const [x, setX] = useState<number | undefined>();
-    const [y, setY] = useState<number | undefined>();
     const [value, setValue] = useState<number | undefined>();
     const [hover, setHover] = useState<boolean>( false );
 
     const { state, setCursor } = useThermoGroupObserver( instance.groupId );
 
-
-
-    // Capture changes of the DOM and mirror it to the local state
     useEffect( () => {
 
         // Do nothing when the reference is not set
@@ -32,53 +27,63 @@ export const useThermoInstanceObserver = (
             instance.bind( container );
             instance.initialise();
         }
+        const onUserInteract = (e: Event) => {
 
-        const observer = new MutationObserver((mutations) => {
+            const event = e as UserInteractionEvent
 
-            const mutationsProperties = mutations.map( mutation => mutation.attributeName );
-
-            console.log( mutationsProperties );
-
-            if ( mutationsProperties.includes( "data-hover" ) ) {
-                setHover( instance.hover );
+            // Update the global cursor
+            if ( state.cursorX !== event.target.cursorX || state.cursorY !== event.target.cursorY) {
+                if ( event.target.cursorX !== undefined && event.target.cursorY !== undefined ) {
+                    setCursor( {x:event.target.cursorX,y:event.target.cursorY} );
+                } else {
+                    setCursor( {x:undefined,y:undefined} );
+                } 
             }
 
-            const newCursor = instance.cursorX !== undefined && instance.cursorY !== undefined
-                ? {x:instance.cursorX, y: instance.cursorY}
-                : {x:undefined, y: undefined};
+            // Update the instance value
+            if ( value !== event.target.cursorValue ) {
+                setValue( event.target.cursorValue );
+            }
+
+            if ( hover === false && event.target.hover === true ) {
+                setHover( true );
+            }
+
+            if ( hover === true && event.target.hover === false ) {
+                setCursor( {x:undefined,y:undefined} );
+                setValue( undefined );
+                setHover( false );
+            }
 
 
 
-            setCursor( newCursor );
-            setValue( instance.cursorValue );
-
-            return;
-
-        });
-
-        if (renderingContainer.current) {
-            observer.observe(renderingContainer.current, { attributes: true });
         }
 
-        return () => observer.disconnect();
+        instance.addEventListener( "userinteraction", onUserInteract );
+        
 
+        return () => {
+            instance.removeEventListener( "userinteraction", onUserInteract );
+        }
 
-    }, [renderingContainer] );
+    }, [hover, value] );
 
-    // Mirror local cursor state to the global one
-    /*
     useEffect( () => {
 
-        // if ( hover === true ) {
-            if ( x !== undefined && y !== undefined ) {
-                // setCursor( {x,y} );
-            } else {
-                // setCursor( {x:undefined,y:undefined} );
-            }
-        // }
+        const onChangedByGod = ( e: Event ) => {
+            const event = e as UserInteractionEvent;
 
-    }, [x,y, hover, setCursor] );
-    */
+            if ( value !== event.target.cursorValue ) {
+                setValue( event.target.cursorValue );
+            }
+
+        }
+
+        instance.addEventListener( "godinteraction", onChangedByGod );
+
+        return () => instance.removeEventListener( "godinteraction", onChangedByGod );
+
+    }, [value] );
 
 
     return {
