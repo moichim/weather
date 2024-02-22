@@ -1,148 +1,316 @@
-import { Reducer } from "react";
-import { ThermalStorageType } from "./storage";
-import { AvailableThermalActions, ThermalActions } from "./actions";
-import ThermalFile from "@/thermal/reader/thermalFile";
+import { ThermalFileSource } from "@/thermal/reader/ThermalFileSource";
+import { ThermoGroup, ThermoStorageType, thermoGroupFactory } from "./storage"
+import { CSSProperties, Reducer } from "react";
+import { AvailableThermoActions, CursorSetterType, RangeSetterType, ThermoActions } from "./actions";
+import { ThermalFileInstance } from "@/thermal/reader/ThermalFileInstance";
+import { calculateMinMax } from "./reducerUtils/numericalValues";
 
-
-const calculateMinMax = (
-    files: ThermalFile[]
-) => {
-    return files.reduce((state, current) => {
-
-        const result = { ...state };
-
-        if (current.min < state.min) {
-            result.min = current.min;
+const initGroup = (
+    state: ThermoStorageType,
+    id: string,
+    name?: string,
+    description?: string
+): ThermoStorageType => {
+    return {
+        ...state,
+        groups: {
+            ...state.groups,
+            [id]: thermoGroupFactory(id, name, description)
         }
-
-        if (current.max > state.max) {
-            result.max = current.max;
-        }
-
-        return result;
-
-    }, {
-        min: Infinity,
-        max: -Infinity
-    });
+    };
 }
 
-const calculateFromTo = (
-    minMax: ReturnType<typeof calculateMinMax>,
-    currentFrom: number | undefined,
-    currentTo: number | undefined
-) => {
 
-    const result = {
-        from: currentFrom,
-        to: currentTo
+const addInstanceInGroup = (
+    instance: ThermalFileInstance,
+    group: ThermoGroup
+): ThermoGroup => {
+
+    const newGroup = { ...group };
+
+    // Clone the index
+    newGroup.instancesByPath = { ...group.instancesByPath }
+
+    // Bind the instance
+    newGroup.instancesByPath[instance.url] = instance;
+
+    const updatedGroupMinMax = calculateMinMax(
+        Object.values(newGroup.instancesByPath)
+            .map(v => v.getMinMax())
+    );
+
+    newGroup.min = updatedGroupMinMax.min;
+    newGroup.max = updatedGroupMinMax.max;
+
+    return newGroup;
+
+}
+
+
+const createOneInstanceByUrl = (
+    state: ThermoStorageType,
+    url: string,
+    group: string
+): ThermoStorageType => {
+
+    if (state.groups[group] === undefined)
+        return state;
+    if (state.sourcesByPath[url] === undefined)
+        return state;
+    if (state.groups[group] !== undefined) {
+        if (state.groups[group].instancesByPath[url] !== undefined) {
+            return state;
+        }
     }
 
-    if (currentFrom === undefined || currentTo === undefined) {
+    const source = state.sourcesByPath[url];
+    const instance = source.createInstance(group, url);
 
-        if (currentFrom == undefined)
-            result.from = minMax.min;
-        if (currentTo = undefined)
-            result.to = minMax.max;
+    const newGroup = addInstanceInGroup(instance, state.groups[group]);
 
-    } else {
+    const newInstancesById = {
+        ...state.instancesById,
+        [instance.id]: instance
+    }
 
-        if (currentFrom < minMax.min)
-            result.from = minMax.min;
-    
-        if ( currentTo > minMax.max )
-            result.to = minMax.max;
+    const { [group]: _, ...oldGroups } = state.groups;
 
+    const result = {
+        ...state,
+        groups: {
+            ...oldGroups,
+            [group]: newGroup
+        },
+        instancesById: newInstancesById
     }
 
     return result;
+
 }
 
-export const thermalReducer: Reducer<ThermalStorageType, AvailableThermalActions> = (
+
+const createMultipleInstancesByUrl = (
+    state: ThermoStorageType,
+    url: string,
+    groups: string[]
+): ThermoStorageType => {
+
+    if (state.sourcesByPath[url] === undefined) {
+        return state;
+    }
+
+    const source = state.sourcesByPath[url];
+
+    const newGroups = { ...state.groups };
+    const newInstancesById = { ...state.instancesById }
+
+    groups.forEach(group => {
+
+        if (newGroups[group] === undefined) {
+            return;
+        }
+
+        const instance = source.createInstance(group, url);
+
+        const newGroup = addInstanceInGroup(instance, newGroups[group]);
+        newGroups[group] = newGroup;
+        newInstancesById[instance.id] = instance;
+
+    });
+
+    return {
+        ...state,
+        groups: newGroups,
+        instancesById: newInstancesById
+    }
+
+}
+
+
+
+/**
+ * Adds a file to the registry and recalculates the global numerical values
+ */
+const registerSourceFileInternal = (
+    state: ThermoStorageType,
+    source: ThermalFileSource
+): ThermoStorageType => {
+
+
+    if (Object.keys(state.sourcesByPath).includes(source.url)) {
+        return state;
+    }
+
+    const newSources = {
+        ...state.sourcesByPath,
+        [source.url]: source
+    }
+
+    const newMinMax = calculateMinMax(
+        Object.values(newSources)
+            .map(v => v.getMinMax())
+    );
+
+    const result = {
+        ...state,
+        sourcesByPath: newSources,
+        ...newMinMax,
+    }
+
+    return result;
+
+}
+
+
+
+const registerLoadedSource = (
+    state: ThermoStorageType,
+    file: ThermalFileSource,
+    groups: string[]
+) => {
+
+    let stateWithRegisteredFile = registerSourceFileInternal(state, file);
+
+    const stateWithAllInstances = createMultipleInstancesByUrl(stateWithRegisteredFile, file.url, groups);
+
+    return stateWithAllInstances;
+
+}
+
+
+const groupSetCursor = (
+    state: ThermoStorageType,
+    groupId: string,
+    cursor: CursorSetterType
+): ThermoStorageType => {
+
+    if (state.groups[groupId] === undefined) {
+        return state;
+    } else {
+
+        const { groups: newGroups, ...restOfTheState } = state;
+
+        const { [groupId]: { ...newGroup }, ...remainingGroups } = newGroups;
+
+        newGroup.cursorX = cursor.x;
+        newGroup.cursorY = cursor.y;
+
+        // Update cursor mirror if necessary
+        if (cursor.x !== undefined && cursor.y !== undefined) {
+
+            // Load the first element present in the group
+            const current = Object.values( newGroup.instancesByPath )[0];
+
+            if (current) {
+
+                if (current.container) {
+
+                    const aspect = current.container.offsetWidth / current.width;
+
+                    newGroup.mirrorX = Math.round( cursor.x * aspect );
+                    newGroup.mirrorY = Math.round( cursor.y * aspect );
+
+                    const labelStyle: CSSProperties = {};
+
+                    if ( cursor.x < ( ( current.width / 4 ) * 3 ) ) {
+                        labelStyle.left = 3;
+                    } else {
+                        labelStyle.right = 3;
+                    }
+
+                    if ( cursor.y < ( ( current.height / 4 ) * 3 ) ) {
+                        labelStyle.top = 3;
+                    } else {
+                        labelStyle.bottom = 3;
+                    }
+
+                    newGroup.cursorLabelStyle = labelStyle;
+                }
+            }
+
+        } else {
+            newGroup.cursorLabelStyle = undefined;
+            newGroup.mirrorX = undefined;
+            newGroup.mirrorY = undefined;
+        }
+
+        // Update the group of every item except the currently hovering one
+        Object.values(newGroup.instancesByPath).forEach(instance => {
+            instance.setCursorFromOutside(cursor.x, cursor.y);
+        });
+
+        return {
+            ...restOfTheState,
+            groups: {
+                ...state.groups,
+                [groupId]: newGroup
+            }
+        }
+
+    }
+
+}
+
+const groupSetRange = (
+    state: ThermoStorageType,
+    groupId: string,
+    range: RangeSetterType
+): ThermoStorageType => {
+
+    if (state.groups[groupId] === undefined) {
+        return state;
+    } else {
+
+        console.log( range );
+
+        const { groups: newGroups, ...restOfTheState } = state;
+
+        const { [groupId]: { ...newGroup }, ...remainingGroups } = newGroups;
+
+        newGroup.from = range.to;
+        newGroup.to = range.to;
+
+        // Update the group of every item except the currently hovering one
+        Object.values(newGroup.instancesByPath).forEach(instance => {
+            instance.setRangeFromTheOutside(range.from, range.to);
+        });
+
+        return {
+            ...restOfTheState,
+            groups: {
+                ...state.groups,
+                [groupId]: newGroup
+            }
+        }
+
+    }
+
+}
+
+export const theRehookReducer: Reducer<ThermoStorageType, AvailableThermoActions> = (
     state,
     action
 ) => {
 
     switch (action.type) {
 
-        case ThermalActions.ADD_FILE:
+        case ThermoActions.INIT_GROUP:
+            return initGroup(state, action.payload.groupId ?? "___");
 
-        
+        case ThermoActions.REGISTER_LOADED_FILE:
+            return registerLoadedSource(state, action.payload.file, action.payload.groups);
 
-            // If there are no objects yet, assign default values
-            if ( Object.values( state.files ).length === 0 ) {
-                return {
-                    ...state,
-                    min: action.payload.file.min,
-                    max: action.payload.file.max,
-                    from: action.payload.file.min,
-                    to: action.payload.file.max,
-                    files: {
-                        [action.payload.file.id]: action.payload.file
-                    },
-                }
-            }
+        case ThermoActions.INSTANTIATE_SOURCE_IN_GROUP:
+            return createOneInstanceByUrl(state, action.payload.url, action.payload.groupId);
 
-            // otherwise calculate new values
+        case ThermoActions.INSTANTIATE_SOURCE_IN_MULTIPLE_GROUPS:
+            return createMultipleInstancesByUrl(state, action.payload.url, action.payload.groups);
 
-            const filesByPathWithNewOne = {
-                ...state.files,
-                [action.payload.file.id]: action.payload.file
-            }
+        case ThermoActions.GROUP_SET_CURSOR:
+            return groupSetCursor(state, action.payload.groupId, action.payload.cursor);
 
-            const minMaxWithNewOne = calculateMinMax(Object.values(filesByPathWithNewOne));
-
-            const fromToWithNewOne = calculateFromTo( minMaxWithNewOne, state.from, state.to );
-
-            const resultWithNewOne = {
-                ...state,
-                ...minMaxWithNewOne,
-                ...fromToWithNewOne,
-                files: filesByPathWithNewOne,
-            } as ThermalStorageType
-
-            return resultWithNewOne;
-
-        case ThermalActions.REMOVE_FILE_BY_ID:
-
-            const filesByPathWithoutTheOne = Object.fromEntries( Object.entries( state.files ).filter( ( [key, value] ) => {
-                return key !== action.payload.id
-            } ) );
-
-            // if there is no file, reset the storage
-
-            if ( Object.values( filesByPathWithoutTheOne ).length === 0 ) {
-                return {
-                    ...state,
-                    min: undefined,
-                    max: undefined,
-                    from: undefined,
-                    to: undefined
-                }
-            }
-
-            const minMaxWithoutNewOne = calculateMinMax( Object.values( filesByPathWithoutTheOne ) );
-
-            const fromToWithoutNewOne = calculateFromTo( minMaxWithoutNewOne, state.from, state.to );
-
-            return {
-                ...state,
-                ...minMaxWithoutNewOne,
-                ...fromToWithoutNewOne,
-                files: filesByPathWithoutTheOne,
-            } as ThermalStorageType
-
-        case ThermalActions.SET_RANGE:
-
-            Object.values( state.files ).forEach( file => {
-                file.from = action.payload.from,
-                file.to = action.payload.to
-            } );
-            return {
-                ...state,
-                from: action.payload.from,
-                to: action.payload.to,
-            }
+        case ThermoActions.GROUP_SET_RANGE:
+            return groupSetRange(state, action.payload.groupId, action.payload.range);
 
     }
 

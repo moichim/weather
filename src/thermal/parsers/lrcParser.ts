@@ -1,6 +1,5 @@
-import fetch from 'cross-fetch';
+import { ThermalFileSource } from '../reader/ThermalFileSource';
 import AbstractParser from './AbstractParser';
-import ThermalFile from '../reader/thermalFile';
 
 
 /**
@@ -175,7 +174,7 @@ export default class LrcParser extends AbstractParser {
             console.log( this.getErrors() );
             return null;
         }
-        return new ThermalFile(
+        return new ThermalFileSource(
             this.url,
             this.signature!,
             this.unit!,

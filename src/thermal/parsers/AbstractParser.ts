@@ -1,4 +1,4 @@
-import ThermalFile from "../reader/thermalFile";
+import { ThermalFileSource } from "../reader/ThermalFileSource";
 
 /** Implement to add a new thermal file parser. */
 export default abstract class AbstractParser {
@@ -15,7 +15,7 @@ export default abstract class AbstractParser {
 
 
     /** The only public endpoint. This method does all the business. */
-    public async parse(): Promise<ThermalFile|null> {
+    public async parse(): Promise<ThermalFileSource|null> {
         await this.init();
         await this.parseFile();
         return this.getThermalFile();
@@ -28,7 +28,7 @@ export default abstract class AbstractParser {
     public abstract isValid(): boolean;
 
     /** Create an instance of Thermal file (if the file is valid). */
-    protected abstract getThermalFile(): ThermalFile | null;
+    protected abstract getThermalFile(): ThermalFileSource | null;
 
 
 
