@@ -1,11 +1,5 @@
-import { IRON, ThermalPalettes } from "@/thermal/components/instance/palettes";
-import {v4 as uuidv4} from 'uuid';
 
-type ThermalMouseEvent = MouseEvent & {
-    layerX: number,
-    layerY: number
-}
-
+/** A foundation for thermal file sources and instances. */
 export default abstract class ThermalFile {
 
     public constructor(

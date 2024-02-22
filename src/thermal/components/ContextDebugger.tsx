@@ -1,34 +1,39 @@
 "use client"
 
-import { useEffect } from "react";
-import { useThermalContext } from "../context/thermalContext"
-import { useThermalContextNew } from "../context/thermalContextNew";
-import { ThermalActionsNewFactory } from "../context/reducerUpdated/actions";
-import { ThermalNGroup } from "./ngroup/ThermalNgroup";
+import { useEffect, useState } from "react";
+import { ThermalNGroup } from "./group/ThermalNgroup";
+import { useThermoContext } from "../context/thermoContext";
 
 export const ContextDebugger: React.FC = () => {
 
-    const context = useThermalContextNew();
+    const context = useThermoContext();
 
-    /*
+    const [ secondGroupUrls, setSecondGroupUrls ] = useState<string[]>( [] );
+
     useEffect( () => {
-        context.dispatch( ThermalActionsNewFactory.grouplInit( "firstGroup" ) );
-        context.dispatch( ThermalActionsNewFactory.groupLoadFile( "firstGroup", "/sample.lrc" ) );
-        context.dispatch( ThermalActionsNewFactory.groupLoadFile( "firstGroup", "/sample2.lrc" ) );
-        context.dispatch( ThermalActionsNewFactory.groupLoadFile( "firstGroup", "/sample2.lrc" ) );
 
-        context.dispatch( ThermalActionsNewFactory.grouplInit( "secondGroup" ) );
-        context.dispatch( ThermalActionsNewFactory.groupLoadFile( "secondGroup", "/sample.lrc" ) );
+        const timeout = setTimeout( () => setSecondGroupUrls( ["/sample.lrc","/sample3.lrc"] ), 1000 );
+
+        return () => clearTimeout( timeout );
+
     }, [] );
-    */
+
+    useEffect( () => {
+
+        const timeout = setTimeout( () => setSecondGroupUrls( ["/sample.lrc","/sample2.lrc", "/sample3.lrc"] ), 5000 );
+
+        return () => clearTimeout( timeout );
+
+    }, [] );
+
 
     useEffect( () => {
         // console.log( context.state );
     }, [context.state] );
 
     return <>
-    <ThermalNGroup name="firstGroup" urls={["/sample.lrc"]}/>
-        <ThermalNGroup name="fourthGroup" urls={["/sample2.lrc","/sample2.lrc"]}/>
+        <ThermalNGroup name="firstGroup" urls={["/sample.lrc"]}/>
+        <ThermalNGroup name="fourthGroup" urls={secondGroupUrls}/>
     </>
 
 }

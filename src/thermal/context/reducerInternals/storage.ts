@@ -1,38 +1,109 @@
-import ThermalFile from "@/thermal/reader/thermalFile"
+import { ThermalFileInstance } from "@/thermal/reader/ThermalFileInstance"
+import { ThermalFileSource } from "@/thermal/reader/ThermalFileSource"
+import { CSSProperties } from "react"
 
-enum ThermalImageLoadingState {
-    LOADING = 0,
-    PENDING = 1,
-    LOADED = 2,
-    ERROR = 3
+type ThermoStorageStats = {
+    min: number,
+    max: number,
+} | {
+    min: undefined,
+    max: undefined,
 }
 
-export type ThermalStorageType = {
+const thermoStorageStatsUndefined = {
+    min: undefined,
+    max: undefined,
+}
 
-    min: number | undefined,
-    max: number | undefined,
+type ThermoCursorPositionType = {
+    cursorX: number,
+    cursorY: number,
+    cursorLabelStyle: CSSProperties,
+    mirrorX: number,
+    mirrorY: number
+} | {
+    cursorX: undefined,
+    cursorY: undefined,
+    cursorLabelStyle: undefined,
+    mirrorX: undefined,
+    mirrorY: undefined
+}
 
-    from: number | undefined,
-    to: number | undefined,
+const thermoCursorPositionUndefined: ThermoCursorPositionType = {
+    cursorX: undefined,
+    cursorY: undefined,
+    cursorLabelStyle: undefined,
+    mirrorX: undefined,
+    mirrorY: undefined
+}
 
-    files: {
-        [index: string]: ThermalFile
-    },
+type ThermoRange = {
+    from: number,
+    to: number
+} | {
+    from: undefined,
+    to: undefined
+}
 
-    loading: {
-        [index: string]: {
-            path: string,
-            status: ThermalImageLoadingState
-        }
+const thermoRagngeUndefined: ThermoRange = {
+    from: undefined,
+    to: undefined
+}
+
+
+export type ThermoGroup = ThermoStorageStats & ThermoRange & ThermoCursorPositionType & {
+    groupId: string,
+    name?: string,
+    description?: string,
+    bypass: boolean,
+    instancesByPath: {
+        [index: string]: ThermalFileInstance
+    }
+}
+
+export const thermoGroupFactory = (
+    id: string,
+    name?: string,
+    description?: string
+): ThermoGroup => {
+    return {
+        ...thermoStorageStatsUndefined,
+        ...thermoCursorPositionUndefined,
+        ...thermoRagngeUndefined,
+        groupId: id,
+        name,
+        description,
+        bypass: false,
+        instancesByPath: {},
+        cursorX: undefined,
+        cursorY: undefined
+    }
+}
+
+
+
+export type ThermoStorageType = ThermoStorageStats & ThermoRange & {
+
+    sourcesByPath: {
+        [index:string]: ThermalFileSource
+    }
+
+    instancesById: {
+        [index:string]: ThermalFileInstance
+    }
+
+    groups: {
+        [index: string]: ThermoGroup
     }
 
 }
 
-export const thermalStorageDefaults: ThermalStorageType = {
-    min: undefined,
-    max: undefined,
-    from: undefined,
-    to: undefined,
-    files: {},
-    loading: {}
+export const thermoStorageFactory = (): ThermoStorageType => {
+    return {
+        ...thermoStorageStatsUndefined,
+        ...thermoRagngeUndefined,
+        instancesById: {},
+        sourcesByPath: {},
+        groups: {},
+    }
 }

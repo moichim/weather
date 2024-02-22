@@ -1,5 +1,9 @@
-import ThermalFile from "@/thermal/reader/thermalFile"
-import { CSSProperties, RefObject, forwardRef, useMemo } from "react"
+"use client";
+
+import { UseThermoInstanceType } from "@/thermal/hooks/useThermoInstanceObserver"
+import { ThermalFileInstance } from "@/thermal/reader/ThermalFileInstance"
+import { CSSProperties, forwardRef, useMemo } from "react"
+import { ThermalInstanceCursorMirror } from "./thermalCanvasCursorMirror"
 
 export type ThermalContainerProps = {
     originalSize?: boolean,
@@ -8,20 +12,20 @@ export type ThermalContainerProps = {
 }
 
 type ThermalContainerPropsInternal = ThermalContainerProps & {
-    ref: RefObject<HTMLDivElement>,
-    file: ThermalFile | undefined
+    file: ThermalFileInstance | undefined,
+    observer: UseThermoInstanceType
 }
 
 /** The canvas is rendered inside this div. */
 const ThermalCanvasContainer = forwardRef<
-    HTMLDivElement, 
+    HTMLDivElement,
     ThermalContainerPropsInternal
->( ( {
+>(({
     originalSize = true,
     containerStyles = {} as CSSProperties,
     file = undefined,
-    ...props 
-}, ref ) => {
+    ...props
+}, ref) => {
 
     const style = useMemo(() => {
         const css = containerStyles;
@@ -32,13 +36,23 @@ const ThermalCanvasContainer = forwardRef<
     }, [originalSize, containerStyles, file]);
 
     return <div
-        ref={ref}
+        className="thermalCanvasContainer"
         style={style}
-    ></div>
+        ref={ref}
+    >
+
+        <div
+            className="thermalCanvasWrapper"
+        ></div>
+        <ThermalInstanceCursorMirror
+            {...props.observer}
+            container={ref}
+        />
+    </div>
 })
 
 ThermalCanvasContainer.displayName = "ThermalCanvasContainer"
 
 export {
     ThermalCanvasContainer
-};
+}

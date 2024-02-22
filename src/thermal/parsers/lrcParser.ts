@@ -1,7 +1,5 @@
-import fetch from 'cross-fetch';
+import { ThermalFileSource } from '../reader/ThermalFileSource';
 import AbstractParser from './AbstractParser';
-import ThermalFile from '../reader/thermalFile';
-import {ThermalFileSource} from '../reader/ThermalFileSource';
 
 
 /**

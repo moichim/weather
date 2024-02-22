@@ -1,5 +1,4 @@
-import ThermalFileSource from "../reader/ThermalFileSource";
-import ThermalFile from "../reader/thermalFile";
+import { ThermalFileSource } from "../reader/ThermalFileSource";
 
 /** Implement to add a new thermal file parser. */
 export default abstract class AbstractParser {

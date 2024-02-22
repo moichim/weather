@@ -1,6 +1,6 @@
 import { IRON, ThermalPalettes } from "@/thermal/components/instance/palettes";
-import {v4 as uuidv4} from 'uuid';
-import {ThermalFileSource} from "./ThermalFileSource";
+import { ThermalFileSource } from "./ThermalFileSource";
+import ThermalFile from "./thermalFile";
 
 type ThermalMouseEvent = MouseEvent & {
     layerX: number,
@@ -12,6 +12,7 @@ export class ThermalFileInstance extends ThermalFile {
 
     // The container is used to store cursor data as data- atributes
     public container: HTMLDivElement | null = null;
+    public wrapper: HTMLDivElement | null = null;
     protected canvas: HTMLCanvasElement | null = null;
     protected context: CanvasRenderingContext2D | null = null;
 
@@ -70,7 +71,7 @@ export class ThermalFileInstance extends ThermalFile {
 
 
     // CURSOR
-    public _cursorX: number | undefined = undefined;
+    protected _cursorX: number | undefined = undefined;
     protected set cursorX(value: number | undefined) {
         this._cursorX = value;
         if (this.container) {
@@ -83,7 +84,7 @@ export class ThermalFileInstance extends ThermalFile {
         return this._cursorX;
     }
 
-    public _cursorY: number | undefined = undefined;
+    protected _cursorY: number | undefined = undefined;
     protected set cursorY(value: number | undefined) {
         this._cursorY = value;
         if (this.container) {
@@ -96,7 +97,7 @@ export class ThermalFileInstance extends ThermalFile {
         return this._cursorY;
     }
 
-    public _cursorValue: number | undefined = undefined;
+    protected _cursorValue: number | undefined = undefined;
     protected set cursorValue(value: number | undefined) {
         this._cursorValue = value;
         if (this.container) {
@@ -108,6 +109,19 @@ export class ThermalFileInstance extends ThermalFile {
     public get cursorValue() {
         return this._cursorValue;
     }
+
+    protected _hover = false;
+    public get hover() {
+        return this._hover;
+    }
+    protected set hover( value: boolean ) {
+        if ( this.container ) {
+            this.container.dataset.hover = value ? "on" : "off";
+        }
+        this._hover = value;
+    }
+
+    
 
 
     public readonly id: string;
@@ -186,20 +200,31 @@ export class ThermalFileInstance extends ThermalFile {
 
     /** Bind the class to the canvas element. */
     public bind(
-        parent: HTMLDivElement
+        container: HTMLDivElement
     ) {
 
         if (this.container) {
+            console.info( "Instance", this.id, "already has a container!" );
             return;
         }
 
-        this.container = parent;
+        this.container = container;
 
-        this.container.setAttribute( "id", `thermal_image_${this.groupId}_${this.fileId}` );
+        const wrapper = this.container.getElementsByClassName( "thermalCanvasWrapper" )[0];
+        console.log( wrapper );
+
+        if ( !wrapper ) {
+            return;
+        }
+
+        this.wrapper = wrapper as HTMLDivElement;
 
         if ( this.container.hasChildNodes() ) {
-            return;
+            // return;
         }
+
+        this.container.setAttribute( "id", `thermal_image_${this.id}` );
+        this.container.dataset.binded === "true";
 
         const canvas = document.createElement("canvas");
         canvas.width = this.width;
@@ -215,7 +240,7 @@ export class ThermalFileInstance extends ThermalFile {
         this.canvas = canvas;
         this.context = canvas.getContext("2d");
 
-        this.container.appendChild(this.canvas);
+        this.wrapper.appendChild(this.canvas);
 
     }
 
@@ -225,11 +250,11 @@ export class ThermalFileInstance extends ThermalFile {
 
     public initialise() {
 
-        if (this.canvas) {
+        if (this.container) {
 
             this.drawEverything();
 
-            this.canvas.onmousemove = (event: MouseEvent) => {
+            this.container.onmousemove = (event: MouseEvent) => {
 
                 const client = this.width;
                 const parent = this.container?.clientWidth;
@@ -243,8 +268,8 @@ export class ThermalFileInstance extends ThermalFile {
                     const x = Math.round(e.layerX * aspect);
                     const y = Math.round(e.layerY * aspect);
 
-                    const index = x + (y * this.width);
-                    const value = this.pixels[index];
+                    const value = this.getValueAtCoordinate( x, y );
+
 
                     if (x !== this.cursorX)
                         this.cursorX = x;
@@ -254,21 +279,56 @@ export class ThermalFileInstance extends ThermalFile {
                     if (value !== this.cursorValue)
                         this.cursorValue = value;
 
+                    if ( this.hover === false )
+                        this.hover = true;
+
                 }
 
 
 
             }
 
-            this.canvas.onmouseleave = () => {
+            this.container.onmouseleave = () => {
                 this.cursorX = undefined;
                 this.cursorY = undefined;
                 this.cursorValue = undefined;
+                if ( this.hover === true )
+                    this.hover = false;
             }
 
         } else {
             console.info("canvas ještě není ready");
         }
+
+    }
+
+    protected getValueAtCoordinate(
+        x: number|undefined,
+        y: number|undefined
+    ) {
+
+        if ( x === undefined || y === undefined ) {
+            return undefined;
+        }
+
+        const index = x + (y * this.width);
+        const value = this.pixels[index];
+        return value;
+
+    }
+
+    public setCursorFromOutside(
+        x: number|undefined,
+        y: number|undefined
+    ) {
+
+        if ( this.hover === true ) {
+            return;
+        }
+
+        this.cursorX = x;
+        this.cursorY = y;
+        this.cursorValue = this.getValueAtCoordinate( x, y );
 
     }
 
