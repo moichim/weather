@@ -1,10 +1,9 @@
 "use client";
 
-import { ThermalFileInstance } from "@/thermal/reader/ThermalFileInstance"
+import { useThermoInstanceObserver } from "@/thermal/hooks/useThermoInstanceObserver";
+import { ThermalFileInstance } from "@/thermal/reader/ThermalFileInstance";
 import { useRef } from "react";
 import { ThermalCanvasContainer, ThermalContainerProps } from "./internals/ThermalCanvas";
-import { useThermoInstanceObserver } from "@/thermal/hooks/useThermoInstanceObserver";
-import { ThermalInstanceLogger } from "./internals/ThermalLogger";
 
 type ThermalNinstanceProps = ThermalContainerProps & {
     file: ThermalFileInstance

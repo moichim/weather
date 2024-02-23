@@ -18,23 +18,14 @@ const thermoStorageStatsUndefined = {
 type ThermoCursorPositionType = {
     cursorX: number,
     cursorY: number,
-    cursorLabelStyle: CSSProperties,
-    mirrorX: number,
-    mirrorY: number
 } | {
     cursorX: undefined,
     cursorY: undefined,
-    cursorLabelStyle: undefined,
-    mirrorX: undefined,
-    mirrorY: undefined
 }
 
 const thermoCursorPositionUndefined: ThermoCursorPositionType = {
     cursorX: undefined,
     cursorY: undefined,
-    cursorLabelStyle: undefined,
-    mirrorX: undefined,
-    mirrorY: undefined
 }
 
 type ThermoRange = {

@@ -195,45 +195,6 @@ const groupSetCursor = (
         newGroup.cursorX = cursor.x;
         newGroup.cursorY = cursor.y;
 
-        // Update cursor mirror if necessary
-        if (cursor.x !== undefined && cursor.y !== undefined) {
-
-            // Load the first element present in the group
-            const current = Object.values( newGroup.instancesByPath )[0];
-
-            if (current) {
-
-                if (current.container) {
-
-                    const aspect = current.container.offsetWidth / current.width;
-
-                    newGroup.mirrorX = Math.round( cursor.x * aspect );
-                    newGroup.mirrorY = Math.round( cursor.y * aspect );
-
-                    const labelStyle: CSSProperties = {};
-
-                    if ( cursor.x < ( ( current.width / 4 ) * 3 ) ) {
-                        labelStyle.left = 3;
-                    } else {
-                        labelStyle.right = 3;
-                    }
-
-                    if ( cursor.y < ( ( current.height / 4 ) * 3 ) ) {
-                        labelStyle.top = 3;
-                    } else {
-                        labelStyle.bottom = 3;
-                    }
-
-                    newGroup.cursorLabelStyle = labelStyle;
-                }
-            }
-
-        } else {
-            newGroup.cursorLabelStyle = undefined;
-            newGroup.mirrorX = undefined;
-            newGroup.mirrorY = undefined;
-        }
-
         // Update the group of every item except the currently hovering one
         Object.values(newGroup.instancesByPath).forEach(instance => {
             instance.setCursorFromOutside(cursor.x, cursor.y);
