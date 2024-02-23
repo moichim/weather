@@ -7,7 +7,10 @@ export enum ThermoActions {
     INSTANTIATE_SOURCE_IN_MULTIPLE_GROUPS = 3,
 
     GROUP_SET_CURSOR = 4,
-    GROUP_SET_RANGE = 5
+    GROUP_SET_RANGE = 5,
+    GLOBAL_SET_RANGE = 6,
+
+    GROUP_AFTER_EVERYTHING_LOADED = 7
 }
 
 export type RangeSetterType = { from: number, to: number } | { from: undefined, to: undefined }
@@ -61,6 +64,7 @@ type GlobalRegisterSourceAction = ThermalGlobalActionBase<GlobalRegisterSourcePa
     type: ThermoActions.REGISTER_LOADED_FILE
 }
 
+
 type GroupSetCursorPayload = ThermalGroupPayloadBase & {
     cursor: CursorSetterType
 }
@@ -68,11 +72,25 @@ type GroupSetCursorAction = ThermalGroupActionBase<GroupSetCursorPayload> & {
     type: ThermoActions.GROUP_SET_CURSOR
 }
 
+
 type GroupSetRangePayload = ThermalGroupPayloadBase & {
     range: RangeSetterType
 }
 type GroupSetRangeAction = ThermalGroupActionBase<GroupSetRangePayload> & {
     type: ThermoActions.GROUP_SET_RANGE
+}
+
+
+type GlobalSetRangePayload = ThermalGlobalPayloadBase & {
+    range: RangeSetterType
+}
+type GlobalSetRangeAction = ThermalGlobalActionBase<GlobalSetRangePayload> & {
+    type: ThermoActions.GLOBAL_SET_RANGE
+}
+
+type GroupAfterEverythingLoadedPayload = ThermalGroupPayloadBase & {}
+type GroupAfterEverythingLoadedAction = ThermalGlobalActionBase<GroupAfterEverythingLoadedPayload> & {
+    type: ThermoActions.GROUP_AFTER_EVERYTHING_LOADED
 }
 
 export class ThermoActionsFactory {
@@ -155,22 +173,37 @@ export class ThermoActionsFactory {
         }
     }
 
+    public static globalSetRange(
+        range: RangeSetterType
+    ): GlobalSetRangeAction {
+        return {
+            type: ThermoActions.GLOBAL_SET_RANGE,
+            payload: {
+                range
+            }
+        }
+    }
+
+    public static groupAfterLoad(
+        groupId: string
+    ): GroupAfterEverythingLoadedAction {
+        return {
+            type: ThermoActions.GROUP_AFTER_EVERYTHING_LOADED,
+            payload: {
+                groupId
+            }
+        }
+    }
+
 
 }
 
 
 export type AvailableThermoActions = GroupInitAction
-    // | GlobalSetRangeAction
-    // | GlobalSetRangeAction
-    // | GroupSetBypassAction
-    // | GroupSetCursorAction
-    // | GroupSetRangeAction
-    // | GroupLoadFileAction
-    // | GlobalAfterFileLoadedAction
-    // | GlobalAfterFileLoadedAction
-    // | GlobalFileLoadedAction
     | GroupInstantiateFileAction
     | GlobalRegisterSourceAction
     | GlobalInstantiateSourceToGroupsAction
     | GroupSetCursorAction
-    | GroupSetRangeAction;
+    | GroupSetRangeAction
+    | GlobalSetRangeAction
+    | GroupAfterEverythingLoadedAction;

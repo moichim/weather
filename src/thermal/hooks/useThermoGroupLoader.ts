@@ -30,15 +30,22 @@ export const useThermoGroupLoader = ( groupId: string ) => {
         startLoadingFiles( urls, id );
     }, [startLoadingFiles, id] );
 
+    const afterLoad = useCallback( () => {
+        dispatch( ThermoActionsFactory.groupAfterLoad( groupId ) );
+    }, [dispatch, id, globalState.groups] );
+
 
     const state = useMemo( () => {
         return globalState.groups[ id ];
     }, [ globalState.groups, id ] );
 
+    console.log( state );
+
     return {
         state,
         loadFile,
-        loadFiles
+        loadFiles,
+        afterLoad
     }
 
 }

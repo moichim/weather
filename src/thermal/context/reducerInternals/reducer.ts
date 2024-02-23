@@ -33,6 +33,12 @@ const addInstanceInGroup = (
 
     // Bind the instance
     newGroup.instancesByPath[instance.url] = instance;
+    newGroup.instancesByPath = Object.fromEntries( 
+        Object.entries( newGroup.instancesByPath ) 
+            .sort( ([keyA, valueA],[keyB,valueB]) => {
+                return valueA.timestamp - valueB.timestamp;
+            } )
+    );
 
     const updatedGroupMinMax = calculateMinMax(
         Object.values(newGroup.instancesByPath)
@@ -212,6 +218,35 @@ const groupSetCursor = (
 
 }
 
+const groupAfterLoaded = (
+    state: ThermoStorageType,
+    groupId: string
+): ThermoStorageType => {
+
+    const { [groupId]:oldGroup, ...remainingGroups } = state.groups;
+
+    
+
+    const minMax = calculateMinMax( Object.values( oldGroup.instancesByPath ).map( i => i.getMinMax() ) );
+
+    oldGroup.from = minMax.min;
+    oldGroup.to = minMax.max;
+    oldGroup.min = minMax.min;
+    oldGroup.max = minMax.max;
+
+    Object.values( oldGroup.instancesByPath ).forEach( i => i.setRangeFromTheOutside( minMax.min, minMax.max ) );
+
+    console.log( "after load", groupId, oldGroup.min, oldGroup.max, remainingGroups );
+
+    return {
+        ...state,
+        groups: {
+            ...remainingGroups,
+            [groupId]: {...oldGroup}
+        }
+    }
+}
+
 const groupSetRange = (
     state: ThermoStorageType,
     groupId: string,
@@ -248,6 +283,28 @@ const groupSetRange = (
 
 }
 
+const globalSetRange = (
+    state: ThermoStorageType,
+    range: RangeSetterType
+): ThermoStorageType => {
+
+    Object.values( state.instancesById ).forEach( instance => {
+        instance.setRangeFromTheOutside( range.from, range.to );
+    } );
+
+    Object.values( state.groups ).forEach( group => {
+        group.from = range.from;
+        group.to = range.to;
+    } );
+
+    return {
+        ...state,
+        from: range.from as number|undefined,
+        to: range.to as number|undefined
+    } as ThermoStorageType
+
+}
+
 export const theRehookReducer: Reducer<ThermoStorageType, AvailableThermoActions> = (
     state,
     action
@@ -272,6 +329,12 @@ export const theRehookReducer: Reducer<ThermoStorageType, AvailableThermoActions
 
         case ThermoActions.GROUP_SET_RANGE:
             return groupSetRange(state, action.payload.groupId, action.payload.range);
+
+        case ThermoActions.GLOBAL_SET_RANGE:
+            return globalSetRange( state, action.payload.range );
+
+        case ThermoActions.GROUP_AFTER_EVERYTHING_LOADED:
+            return groupAfterLoaded( state, action.payload.groupId );
 
     }
 
