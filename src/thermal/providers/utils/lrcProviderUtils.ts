@@ -38,7 +38,7 @@ const getScopeFolderInfo = (scope: string, folder: string): {
 } => {
     const filePath = path.join(getScopePath(scope, folder), "_info.json");
     const raw = fs.readFileSync(filePath);
-    return JSON.parse( raw );
+    return JSON.parse( raw.toString() );
 }
 
 const isScopeFolder = (scope: string, folder: string) => Object
