@@ -63,8 +63,6 @@ export const ThermalScale: React.FC<ThermalScaleProps> = ({
         //return () => clearTimeout( timeout );
     }, [props.from, props.to] );
 
-    console.log( label, value );
-
     return <Slider
         label={label}
 

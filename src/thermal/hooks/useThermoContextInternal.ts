@@ -3,7 +3,7 @@ import { ThermoStorageType, thermoStorageFactory } from "../context/reducerInter
 import { AvailableThermoActions, ThermoActionsFactory } from "../context/reducerInternals/actions"
 import { theRehookReducer } from "../context/reducerInternals/reducer";
 import { ThermalFileSource } from "@/thermal/reader/ThermalFileSource";
-import { ThermalLoader } from "@/thermal/reader/thermalLoader";
+import { ThermalLoader } from "@/thermal/parsers/thermalLoader";
 
 /** A hook used in the global context.
  * - handles loading internally

@@ -35,7 +35,9 @@ const ThermalCanvasContainer = forwardRef<
         return css;
     }, [originalSize, containerStyles, file]);
 
-    return <div
+    return <>
+        
+        <div
         className={cn(
             "thermalCanvasContainer m-0 p-0",
             props.containerClass
@@ -44,6 +46,7 @@ const ThermalCanvasContainer = forwardRef<
         ref={ref}
     >
     </div>
+    </>
 })
 
 ThermalCanvasContainer.displayName = "ThermalCanvasContainer"

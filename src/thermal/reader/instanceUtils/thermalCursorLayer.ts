@@ -1,7 +1,8 @@
 import { ThermalFileInstance } from "../ThermalFileInstance";
+import { AbstractLayer } from "./AbstractLayer";
 import ThermalDomFactory from "./domFactories";
 
-export default class ThermalCursorLayer {
+export default class ThermalCursorLayer extends AbstractLayer {
 
     protected layerRoot: HTMLDivElement;
     protected center: HTMLDivElement;
@@ -10,12 +11,14 @@ export default class ThermalCursorLayer {
     protected label: HTMLDivElement;
 
     public constructor(
-        protected readonly instance: ThermalFileInstance
+        instance: ThermalFileInstance
     ){
 
+        super( instance );
+
         // Create the elements
-        this.layerRoot = ThermalDomFactory.createCursorLayer();
-        this.center = ThermalDomFactory.createCursorLabelCenter();
+        this.layerRoot = ThermalDomFactory.createCursorLayerRoot();
+        this.center = ThermalDomFactory.createCursorLayerCenter();
         this.axisX = ThermalDomFactory.createCursorLayerX();
         this.axisY = ThermalDomFactory.createCursorLayerY();
         this.label = ThermalDomFactory.createCursorLayerLabel();

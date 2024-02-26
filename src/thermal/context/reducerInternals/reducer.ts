@@ -236,8 +236,6 @@ const groupAfterLoaded = (
 
     Object.values( oldGroup.instancesByPath ).forEach( i => i.setRangeFromTheOutside( minMax.min, minMax.max ) );
 
-    console.log( "after load", groupId, oldGroup.min, oldGroup.max, remainingGroups );
-
     return {
         ...state,
         groups: {
@@ -256,8 +254,6 @@ const groupSetRange = (
     if (state.groups[groupId] === undefined) {
         return state;
     } else {
-
-        console.log( range );
 
         const { groups: newGroups, ...restOfTheState } = state;
 

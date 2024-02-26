@@ -1,7 +1,7 @@
 import fetch from 'cross-fetch';
 
-import AbstractParser from "../parsers/AbstractParser";
-import LrcParser from '../parsers/lrcParser';
+import AbstractParser from "./AbstractParser";
+import LrcParser from './lrcParser';
 
 /**
  * Loader of thermal files from the web.

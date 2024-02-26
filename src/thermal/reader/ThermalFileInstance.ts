@@ -4,6 +4,7 @@ import ThermalFile from "./thermalFile";
 import EventEmitter from "events";
 import ThermalDomFactory from "./instanceUtils/domFactories";
 import ThermalCursorLayer from "./instanceUtils/thermalCursorLayer";
+import { ThermalCanvasLayer } from "./instanceUtils/thermalCanvasLayer";
 
 type ThermalMouseEvent = MouseEvent & {
     layerX: number,
@@ -22,15 +23,14 @@ export class ThermalFileInstance extends ThermalFile {
     // The container is used to store cursor data as data- atributes
     public root: HTMLDivElement | null = null;
 
-    // The canvas itself should be inside a wrapper
-    public canvasContainer: HTMLDivElement | null = null;
-
-    // The canvas element must be in the lowest layer
-    protected canvas: HTMLCanvasElement | null = null;
-    protected context: CanvasRenderingContext2D | null = null;
+    // The canvas layer
+    protected canvasLayer: ThermalCanvasLayer | null = null;
 
     /// The cursor layer
     protected cursorLayer: ThermalCursorLayer | null = null;
+
+    // The listener layer
+    protected listenerLayer: HTMLDivElement | null = null;
 
     protected palette = ThermalPalettes.IRON;
 
@@ -38,7 +38,7 @@ export class ThermalFileInstance extends ThermalFile {
     // FROM
 
     protected _from: number = this.min;
-    public set from(value: number) {
+    protected set from(value: number) {
         this._from = this.sanitizeMinBeforeSetting(value);
         this.update();
     };
@@ -49,7 +49,7 @@ export class ThermalFileInstance extends ThermalFile {
     // TO
 
     protected _to: number = this.max;
-    public set to(value: number) {
+    protected set to(value: number) {
         this._to = this.sanitizeMaxBeforeSetting(value);
         this.update();
     }
@@ -90,7 +90,6 @@ export class ThermalFileInstance extends ThermalFile {
     protected _cursorX: number | undefined = undefined;
     protected set cursorX(value: number | undefined) {
         this._cursorX = value;
-        //this.interact();
     }
     public get cursorX() {
         return this._cursorX;
@@ -99,7 +98,6 @@ export class ThermalFileInstance extends ThermalFile {
     protected _cursorY: number | undefined = undefined;
     protected set cursorY(value: number | undefined) {
         this._cursorY = value;
-        //this.interact();
     }
     public get cursorY() {
         return this._cursorY;
@@ -108,7 +106,6 @@ export class ThermalFileInstance extends ThermalFile {
     protected _cursorValue: number | undefined = undefined;
     protected set cursorValue(value: number | undefined) {
         this._cursorValue = value;
-        // this.interact();
     }
     public get cursorValue() {
         return this._cursorValue;
@@ -119,7 +116,6 @@ export class ThermalFileInstance extends ThermalFile {
         return this._hover;
     }
     protected set hover(value: boolean) {
-        // this.interact();
         this._hover = value;
         if ( this.cursorLayer ) {
             this.cursorLayer.hover = this._hover;
@@ -161,47 +157,7 @@ export class ThermalFileInstance extends ThermalFile {
 
     }
 
-    public static fromSource(
-        groupId: string,
-        frameId: string,
-        source: ThermalFileSource
-    ) {
-        return new ThermalFileInstance(
-            source.url,
-            source.signature,
-            source.unit,
-            source.width,
-            source.height,
-            source.timestamp,
-            source.pixels,
-            source.min,
-            source.max,
-            groupId,
-            frameId
-        );
-    }
 
-    public static fromSourceWithIndexedName(
-        groupId: string,
-        files: { [index: string]: ThermalFileInstance },
-        source: ThermalFileSource
-    ) {
-
-        return new ThermalFileInstance(
-            source.url,
-            source.signature,
-            source.unit,
-            source.width,
-            source.height,
-            source.timestamp,
-            source.pixels,
-            source.min,
-            source.max,
-            groupId,
-            `file_${groupId}_${Object.values(files).length.toString()}`
-        );
-
-    }
 
     /** Bind the class to the canvas element. */
     public bind(
@@ -221,34 +177,25 @@ export class ThermalFileInstance extends ThermalFile {
         this.root.style.zIndex = "100";
 
 
-        // Create the container for the canvas
-        this.canvasContainer = document.createElement( "div" );
-        this.canvasContainer.classList.add( "thermalCanvasWeapper" );
-
-
-        // Create the canvas
-        this.canvas = ThermalDomFactory.createCanvas();
-        this.canvas.width = this.width;
-        this.canvas.height = this.height;
-
-        // Extract the drawing context
-        this.context = this.canvas.getContext("2d");
-
+        // Create the canvas layer
+        this.canvasLayer = new ThermalCanvasLayer( this );
 
         // Create the canvas layer instance
         this.cursorLayer = new ThermalCursorLayer( this );
 
+        // Create the listener layer
+        this.listenerLayer = ThermalDomFactory.createListener();
+
 
         // Bind it all together
 
-        // 1. append the canvas container
-        this.root.appendChild( this.canvasContainer );
-
-        // 2. push the canvas inside the container
-        this.canvasContainer.appendChild(this.canvas);
+        this.root.appendChild( this.canvasLayer.getLayerRoot() );
 
         // 3. bind the cursor layer root element
         this.root.appendChild( this.cursorLayer.getLayerRoot() );
+
+        // 4. append the listener on the top
+        this.root.appendChild( this.listenerLayer );
 
     }
 
@@ -258,11 +205,14 @@ export class ThermalFileInstance extends ThermalFile {
 
     public initialise() {
 
-        if (this.root) {
+        if (this.listenerLayer) {
+
+            // this.listenerLayer.innerHTML = this.url;
 
             this.drawEverything();
 
-            this.root.onmousemove = (event: MouseEvent) => {
+            
+            this.listenerLayer.onmousemove = (event: MouseEvent) => {
 
                 const client = this.width;
                 const parent = this.root?.clientWidth;
@@ -317,7 +267,7 @@ export class ThermalFileInstance extends ThermalFile {
 
             }
 
-            this.root.onmouseleave = () => {
+            this.listenerLayer.onmouseleave = () => {
 
                 this.cursorX = undefined;
                 this.cursorY = undefined;
@@ -425,46 +375,14 @@ export class ThermalFileInstance extends ThermalFile {
 
     public update() {
 
-        if (this.canvas) {
-
-            this.drawEverything();
-
-        }
+        this.drawEverything();
 
     }
 
     protected drawEverything() {
 
-        if (this.context !== null) {
-
-            // Get the displayed range
-            const displayRange = this.to - this.from;
-
-            for (let x = 0; x <= this.width; x++) {
-
-                for (let y = 0; y <= this.height; y++) {
-
-                    const index = x + (y * this.width);
-
-                    // Clamp temperature to the displayedRange
-                    let temperature = this.pixels[index];
-                    if (temperature < this.from)
-                        temperature = this.from;
-                    if (temperature > this.to)
-                        temperature = this.to;
-
-                    const temperatureRelative = temperature - this.from;
-                    const temperatureAspect = temperatureRelative / displayRange;
-                    const colorIndex = Math.round(255 * temperatureAspect);
-
-                    const color = this.getPalette()[colorIndex];
-                    this.context.fillStyle = color;
-                    this.context.fillRect(x, y, 1, 1);
-
-                }
-
-            }
-
+        if ( this.canvasLayer ) {
+            this.canvasLayer.draw();
         }
 
 

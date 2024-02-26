@@ -39,8 +39,6 @@ export const useThermoGroupLoader = ( groupId: string ) => {
         return globalState.groups[ id ];
     }, [ globalState.groups, id ] );
 
-    console.log( state );
-
     return {
         state,
         loadFile,
