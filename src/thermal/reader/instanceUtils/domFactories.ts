@@ -3,6 +3,7 @@ export default class ThermalDomFactory {
     public static createCanvasContainer(): HTMLDivElement {
         const container = document.createElement( "div" );
         container.classList.add( "thermalCanvasWeapper" );
+        // container.style.transition = "opacity 300ms ease-in-out";
         return container;
     }
 
@@ -16,7 +17,35 @@ export default class ThermalDomFactory {
         canvas.style.height = "100%";
         canvas.style.objectPosition = "top left";
         // canvas.style.cursor = "crosshair";
+        //canvas.style.transition = "opacity 300ms ease-in-out";
         return canvas;
+    }
+
+    public static createVisibleLayer(): HTMLDivElement {
+        const layer = document.createElement( "div" );
+        layer.classList.add( "visibleLayer" );
+        layer.style.margin = "0px";
+        layer.style.padding = "0px";
+        layer.style.height = "100%";
+        layer.style.width = "100%";
+        layer.style.position = "absolute";
+        layer.style.top = "0px";
+        layer.style.left = "0px";
+        // layer.style.transition = "opacity 300ms ease-in-out";
+        return layer;
+    }
+
+    public static createVisibleImage(): HTMLImageElement {
+        const img = document.createElement( "img" );
+        img.classList.add( "visibleLayerImage" );
+        img.style.padding = "0px";
+        img.style.margin = "0px";
+        img.style.objectFit = "contain";
+        img.style.width = "100%";
+        img.style.height = "100%";
+        img.style.objectPosition = "top left";
+        // canvas.style.cursor = "crosshair";
+        return img;
     }
 
 

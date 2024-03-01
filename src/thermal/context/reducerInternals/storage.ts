@@ -75,6 +75,8 @@ export const thermoGroupFactory = (
 
 export type ThermoStorageType = ThermoStorageStats & ThermoRange & {
 
+    irAspect: number,
+
     sourcesByPath: {
         [index:string]: ThermalFileSource
     }
@@ -91,6 +93,7 @@ export type ThermoStorageType = ThermoStorageStats & ThermoRange & {
 
 export const thermoStorageFactory = (): ThermoStorageType => {
     return {
+        irAspect: 1,
         ...thermoStorageStatsUndefined,
         ...thermoRagngeUndefined,
         instancesById: {},

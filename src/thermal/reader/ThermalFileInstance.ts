@@ -5,6 +5,7 @@ import EventEmitter from "events";
 import ThermalDomFactory from "./instanceUtils/domFactories";
 import ThermalCursorLayer from "./instanceUtils/thermalCursorLayer";
 import { ThermalCanvasLayer } from "./instanceUtils/thermalCanvasLayer";
+import { VisibleLayer } from "./instanceUtils/VisibleLeyer";
 
 type ThermalMouseEvent = MouseEvent & {
     layerX: number,
@@ -26,6 +27,9 @@ export class ThermalFileInstance extends ThermalFile {
     // The canvas layer
     protected canvasLayer: ThermalCanvasLayer | null = null;
 
+    // The visible layer
+    protected visibleLayer: VisibleLayer | null = null;
+
     /// The cursor layer
     protected cursorLayer: ThermalCursorLayer | null = null;
 
@@ -33,6 +37,37 @@ export class ThermalFileInstance extends ThermalFile {
     protected listenerLayer: HTMLDivElement | null = null;
 
     protected palette = ThermalPalettes.IRON;
+
+    protected _irAspect: number = 1;
+    public get irAspect() { return this._irAspect; }
+    public set irAspect( value: number ) {
+
+        this._irAspect = Math.max( Math.min( value, 1 ), 0 );
+
+        if ( this.canvasLayer )
+            this.canvasLayer.opacityAspect = this._irAspect;
+
+        if ( this.visibleLayer && this.canvasLayer ) {
+            this.canvasLayer.opacityAspect = this._irAspect;
+            // this.visibleLayer.opacityAspect = 1;
+            // this.visibleLayer.opacityAspect = 1 - this._irAspect;
+        }
+            
+    }
+
+    public get visibleImage(): string { 
+        if ( this.visibleLayer )
+            return this.visibleLayer.url;
+        return "";
+     }
+    public set visibleImage( url: string ) {
+        if ( this.visibleLayer === null ) {
+            this.visibleLayer = new VisibleLayer( this, url );
+            this.root?.prepend( this.visibleLayer.getLayerRoot() )
+        } else {
+            this.visibleLayer.url = url;
+        }
+    }
 
 
     // FROM
@@ -185,6 +220,11 @@ export class ThermalFileInstance extends ThermalFile {
 
         // Create the listener layer
         this.listenerLayer = ThermalDomFactory.createListener();
+
+        this.visibleImage = this.url
+            .replace( "image-thermal", "image-visual" )
+            .replace( ".lrc", ".png" );
+        this.irAspect = 1;
 
 
         // Bind it all together

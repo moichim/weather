@@ -3,6 +3,7 @@ import gql from "graphql-tag";
 import { useCallback, useState } from "react";
 import { FilesScopeContent } from "../providers/lrcProvider";
 import { ThermalGroup } from "./group/ThermalGroup";
+import { ThermoIrAspectSlider } from "./utils/ThermoIrAspectSlider";
 
 type ThermalProjectFolders = {
     scope: string
@@ -89,6 +90,8 @@ export const ThermalProjectFolders: React.FC<ThermalProjectFolders> = props => {
     console.log( folders );
 
     return <div>
+
+        <ThermoIrAspectSlider />
 
         {folders.map( folder => <ThermalGroup 
             key={folder.id}

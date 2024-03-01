@@ -37,6 +37,7 @@ export class ThermalCanvasLayer extends AbstractLayer {
         return this.container;
     }
 
+    /** Returns an array of 255 RGB colors */
     protected getPalette(): string[] {
         return PALETTE;
     }

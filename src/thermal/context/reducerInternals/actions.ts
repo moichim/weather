@@ -10,7 +10,9 @@ export enum ThermoActions {
     GROUP_SET_RANGE = 5,
     GLOBAL_SET_RANGE = 6,
 
-    GROUP_AFTER_EVERYTHING_LOADED = 7
+    GROUP_AFTER_EVERYTHING_LOADED = 7,
+
+    GLOBAL_SET_IR_ASPECT = 8
 }
 
 export type RangeSetterType = { from: number, to: number } | { from: undefined, to: undefined }
@@ -88,9 +90,18 @@ type GlobalSetRangeAction = ThermalGlobalActionBase<GlobalSetRangePayload> & {
     type: ThermoActions.GLOBAL_SET_RANGE
 }
 
+
 type GroupAfterEverythingLoadedPayload = ThermalGroupPayloadBase & {}
 type GroupAfterEverythingLoadedAction = ThermalGlobalActionBase<GroupAfterEverythingLoadedPayload> & {
     type: ThermoActions.GROUP_AFTER_EVERYTHING_LOADED
+}
+
+
+type GlobalSetIrAspectPayload = ThermalGlobalPayloadBase & {
+    irAspect: number
+}
+type GlobalSetIrAspectAction = ThermalGlobalActionBase<GlobalSetIrAspectPayload> & {
+    type: ThermoActions.GLOBAL_SET_IR_ASPECT
 }
 
 export class ThermoActionsFactory {
@@ -195,6 +206,17 @@ export class ThermoActionsFactory {
         }
     }
 
+    public static setIrAspect(
+        irAspect: number
+    ): GlobalSetIrAspectAction {
+        return {
+            type: ThermoActions.GLOBAL_SET_IR_ASPECT,
+            payload: {
+                irAspect: irAspect
+            }
+        }
+    }
+
 
 }
 
@@ -206,4 +228,5 @@ export type AvailableThermoActions = GroupInitAction
     | GroupSetCursorAction
     | GroupSetRangeAction
     | GlobalSetRangeAction
-    | GroupAfterEverythingLoadedAction;
+    | GroupAfterEverythingLoadedAction
+    | GlobalSetIrAspectAction;

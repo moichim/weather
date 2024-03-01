@@ -279,6 +279,7 @@ const groupSetRange = (
 
 }
 
+
 const globalSetRange = (
     state: ThermoStorageType,
     range: RangeSetterType
@@ -299,6 +300,22 @@ const globalSetRange = (
         to: range.to as number|undefined
     } as ThermoStorageType
 
+}
+
+
+const globalSetIrAspect = (
+    state: ThermoStorageType,
+    irAspect: number
+): ThermoStorageType => {
+
+    Object.values( state.instancesById ).forEach( instance => {
+        instance.irAspect = irAspect;
+    } );
+
+    return {
+        ...state,
+        irAspect: irAspect
+    }
 }
 
 export const theRehookReducer: Reducer<ThermoStorageType, AvailableThermoActions> = (
@@ -331,6 +348,9 @@ export const theRehookReducer: Reducer<ThermoStorageType, AvailableThermoActions
 
         case ThermoActions.GROUP_AFTER_EVERYTHING_LOADED:
             return groupAfterLoaded( state, action.payload.groupId );
+        
+        case ThermoActions.GLOBAL_SET_IR_ASPECT:
+            return globalSetIrAspect( state, action.payload.irAspect );
 
     }
 
