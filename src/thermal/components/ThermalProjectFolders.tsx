@@ -86,9 +86,6 @@ export const ThermalProjectFolders: React.FC<ThermalProjectFolders> = props => {
         }
     });
 
-
-    console.log( folders );
-
     return <div>
 
         <ThermoIrAspectSlider />

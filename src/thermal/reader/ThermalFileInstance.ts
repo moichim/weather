@@ -55,17 +55,25 @@ export class ThermalFileInstance extends ThermalFile {
             
     }
 
-    public get visibleImage(): string { 
-        if ( this.visibleLayer )
-            return this.visibleLayer.url;
-        return "";
+    protected _visibleImage?: string = undefined;
+    public get visibleImage(): string|undefined { 
+        return this._visibleImage;
      }
-    public set visibleImage( url: string ) {
+    public set visibleImage( url: string|undefined ) {
+
+        this._visibleImage = url;
+
         if ( this.visibleLayer === null ) {
-            this.visibleLayer = new VisibleLayer( this, url );
-            this.root?.prepend( this.visibleLayer.getLayerRoot() )
+            if ( url !== undefined ) {
+                this.visibleLayer = new VisibleLayer( this, url );
+                this.root?.prepend( this.visibleLayer.getLayerRoot() )
+            }
         } else {
-            this.visibleLayer.url = url;
+            if ( url !== undefined ) {
+                this.visibleLayer.url = url;
+            } else {
+                this.visibleLayer.getLayerRoot().remove();
+            }
         }
     }
 
@@ -173,7 +181,8 @@ export class ThermalFileInstance extends ThermalFile {
         public readonly min: number,
         public readonly max: number,
         public readonly groupId: string,
-        public readonly fileId: string
+        public readonly fileId: string,
+        public readonly visibleUrl?: string
     ) {
 
         super(
@@ -185,7 +194,8 @@ export class ThermalFileInstance extends ThermalFile {
             timestamp,
             [...pixels],
             min,
-            max
+            max,
+            visibleUrl
         );
 
         this.id = `instance_${this.groupId}_${this.fileId}`
@@ -236,6 +246,8 @@ export class ThermalFileInstance extends ThermalFile {
 
         // 4. append the listener on the top
         this.root.appendChild( this.listenerLayer );
+
+        this.dispatchEvent( new Event( "binded" ) );
 
     }
 

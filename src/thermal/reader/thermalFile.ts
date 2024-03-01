@@ -11,6 +11,7 @@ export default abstract class ThermalFile extends EventTarget {
         public readonly pixels: number[],
         public readonly min: number,
         public readonly max: number,
+        public readonly visibleUrl?: string
     ) {
         super();
     }
