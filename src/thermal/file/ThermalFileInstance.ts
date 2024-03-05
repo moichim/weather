@@ -145,7 +145,7 @@ export class ThermalFileInstance extends ThermalObjectBase {
                 const x = Math.round( event.offsetX * aspect );
                 const y = Math.round( event.offsetY * aspect );
 
-                this.group.recieveCursorPosition( { x, y} );
+                this.group.recieveCursorPosition( { x, y } );
 
 
             }
@@ -221,24 +221,32 @@ export class ThermalFileInstance extends ThermalObjectBase {
         // Dispatch the change event
         this.dispatchCursorEvent( position, this.isHover );
 
-        // redraw
-        // ...
-
     }
 
 
     protected processCursorMovedEvent(
         value: ThermalCursorPositionOrundefined,
     ) {
+        // Store the values locally
         this._cursorPosition = value;
         this._isHover = value !== undefined;
-
         if ( this.cursorPosition !== undefined ) {
 
             this._cursorValue = this.getValueAtCoordinate( this.cursorPosition.x, this.cursorPosition.y );
 
         } else {
             this._cursorValue = undefined;
+        }
+
+        // Propagate the values in the cursor layer
+        if ( this.cursorLayer ) {
+
+            if ( this.cursorPosition && this.cursorValue !== undefined ) {
+                this.cursorLayer.setCursor( this.cursorPosition?.x, this.cursorPosition.y, this.cursorValue );
+            } else {
+                this.cursorLayer.resetCursor();
+            }
+
         }
 
     }
