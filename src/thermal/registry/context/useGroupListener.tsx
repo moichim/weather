@@ -1,11 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useRegistryContext } from "./RegistryContext";
-import { ThermalRangeOrUndefined, ThermalMinmaxOrUndefined, ThermalCursorPositionOrundefined } from "../interfaces";
+import { useEffect, useState } from "react";
 import { CursorEvent, MinmaxEvent, OpacityEvent, RangeEvent, ThermalEvents } from "../events";
+import { ThermalCursorPositionOrundefined, ThermalMinmaxOrUndefined, ThermalRangeOrUndefined } from "../interfaces";
 import { useGroupInstance } from "./useGroupInstance";
-import { gql } from "@apollo/client";
 
 
 export const useGroupListener = (

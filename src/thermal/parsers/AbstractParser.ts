@@ -15,7 +15,6 @@ export default abstract class AbstractParser {
 
     /** The only public endpoint. This method does all the business. */
     public async parse(): Promise<ThermalFileSource|null> {
-        console.log( "parsing", this );
         await this.init();
         await this.parseFile();
         return this.getThermalFile();

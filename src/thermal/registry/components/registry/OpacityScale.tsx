@@ -1,6 +1,4 @@
-import { ThermoActionsFactory } from "@/thermal/context/reducerInternals/actions";
-import { useThermoContext } from "@/thermal/context/thermoContext";
-import { Slider } from "@nextui-org/react"
+import { Slider } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import { useRegistryListener } from "../../context/useRegistryListener";
 

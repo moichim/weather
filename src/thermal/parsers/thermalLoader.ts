@@ -56,7 +56,6 @@ export class ThermalLoader {
 
     /** INTERNAL - determine the file type and return the corresponding parser. */
     protected assignParserInstance( blob: Blob ) {
-        console.log( this );
         return new LrcParser( this.thermalUrl, blob, this.visibleUrl );
     }
 

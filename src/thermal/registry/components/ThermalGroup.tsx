@@ -2,10 +2,9 @@
 
 import { useEffect } from "react";
 import { ThermalFileRequest } from "../ThermalRequest";
-import { useGroupLoader } from "../context/useGroupLoader"
-import { useProjectLoader } from "../context/useProjectLoader";
-import { ThermalInstance } from "./instance/ThermalInstance";
 import { useGroupListener } from "../context/useGroupListener";
+import { useGroupLoader } from "../context/useGroupLoader";
+import { ThermalInstance } from "./instance/ThermalInstance";
 
 type ThermalGroupProps = {
     groupId: string,
@@ -36,21 +35,20 @@ export const ThermalGroup: React.FC<ThermalGroupProps> = props => {
 
                 {props.description && <p className="py-2">{props.description}</p>}
 
-                {listener.minmax &&<div className="text-small text-gray-500">
+                {listener.minmax && <div className="text-small text-gray-500">
                     <p>Minimum: {listener.minmax.min.toFixed(3)} °C</p>
                     <p>Maximum: {listener.minmax.max.toFixed(3)} °C</p>
                 </div>}
 
             </div>
-            
+
             {loader.instances.length > 0 && <>
                 <div className="w-full h-[1px] bg-black mb-10"></div>
                 <div className="relative flex flex-wrap">
-                {loader.instances.map(instance => {
-                    // return <></>
-                    return <ThermalInstance instance={instance} />
-                })}
-            </div>
+                    {loader.instances.map(instance => {
+                        return <ThermalInstance instance={instance} key={instance.id}/>
+                    })}
+                </div>
             </>}
 
         </div>

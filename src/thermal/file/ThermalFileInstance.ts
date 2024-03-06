@@ -1,8 +1,8 @@
-import { ThermalPalettes } from "../components/instance/palettes";
+import { ThermalPalettes } from "./palettes";
 import { ThermalGroup } from "../registry/ThermalGroup";
 import { ThermalObjectBase } from "../registry/abstractions/ThermalObjectBase";
 import { ThermalEventsFactory } from "../registry/events";
-import { ThermalCursorInstanceEventDetail, ThermalCursorPositionOrundefined, ThermalRangeDataType } from "../registry/interfaces";
+import { ThermalCursorPositionOrundefined, ThermalRangeDataType } from "../registry/interfaces";
 import { ThermalFileSource } from "./ThermalFileSource";
 import { VisibleLayer } from "./instanceUtils/VisibleLayer";
 import ThermalDomFactory from "./instanceUtils/domFactories";
@@ -82,8 +82,6 @@ export class ThermalFileInstance extends ThermalObjectBase {
         }
 
         this.root = container;
-
-        console.log( this.source, this.visibleUrl );
 
         // Create the visible layer if necessary
         if ( this.visibleUrl ) {

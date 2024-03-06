@@ -183,7 +183,8 @@ export default class LrcParser extends AbstractParser {
             this.timestamp!,
             this.pixels!,
             this.min!,
-            this.max!
+            this.max!,
+            this.visibleUrl
         );
     }
 

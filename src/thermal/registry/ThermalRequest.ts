@@ -40,8 +40,6 @@ export class ThermalRequest extends EventTarget {
 
         const file = await ThermalFileSource.fromUrl( this.url, this.visibleUrl ) as unknown as ThermalFileSource;
 
-        console.log( file.visibleUrl );
-
         if ( !file ) {
             return null;
         } else if ( file !== null ) {

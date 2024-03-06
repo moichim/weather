@@ -1,14 +1,12 @@
 "use client";
 
-import { ThermalGroup } from "./ThermalGroup";
+import { Navbar, NavbarBrand, NavbarContent, Spinner } from "@nextui-org/react";
+import { SliderValue } from "@nextui-org/slider";
 import { useProjectLoader } from "../context/useProjectLoader";
 import { useRegistryListener } from "../context/useRegistryListener";
-import { ThermalScale } from "./registry/ThermalScale";
-import { useEffect, useState } from "react";
-import { SliderValue } from "@nextui-org/slider";
-import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Button, Spinner } from "@nextui-org/react";
-import Link from "next/link";
+import { ThermalGroup } from "./ThermalGroup";
 import { OpacityScale } from "./registry/OpacityScale";
+import { ThermalScale } from "./registry/ThermalScale";
 
 type ProjectControllerProps = {
     scope: string

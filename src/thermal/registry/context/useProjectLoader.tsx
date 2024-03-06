@@ -1,10 +1,10 @@
 "use client";
 
+import { FilesScopeContent } from "@/thermal/providers/lrcProvider";
+import { useQuery } from "@apollo/client";
 import gql from "graphql-tag";
 import { useCallback, useState } from "react";
 import { ThermalFileRequest } from "../ThermalRequest";
-import { useQuery } from "@apollo/client";
-import { FilesScopeContent } from "@/thermal/providers/lrcProvider";
 
 export const PROJECT_FILES_QUERY = gql`
 
@@ -45,16 +45,16 @@ export const useProjectLoader = (
 
     const [groups, setGroups] = useState<ProjectDescription>({});
 
-    const addGroup = useCallback( (
+    const addGroup = useCallback((
         id: string,
         files: ThermalFileRequest[],
         name: string,
         description?: string
     ) => {
 
-        setGroups( prev => {
+        setGroups(prev => {
 
-            if ( ! Object.keys( prev ).includes( id ) ) {
+            if (!Object.keys(prev).includes(id)) {
                 return {
                     ...prev,
                     [id]: {
@@ -68,28 +68,28 @@ export const useProjectLoader = (
 
             return prev;
 
-        } );
+        });
 
-    }, [setGroups] );
+    }, [setGroups]);
 
     const query = useQuery<ProjectFilesQueryResponse>(PROJECT_FILES_QUERY, {
         variables: {
             scope: scopeId
         },
-        onCompleted: ( result ) => {
+        onCompleted: (result) => {
 
-            result.filesGetContent.forEach( folder => {
+            result.filesGetContent.forEach(folder => {
 
-                const files: ThermalFileRequest[] = folder.files.map( file => {
+                const files: ThermalFileRequest[] = folder.files.map(file => {
                     return {
                         thermalUrl: file.ir,
                         visibleUrl: file.visu
                     }
-                } );
+                });
 
-                addGroup( folder.id, files, folder.name, folder.description );
+                addGroup(folder.id, files, folder.name, folder.description);
 
-            } );
+            });
 
         }
     });

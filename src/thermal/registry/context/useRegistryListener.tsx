@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { OpacityEvent, ThermalEvents, RangeEvent, MinmaxEvent } from "../events";
-import { ThermalRangeOrUndefined, ThermalMinmaxOrUndefined } from "../interfaces";
+import { useEffect, useState } from "react";
+import { MinmaxEvent, OpacityEvent, RangeEvent, ThermalEvents } from "../events";
+import { ThermalMinmaxOrUndefined, ThermalRangeOrUndefined } from "../interfaces";
 import { useRegistryContext } from "./RegistryContext";
 
 export const useRegistryListener = () => {
@@ -13,7 +13,7 @@ export const useRegistryListener = () => {
 
     const registry = useRegistryContext();
 
-    useEffect( () => {
+    useEffect(() => {
 
         // Add bindings
 
@@ -33,52 +33,52 @@ export const useRegistryListener = () => {
             setRange(e.detail.range);
         }
 
-        registry.addEventListener( ThermalEvents.RANGE_UPDATED, rangeListener );
+        registry.addEventListener(ThermalEvents.RANGE_UPDATED, rangeListener);
 
 
         // Min max
-        const minmaxListener = ( evt: Event ) => {
+        const minmaxListener = (evt: Event) => {
             const e = evt as MinmaxEvent;
-            setMinmax( e.detail.minmax );
+            setMinmax(e.detail.minmax);
         }
 
-        registry.addEventListener( ThermalEvents.MINMAX_UPDATED, minmaxListener );
+        registry.addEventListener(ThermalEvents.MINMAX_UPDATED, minmaxListener);
 
         return () => {
-            registry.removeEventListener( ThermalEvents.OPACITY_UPDATED, opacityListener );
-            registry.removeEventListener( ThermalEvents.RANGE_UPDATED, rangeListener );
-            registry.removeEventListener( ThermalEvents.MINMAX_UPDATED, minmaxListener );
+            registry.removeEventListener(ThermalEvents.OPACITY_UPDATED, opacityListener);
+            registry.removeEventListener(ThermalEvents.RANGE_UPDATED, rangeListener);
+            registry.removeEventListener(ThermalEvents.MINMAX_UPDATED, minmaxListener);
         }
 
 
-    }, [ registry, setRange, setOpacity, setMinmax ] );
+    }, [registry, setRange, setOpacity, setMinmax]);
 
-    useEffect( () => {
+    useEffect(() => {
 
-        if ( opacity !== registry.opacity ) {
+        if (opacity !== registry.opacity) {
 
-            registry.imposeOpacity( opacity );
+            registry.imposeOpacity(opacity);
 
         }
 
-    }, [ registry, opacity ] );
+    }, [registry, opacity]);
 
-    useEffect( () => {
+    useEffect(() => {
 
-        if ( registry.range === undefined && range !== undefined ) {
-            registry.imposeRange( range );
-        } else if ( registry.range === undefined && range === undefined ) {
+        if (registry.range === undefined && range !== undefined) {
+            registry.imposeRange(range);
+        } else if (registry.range === undefined && range === undefined) {
 
-        } else if ( registry.range !== undefined && range !== undefined ) {
+        } else if (registry.range !== undefined && range !== undefined) {
             if (
                 registry.range.from !== range.from
                 || registry.range.to !== range.to
             ) {
-                registry.imposeRange( range );
+                registry.imposeRange(range);
             }
         }
 
-    }, [ registry, range ] );
+    }, [registry, range]);
 
     return {
         range, setRange,

@@ -1,9 +1,8 @@
 import { ThermalFileSource } from "../file/ThermalFileSource";
 import { ThermalGroup } from "./ThermalGroup";
-import { ThermalRequest } from "./ThermalRequest";
 import { ThermalObjectContainer } from "./abstractions/ThermalObjectContainer";
 import { ThermalEventsFactory } from "./events";
-import { ThermalMinmaxOrUndefined, ThermalMinmaxType, ThermalRangeOrUndefined, ThermalRangeType, ThermalSourceAddedEventDetail } from "./interfaces";
+import { ThermalRangeOrUndefined } from "./interfaces";
 
 export class ThermalRegistry extends ThermalObjectContainer {
 
@@ -32,7 +31,7 @@ export class ThermalRegistry extends ThermalObjectContainer {
             return group;
         }
 
-        return this.groups[ id ];
+        return this.groups[id];
     }
 
 
@@ -92,7 +91,7 @@ export class ThermalRegistry extends ThermalObjectContainer {
      */
     public recalculateMinmax() {
         this.minmax = this.calculateMinmaxFromGroups();
-        if ( this.minmax ) {
+        if (this.minmax) {
             this.range = { from: this.minmax.min, to: this.minmax.max };
         }
     }

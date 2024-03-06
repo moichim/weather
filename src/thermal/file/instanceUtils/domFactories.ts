@@ -4,6 +4,7 @@ export default class ThermalDomFactory {
         const container = document.createElement( "div" );
         container.classList.add( "thermalCanvasWeapper" );
         // container.style.transition = "opacity 300ms ease-in-out";
+        container.style.position = "relative";
         return container;
     }
 

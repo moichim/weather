@@ -1,18 +1,3 @@
-
-import { ThermalFileInstance } from "../file/ThermalFileInstance";
-import { ThermalFileSource } from "../file/ThermalFileSource";
-
-// Source registered
-export type ThermalSourceAddedEventDetail = {
-    source: ThermalFileSource
-}
-
-// Group instances
-export type ThermalInstanceAddedEventDetail = {
-    instance: ThermalFileInstance
-}
-
-
 // Range
 
 export type ThermalRangeType = {
@@ -27,15 +12,6 @@ export type ThermalRangeDataType = ThermalRangeOrUndefined & {
     to: number
 }
 
-export type ThermalRangeEventDetails = {
-    range: ThermalRangeOrUndefined,
-    imposed: boolean
-}
-
-export interface IThermalWithRange {
-    range: ThermalRangeOrUndefined
-}
-
 
 // Min Max
 
@@ -44,11 +20,6 @@ export interface ThermalMinmaxType {
     max: number
 }
 export type ThermalMinmaxOrUndefined = ThermalMinmaxType | undefined;
-
-export type ThermalMinmaxEventDetail = {
-    minmax: ThermalMinmaxOrUndefined,
-    imposed: boolean
-}
 
 
 // Cursor
@@ -59,28 +30,3 @@ export type ThermalCursorPosition = {
 }
 
 export type ThermalCursorPositionOrundefined = ThermalCursorPosition | undefined;
-
-export type ThermalCursorEventDetail = {
-    value: number|undefined,
-    position: ThermalCursorPositionOrundefined,
-    isHover: boolean,
-    isSync: boolean
-}
-
-export interface IThermalWithCursor {
-
-    cursorPosition: ThermalCursorPositionOrundefined,
-    cursorValue: number|undefined,
-    isHover: boolean
-
-}
-
-export type ThermalCursorGroupEventDetail = {
-    position: ThermalCursorPositionOrundefined,
-    imposed: boolean,
-    isHover: boolean
-}
-
-export type ThermalCursorInstanceEventDetail = ThermalCursorGroupEventDetail & {
-    value: number|undefined
-}

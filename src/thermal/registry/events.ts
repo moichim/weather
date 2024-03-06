@@ -18,19 +18,13 @@ export enum ThermalEvents {
     CURSOR_UPDATED = "cursorevent",
     OPACITY_UPDATED = "opacityevent"
 
-
 }
-
-// Utility for listeners creation
-type ThermalEventListener<D extends {}> = (
-    evt: CustomEvent<D>
-) => void;
 
 // Events registry
 
 // Group initialised
 type GroupInitDetail = { group: ThermalGroup }
-export type GroupInitListener = CustomEvent<GroupInitDetail>;
+export type GroupInitEvent = CustomEvent<GroupInitDetail>;
 
 // Group loading
 type GroupLoadingDetail = { group: ThermalGroup, loading: boolean }
@@ -38,7 +32,7 @@ export type GroupLoadingEvent = CustomEvent<GroupInitDetail>;
 
 // Source registered
 type SourceRegistered = { source: ThermalFileSource }
-export type SourceRegisteredListener = CustomEvent<SourceRegistered>;
+export type SourceREgisteredEvent = CustomEvent<SourceRegistered>;
 
 // Instance created
 type InstanceCreated = { instance: ThermalFileInstance, group: ThermalGroup }
@@ -53,8 +47,8 @@ type RangeUpdated = { range: ThermalRangeOrUndefined }
 export type RangeEvent = CustomEvent<RangeUpdated>;
 
 // Cursor event
-type CursorUpdated = { 
-    cursorPosition: ThermalCursorPositionOrundefined, 
+type CursorUpdated = {
+    cursorPosition: ThermalCursorPositionOrundefined,
     cursorValue?: number,
     isHover: boolean
 }
@@ -166,7 +160,7 @@ export class ThermalEventsFactory {
     public static cursorUpdated(
         isHover: boolean,
         position: ThermalCursorPositionOrundefined,
-        value: number|undefined,
+        value: number | undefined,
     ) {
         return new CustomEvent<CursorUpdated>(
             ThermalEvents.CURSOR_UPDATED,
@@ -180,7 +174,7 @@ export class ThermalEventsFactory {
         );
     }
 
-    public static opacityUpdated( opacity: number ) {
+    public static opacityUpdated(opacity: number) {
         return new CustomEvent<OpacityUpdated>(
             ThermalEvents.OPACITY_UPDATED,
             {

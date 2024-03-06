@@ -1,4 +1,4 @@
-import { PALETTE } from "@/thermal/components/instance/palettes";
+import { PALETTE } from "@/thermal/file/palettes";
 import { ThermalFileInstance } from "../ThermalFileInstance";
 import { AbstractLayer } from "./AbstractLayer";
 import ThermalDomFactory from "./domFactories";
@@ -19,7 +19,11 @@ export class ThermalCanvasLayer extends AbstractLayer {
     public get opacity() { return this._opacity; }
     public set opacity( value: number ) {
         this._opacity = Math.max( Math.min( value, 1 ), 0 );
-        this.getLayerRoot().style.opacity = this._opacity.toString();
+        if ( this._opacity !== 1 )
+            this.getLayerRoot().style.opacity = this._opacity.toString();
+        else {
+            this.getLayerRoot().style.removeProperty( "opacity" );
+        }
     }
 
     public constructor(
