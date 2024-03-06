@@ -1,19 +1,195 @@
+import { ThermalFileInstance } from "../file/ThermalFileInstance";
+import { ThermalFileSource } from "../file/ThermalFileSource";
 import { ThermalGroup } from "./ThermalGroup";
+import { ThermalCursorPositionOrundefined, ThermalMinmaxOrUndefined, ThermalRangeOrUndefined } from "./interfaces";
 
-export interface RegistryEventDetails {}
-export interface RegistryEvent<D extends RegistryEventDetails = RegistryEventDetails> extends CustomEvent<D> {}
+export enum ThermalEvents {
 
-export interface GroupEventDetails {}
-export interface GroupEvent<D extends GroupEventDetails = GroupEventDetails> extends CustomEvent<D> {}
+    GROUP_INIT = "groupinit",
 
-export interface SourceEventDetails {}
-export interface SourceEvent<D extends SourceEventDetails = SourceEventDetails> extends CustomEvent<D> {}
+    GROUP_LOADING_START = "grouprequeststart",
+    GROUP_LOADING_FINISH = "grouploadingfinish",
 
-export interface InstanceEventDetails {}
-export interface InstanceEvent<D extends InstanceEventDetails =InstanceEventDetails> extends CustomEvent<D> {}
+    SOURCE_REGISTERED = "sourceregistered",
+    INSTANCE_CREATED = "instancecreated",
 
-// RegistryEvents
-interface RegistryGroupInitialisedEventDetails { group: ThermalGroup }
-export interface RegistryGroupInitialisedEvent extends RegistryEvent<RegistryGroupInitialisedEventDetails> {
-    
+    MINMAX_UPDATED = "minmaxevent",
+    RANGE_UPDATED = "rangeevent",
+    CURSOR_UPDATED = "cursorevent",
+    OPACITY_UPDATED = "opacityevent"
+
+
 }
+
+// Utility for listeners creation
+type ThermalEventListener<D extends {}> = (
+    evt: CustomEvent<D>
+) => void;
+
+// Events registry
+
+// Group initialised
+type GroupInitDetail = { group: ThermalGroup }
+export type GroupInitListener = CustomEvent<GroupInitDetail>;
+
+// Group loading
+type GroupLoadingDetail = { group: ThermalGroup, loading: boolean }
+export type GroupLoadingEvent = CustomEvent<GroupInitDetail>;
+
+// Source registered
+type SourceRegistered = { source: ThermalFileSource }
+export type SourceRegisteredListener = CustomEvent<SourceRegistered>;
+
+// Instance created
+type InstanceCreated = { instance: ThermalFileInstance, group: ThermalGroup }
+export type InstanceCreatedEvent = CustomEvent<InstanceCreated>;
+
+// Minmax event
+type MinmaxUpdated = { minmax: ThermalMinmaxOrUndefined }
+export type MinmaxEvent = CustomEvent<MinmaxUpdated>;
+
+// Range event
+type RangeUpdated = { range: ThermalRangeOrUndefined }
+export type RangeEvent = CustomEvent<RangeUpdated>;
+
+// Cursor event
+type CursorUpdated = { 
+    cursorPosition: ThermalCursorPositionOrundefined, 
+    cursorValue?: number,
+    isHover: boolean
+}
+export type CursorEvent = CustomEvent<CursorUpdated>
+
+
+// Opacity event
+type OpacityUpdated = { opacity: number }
+export type OpacityEvent = CustomEvent<OpacityUpdated>;
+
+
+export class ThermalEventsFactory {
+
+    public static groupInit(
+        group: ThermalGroup
+    ) {
+        return new CustomEvent<GroupInitDetail>(
+            ThermalEvents.GROUP_INIT,
+            {
+                detail: {
+                    group
+                }
+            }
+        );
+    }
+
+    public static groupLoadingStart(
+        group: ThermalGroup
+    ) {
+        return new CustomEvent<GroupLoadingDetail>(
+            ThermalEvents.GROUP_LOADING_START,
+            {
+                detail: {
+                    group,
+                    loading: true
+                }
+            }
+        );
+    }
+
+    public static groupLoadingEnd(
+        group: ThermalGroup
+    ) {
+        return new CustomEvent<GroupLoadingDetail>(
+            ThermalEvents.GROUP_LOADING_FINISH,
+            {
+                detail: {
+                    group,
+                    loading: false
+                }
+            }
+        );
+    }
+
+    public static sourceRegistered(
+        source: ThermalFileSource
+    ) {
+        return new CustomEvent<SourceRegistered>(
+            ThermalEvents.SOURCE_REGISTERED,
+            {
+                detail: {
+                    source
+                }
+            }
+        );
+    }
+
+    public static instanceCreated(
+        instance: ThermalFileInstance,
+        group: ThermalGroup
+    ) {
+        return new CustomEvent<InstanceCreated>(
+            ThermalEvents.INSTANCE_CREATED,
+            {
+                detail: {
+                    instance,
+                    group
+                }
+            }
+        );
+    }
+
+    public static minmaxUpdated(
+        minmax: ThermalMinmaxOrUndefined
+    ) {
+        return new CustomEvent<MinmaxUpdated>(
+            ThermalEvents.MINMAX_UPDATED,
+            {
+                detail: {
+                    minmax
+                }
+            }
+        );
+    }
+
+    public static rangeUpdated(
+        range: ThermalRangeOrUndefined
+    ) {
+        return new CustomEvent<RangeUpdated>(
+            ThermalEvents.RANGE_UPDATED,
+            {
+                detail: {
+                    range
+                }
+            }
+        );
+    }
+
+    public static cursorUpdated(
+        isHover: boolean,
+        position: ThermalCursorPositionOrundefined,
+        value: number|undefined,
+    ) {
+        return new CustomEvent<CursorUpdated>(
+            ThermalEvents.CURSOR_UPDATED,
+            {
+                detail: {
+                    cursorPosition: position,
+                    cursorValue: value,
+                    isHover
+                }
+            }
+        );
+    }
+
+    public static opacityUpdated( opacity: number ) {
+        return new CustomEvent<OpacityUpdated>(
+            ThermalEvents.OPACITY_UPDATED,
+            {
+                detail: {
+                    opacity: opacity
+                }
+            }
+        );
+    }
+
+}
+

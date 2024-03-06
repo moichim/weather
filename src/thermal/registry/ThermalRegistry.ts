@@ -1,66 +1,73 @@
-import { ThermalFileSource } from "../reader/ThermalFileSource";
+import { ThermalFileSource } from "../file/ThermalFileSource";
 import { ThermalGroup } from "./ThermalGroup";
+import { ThermalRequest } from "./ThermalRequest";
 import { ThermalObjectContainer } from "./abstractions/ThermalObjectContainer";
-import { ThermalMinmaxOrUndefined, ThermalRangeOrUndefined, ThermalSourceAddedEventDetail } from "./interfaces";
+import { ThermalEventsFactory } from "./events";
+import { ThermalMinmaxOrUndefined, ThermalMinmaxType, ThermalRangeOrUndefined, ThermalRangeType, ThermalSourceAddedEventDetail } from "./interfaces";
 
 export class ThermalRegistry extends ThermalObjectContainer {
 
-    public static SOURCE_REGISTERED_EVENT = "sourceregistered";
 
-    protected groups: {
+    protected _groups: {
         [index: string]: ThermalGroup
     } = {}
+    public get groups() { return this._groups }
     protected getGroupsArray() {
-        return Object.values( this.groups );
+        return Object.values(this.groups);
+    }
+    protected isGroupRegistered(id: string) {
+        return this.groups[id] !== undefined;
+    }
+    public addOrGetGroup(
+        id: string
+    ) {
+        if (!this.isGroupRegistered(id)) {
+
+            const group = new ThermalGroup(this, id);
+            this.groups[id] = group;
+            this.dispatchEvent(
+                ThermalEventsFactory.groupInit(group)
+            );
+
+            return group;
+        }
+
+        return this.groups[ id ];
     }
 
-    protected sourcesByUrl: {
+
+
+
+
+    protected _sourcesByUrl: {
         [index: string]: ThermalFileSource
     } = {}
+    public get sourcesByUrl() { return this._sourcesByUrl; }
     protected getSourcesArray() {
-        return Object.values( this.sourcesByUrl );
+        return Object.values(this.sourcesByUrl);
     }
     protected getRegisteredUrls() {
-        return Object.keys( this.sourcesByUrl );
+        return Object.keys(this.sourcesByUrl);
     }
-    protected registerSource(
+    public registerSource(
         source: ThermalFileSource
     ) {
-        if ( ! this.getRegisteredUrls().includes( source.url ) ) {
+        if (!this.getRegisteredUrls().includes(source.url)) {
 
             // Assign the source
             this.sourcesByUrl[source.url] = source;
 
-            // Update the min max locally
-            if ( this.minmax === undefined ) {
-                this._minmax = { min: source.min, max: source.max };
-            } else if ( this.minmax !== undefined ) {
-                if ( this.minmax.min > source.min ) 
-                    this.minmax.min = source.min;
-                if ( this.minmax.max < source.max )
-                    this.minmax.max = source.max;
-            }
-
-            // Emit the minmax event
-            this.dispatchMinmaxEvent( false );
-
             // Emit the loaded event
-            this.dispatchSourceRegisterEvent( source );
+            this.dispatchEvent(ThermalEventsFactory.sourceRegistered(source));
+
+            return source;
 
         }
-    }
 
-    protected dispatchSourceRegisterEvent(
-        source: ThermalFileSource
-    ) {
-        this.dispatchEvent( new CustomEvent<ThermalSourceAddedEventDetail>(
-            ThermalRegistry.SOURCE_REGISTERED_EVENT,
-            {
-                detail: {
-                    source: source
-                }
-            }
-        ) );
+        return this.sourcesByUrl[source.url];
+    }
+    public isUrlRegistered(url: string) {
+        return Object.keys(this.sourcesByUrl).includes(url);
     }
 
 
@@ -69,44 +76,64 @@ export class ThermalRegistry extends ThermalObjectContainer {
      * Range
      */
 
-    /**
-     * Range set
-     * = propaguj do všech grup
-     * = ulož lokálně
-     * = emituj event
-     */
-    
-    public imposeRange( value: ThermalRangeOrUndefined ) {
+    public imposeRange(value: ThermalRangeOrUndefined) {
         this.range = value;
-        this.getGroupsArray().forEach( group => group.recieveRange( value ) );
-        this.dispatchRangeEvent( true )
     }
+
+    protected onRangeUpdated(value: ThermalRangeOrUndefined): void {
+        this.getGroupsArray().forEach(group => group.recieveRange(value));
+    }
+
+
+
 
     /**
      * Minmax
      */
-
-    /**
-     * Minmax set
-     * = propaguj do vsšch grup
-     * = ulož lokálně
-     * = emituj event
-     */
-    protected imposeMinmax( value:  ThermalMinmaxOrUndefined ) {
-        this.minmax = value;
-        if ( this.minmax !== undefined ) {
-            this.getGroupsArray().forEach( group => group.recieveMinmax( this.minmax ) );
+    public recalculateMinmax() {
+        this.minmax = this.calculateMinmaxFromGroups();
+        if ( this.minmax ) {
+            this.range = { from: this.minmax.min, to: this.minmax.max };
         }
     }
+
+    protected calculateMinmaxFromGroups() {
+
+        const groups = this.getGroupsArray();
+
+        if (groups.length === 0) {
+            return undefined;
+        }
+
+        const minmax = groups.reduce((state, current) => {
+
+            if (current.minmax === undefined) {
+                return state;
+            }
+
+            return {
+                min: current.minmax.min < state.min ? current.minmax.min : state.min,
+                max: current.minmax.max > state.max ? current.minmax.max : state.max
+            }
+
+        }, { min: Infinity, max: -Infinity });
+
+        return minmax;
+
+    }
+
+
 
 
     /**
      * Opacity
      */
-    public imposeOpacity( value: number ) {
+    public imposeOpacity(value: number) {
         this.opacity = value;
-        this.getGroupsArray().forEach( group => group.recieveOpacity( value ) );
-        this.dispatchOpacityEvent();
+    }
+
+    protected onOpacityUpdated(value: number): void {
+        this.getGroupsArray().forEach(group => group.recieveOpacity(value));
     }
 
 }

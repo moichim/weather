@@ -1,4 +1,4 @@
-import { ThermalFileSource } from '../reader/ThermalFileSource';
+import { ThermalFileSource } from '../file/ThermalFileSource';
 import AbstractParser from './AbstractParser';
 
 

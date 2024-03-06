@@ -1,6 +1,6 @@
 
 import { ThermalFileInstance } from "../file/ThermalFileInstance";
-import { ThermalFileSource } from "../reader/ThermalFileSource";
+import { ThermalFileSource } from "../file/ThermalFileSource";
 
 // Source registered
 export type ThermalSourceAddedEventDetail = {
@@ -39,11 +39,11 @@ export interface IThermalWithRange {
 
 // Min Max
 
-export interface IThermalWithMinMax {
+export interface ThermalMinmaxType {
     min: number,
     max: number
 }
-export type ThermalMinmaxOrUndefined = IThermalWithMinMax | undefined;
+export type ThermalMinmaxOrUndefined = ThermalMinmaxType | undefined;
 
 export type ThermalMinmaxEventDetail = {
     minmax: ThermalMinmaxOrUndefined,

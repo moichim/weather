@@ -1,44 +1,151 @@
 
 import { ThermalFileInstance } from "../file/ThermalFileInstance";
+import { ThermalFileSource } from "../file/ThermalFileSource";
 import { ThermalRegistry } from "./ThermalRegistry";
+import { ThermalFileRequest, ThermalRequest } from "./ThermalRequest";
 import { ThermalObjectContainer } from "./abstractions/ThermalObjectContainer";
-import { ThermalCursorGroupEventDetail, ThermalCursorPositionOrundefined, ThermalInstanceAddedEventDetail, ThermalMinmaxOrUndefined, ThermalRangeOrUndefined } from "./interfaces";
+import { ThermalEventsFactory } from "./events";
+import { ThermalCursorPositionOrundefined, ThermalMinmaxType, ThermalRangeOrUndefined } from "./interfaces";
 
 export class ThermalGroup extends ThermalObjectContainer {
 
-    public static INSTANCE_ADDED_EVENT = "instanceadded";
-    public static CURSOR_EVENT = "cursorevent";
+
+    public readonly hash = Math.random();
+
+    // Requesting
+    protected _loading: ThermalRequest[] = []
+
+    protected _isLoading: boolean = false;
+    public get isLoading() { return this._isLoading; }
+    protected set isLoading(value: boolean) {
+
+        if (value !== this._isLoading) {
+            this._isLoading = value;
+            
+            value
+                ? this.dispatchEvent(ThermalEventsFactory.groupLoadingStart(this))
+                : this.dispatchEvent( ThermalEventsFactory.groupLoadingEnd( this ) );
+        }
+
+    }
+
+    public requestFile(
+        thermalUrl: string,
+        visibleUrl?: string
+    ) {
+
+        if (this.isLoading === false)
+            this.isLoading = true;
+
+        this._loading.push(ThermalRequest.single(this, thermalUrl, visibleUrl));
+
+    }
+    public requestFiles(requests: ThermalFileRequest[]) {
+
+        if (this.isLoading === false)
+            this.isLoading = true;
+
+        this._loading = ThermalRequest.multiple(this, requests);
+
+    }
+    public async resolveQuery() {
+
+        // Perform the fetches
+        const result = await Promise.all(
+            this._loading.map(request => request.fetch())
+        );
+
+        // Process the requests
+        for (let file of result) {
+
+            if (file !== null) {
+
+                // This makes sure that there are no duplicite sources
+                file = this.registry.registerSource(file);
+
+                // Add the request in the group in a unified way
+                this.instantiateSource(file);
+
+            }
+
+        }
+
+        // Calculate the minmax
+
+        this.minmax = this.calculateMinMax();
+
+        this.registry.recalculateMinmax();
+
+        // Dispatch the event on the end
+        this.isLoading = false;
+
+    }
+
+    protected calculateMinMax() {
+
+        const instances = this.getInstancesArray();
+
+        if (instances.length === 0)
+            return undefined;
+        return instances.reduce((state, current) => {
+
+            if (current.min < state.min || current.max > state.max) {
+                return {
+                    min: current.min < state.min ? current.min : state.min,
+                    max: current.max > state.max ? current.max : state.max
+                }
+            }
+
+            return state;
+
+        }, { min: Infinity, max: -Infinity } as ThermalMinmaxType);
+    }
+
+    protected clampRangeWithinMinmax(): ThermalRangeOrUndefined {
+
+        // If there is no minmax, return undefined
+        if (this.minmax === undefined) {
+
+            return undefined;
+
+        }
+
+        // If there is a minmax but no range, create the range from minmax
+        else if (this.minmax !== undefined && this.range === undefined) {
+            return {
+                from: this.minmax.min,
+                to: this.minmax.max
+            }
+        }
+
+        // Otherwise make sure the range fits withnin the minmax
+
+        return this.range;
+
+    }
+
+
+
 
     protected instancesByUrl: {
         [index: string]: ThermalFileInstance
     } = {}
     public getInstancesArray() {
-        return Object.values( this.instancesByUrl );
+        return Object.values(this.instancesByUrl);
     }
     protected getInstancesUrls() {
-        return Object.keys( this.instancesByUrl );
+        return Object.keys(this.instancesByUrl);
     }
-    public recieveInstance(
-        instance: ThermalFileInstance
+    public instantiateSource(
+        source: ThermalFileSource
     ) {
-        if ( ! this.getInstancesUrls().includes( instance.url ) ) {
-            this.instancesByUrl[ instance.url ] = instance;
-            this.dispatchInstanceCreatedEvent( instance );
+        if (!this.getInstancesUrls().includes(source.url)) {
+            const instance = source.createInstance(this);
+            this.instancesByUrl[source.url] = instance;
+            this.dispatchEvent( ThermalEventsFactory.instanceCreated( instance, this ) );
         }
     }
 
-    protected dispatchInstanceCreatedEvent(
-        instance: ThermalFileInstance
-    ) {
-        this.dispatchEvent( new CustomEvent<ThermalInstanceAddedEventDetail>(
-            ThermalGroup.INSTANCE_ADDED_EVENT,
-            {
-                detail: {
-                    instance: instance
-                }
-            }
-        ) );
-    }
 
 
     public constructor(
@@ -49,33 +156,21 @@ export class ThermalGroup extends ThermalObjectContainer {
     }
 
 
-    public recieveRange( value: ThermalRangeOrUndefined ) {
+    public recieveRange(value: ThermalRangeOrUndefined) {
 
         // Store locally
         this.range = value;
-        const imposedValue = value
-            ? {from: value.from, to: value.to}
-            : { from: undefined, to: undefined }
-        
-        // Project in all instances
-        this.getInstancesArray().forEach( instance => {
-
-            //instance.setRangeFromTheOutside( imposedValue.from, imposedValue.to );
-
-        } );
-
-        // Dispatch event
-        this.dispatchRangeEvent( false );
 
     }
 
-    public recieveMinmax( value: ThermalMinmaxOrUndefined ) {
-        
-        // Store locally
-        this.minmax = value;
-        
-        // Dispatch event
-        this.dispatchMinmaxEvent( false );
+    protected onRangeUpdated( value: ThermalRangeOrUndefined ) {
+
+        // Project in all instances
+        if (value !== undefined) {
+            this.getInstancesArray().forEach(instance => {
+                instance.recieveRange(value);
+            });
+        }
 
     }
 
@@ -84,46 +179,28 @@ export class ThermalGroup extends ThermalObjectContainer {
 
     protected _cursorPosition: ThermalCursorPositionOrundefined;
     public get cursorPosition() { return this._cursorPosition }
-    
+
     public recieveCursorPosition(
         value: ThermalCursorPositionOrundefined
     ) {
         this._cursorPosition = value;
         this._isHover = value !== undefined;
-        this.getInstancesArray().forEach( instance => {
-            instance.recieveCursorPosition( value );
-        } );
-        this.dispatchCursorEvent( value, false );
+        this.getInstancesArray().forEach(instance => {
+            instance.recieveCursorPosition(value);
+        });
+        this.dispatchEvent( ThermalEventsFactory.cursorUpdated( this._isHover, this.cursorPosition, undefined ) );
 
-    }
-
-    protected dispatchCursorEvent(
-        value: ThermalCursorPositionOrundefined,
-        impose: boolean = false,
-    ) {
-        this.dispatchEvent( new CustomEvent<ThermalCursorGroupEventDetail>(
-            ThermalGroup.CURSOR_EVENT,
-            {
-                detail: {
-                    position: value,
-                    imposed: impose,
-                    isHover: value !== undefined
-                }
-            }
-        ) );
     }
 
 
 
     // Opacity
-    public recieveOpacity( value: number ) {
-
+    public recieveOpacity(value: number) {
         this.opacity = value;
+    }
 
+    protected onOpacityUpdated(value: number): void {
         this.getInstancesArray().forEach( instance => instance.recieveOpacity( value ) );
-
-        this.dispatchOpacityEvent();
-
     }
 
 }

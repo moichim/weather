@@ -27,8 +27,8 @@ export class ThermalLoader {
         thermalUrl: string,
         visibleUrl?: string
     ) {
-        const instance = new ThermalLoader( thermalUrl, visibleUrl );
-        return await instance.load();
+        const loader = new ThermalLoader( thermalUrl, visibleUrl );
+        return await loader.load();
     }
 
     /** INTERNAL - loads a file and parses it. */
@@ -56,7 +56,8 @@ export class ThermalLoader {
 
     /** INTERNAL - determine the file type and return the corresponding parser. */
     protected assignParserInstance( blob: Blob ) {
-        return new LrcParser( this.thermalUrl, blob );
+        console.log( this );
+        return new LrcParser( this.thermalUrl, blob, this.visibleUrl );
     }
 
     /** INTERNAL - return the current parser instance. */

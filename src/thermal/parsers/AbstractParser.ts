@@ -1,13 +1,12 @@
-import { ThermalFileSource } from "../reader/ThermalFileSource";
+import { ThermalFileSource } from "../file/ThermalFileSource";
 
 /** Implement to add a new thermal file parser. */
 export default abstract class AbstractParser {
 
-    protected url: string;
-
     public constructor(
-        url: string,
-        blob: Blob
+        protected url: string,
+        blob: Blob,
+        protected visibleUrl?: string
     ) {
         this.url = url;
         this.blob = blob;
@@ -16,6 +15,7 @@ export default abstract class AbstractParser {
 
     /** The only public endpoint. This method does all the business. */
     public async parse(): Promise<ThermalFileSource|null> {
+        console.log( "parsing", this );
         await this.init();
         await this.parseFile();
         return this.getThermalFile();
