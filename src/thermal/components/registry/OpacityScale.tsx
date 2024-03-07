@@ -17,7 +17,7 @@ export const OpacityScale: React.FC = props => {
     },[value]);
 
     return <Slider 
-        label="IR / VISU"
+        label="IR / Visible"
         step={0.1}
         showSteps={true}
         showTooltip={true}
