@@ -7,6 +7,7 @@ import { useRegistryListener } from "../context/useRegistryListener";
 import { ThermalGroup } from "./ThermalGroup";
 import { OpacityScale } from "./registry/OpacityScale";
 import { ThermalScale } from "./registry/ThermalScale";
+import { ThermalAbout } from "./info/ThermalAbout";
 
 type ProjectControllerProps = {
     scope: string
@@ -31,11 +32,12 @@ export const ProjectController: React.FC<ProjectControllerProps> = props => {
             height="10rem"
             isBordered={true}
         >
-            <NavbarBrand className="">
+            <NavbarBrand className="gap-4">
                 <div>
                     <p className="font-bold">Analýza časosběrného měření</p>
                     <p>Hromadné vyhodnocení termogramů.</p>
                 </div>
+                <ThermalAbout />
             </NavbarBrand>
             <NavbarContent className="gap-4" justify="center" style={{ minWidth: "50%" }}>
 

@@ -11,7 +11,7 @@ type ThermalScaleProps = {
     from: number,
     to: number,
     scaleOffset?: number,
-    onChange: ( value: SliderValue ) => void
+    onChange: (value: SliderValue) => void
 }
 
 export const ThermalScale: React.FC<ThermalScaleProps> = ({
@@ -38,42 +38,43 @@ export const ThermalScale: React.FC<ThermalScaleProps> = ({
         </div>)
     }, []);
 
-    const min = useMemo( () =>Math.floor( props.min ) - scaleOffset, [props.min, scaleOffset] );
+    const min = useMemo(() => Math.floor(props.min) - scaleOffset, [props.min, scaleOffset]);
 
-    const max = useMemo( () =>Math.ceil( props.max ) + scaleOffset, [props.max, scaleOffset] );
+    const max = useMemo(() => Math.ceil(props.max) + scaleOffset, [props.max, scaleOffset]);
 
-    const [value, setValue] = useState<[number,number]>( [ props.min, props.max ] );
+    const [value, setValue] = useState<[number, number]>([props.min, props.max]);
 
-    useEffect( () => {
+    const [final, setFinal] = useState<[number, number]>([props.min, props.max]);
 
-        const timeout = setTimeout( () => {
-            if ( props.from !== value[0] || props.to !== value[1] ) 
-            props.onChange( value )
-        }, 40 );
-        return () => clearTimeout( timeout );
-    }, [value] );
+    useEffect(() => {
+        if (props.from !== value[0] || props.to !== value[1])
+            props.onChange(final)
+    }, [final]);
 
-    useEffect( () => {
+    useEffect(() => {
 
-        const timeout = setTimeout( () => {
-            if ( props.from !== value[0] || props.to !== value[1] ) {
-                setValue( [props.from, props.to] );
+        const timeout = setTimeout(() => {
+            if (props.from !== value[0] || props.to !== value[1]) {
+                setValue([props.from, props.to]);
             }
-        }, 1 );
-        
-        //return () => clearTimeout( timeout );
-    }, [props.from, props.to] );
+        }, 1);
+
+        return () => clearTimeout(timeout);
+    }, [props.from, props.to]);
 
     return <Slider
         label={label}
 
         minValue={min}
         maxValue={max}
-        // defaultValue={[min, max]}
         value={value}
-        onChange={(data:SliderValue) => {
-            if (Array.isArray( data ))
-                setValue(data as [number,number])
+        onChange={(data: SliderValue) => {
+            if (Array.isArray(data))
+                setValue(data as [number, number])
+        }}
+        onChangeEnd={(data: SliderValue) => {
+            if (Array.isArray(data))
+                setFinal(data as [number, number])
         }}
 
         showTooltip={true}
@@ -87,7 +88,7 @@ export const ThermalScale: React.FC<ThermalScaleProps> = ({
             mark: "bg-black",
             track: "bg-gray-400 h-6 cursor-pointer",
             filler: "thermal-scale-gradient cursor-pointer",
-            
+
         }}
         renderThumb={renderThumb}
     />
