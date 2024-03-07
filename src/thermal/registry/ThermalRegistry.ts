@@ -1,7 +1,7 @@
 import { ThermalFileSource } from "../file/ThermalFileSource";
 import { ThermalGroup } from "./ThermalGroup";
 import { ThermalObjectContainer } from "./abstractions/ThermalObjectContainer";
-import { ThermalEventsFactory } from "./events";
+import { ThermalEvents, ThermalEventsFactory } from "./events";
 import { ThermalRangeOrUndefined } from "./interfaces";
 
 export class ThermalRegistry extends ThermalObjectContainer {
@@ -27,6 +27,22 @@ export class ThermalRegistry extends ThermalObjectContainer {
             this.dispatchEvent(
                 ThermalEventsFactory.groupInit(group)
             );
+
+            group.addEventListener( ThermalEvents.GROUP_LOADING_FINISH, () => {
+
+                const all = this.getGroupsArray().reduce( ( state, current ) => {
+                    if ( current.isLoading )
+                        return false;
+                    return state
+                }, true );
+
+                if ( all ) {
+
+                    this.dispatchEvent( ThermalEventsFactory.ready() );
+
+                }
+
+            } );
 
             return group;
         }

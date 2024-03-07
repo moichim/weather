@@ -17,7 +17,7 @@ export const ThermalInstance: React.FC<ThermalInstanceProps> = props => {
         if (ref !== null) {
             if (ref.current) {
                 props.instance.bind(ref.current);
-                props.instance.initialise();
+                // props.instance.initialise();
             }
         }
 

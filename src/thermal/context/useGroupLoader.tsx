@@ -2,9 +2,9 @@
 
 import { ThermalFileInstance } from "@/thermal/file/ThermalFileInstance";
 import { useCallback, useEffect, useState } from "react";
-import { ThermalGroup } from "../ThermalGroup";
-import { ThermalFileRequest } from "../ThermalRequest";
-import { ThermalEvents } from "../events";
+import { ThermalGroup } from "../registry/ThermalGroup";
+import { ThermalFileRequest } from "../registry/ThermalRequest";
+import { ThermalEvents } from "../registry/events";
 import { useGroupInstance } from "./useGroupInstance";
 
 export const useGroupLoader = (

@@ -1,5 +1,5 @@
-import { ProjectController } from "@/thermal/registry/components/ProjectController";
-import { RegistryContextProvider } from "@/thermal/registry/context/RegistryContext";
+import { ProjectController } from "@/thermal/components/ProjectController";
+import { RegistryContextProvider } from "@/thermal/context/RegistryContext";
 
 export default async function Home() {
 

@@ -16,7 +16,9 @@ export enum ThermalEvents {
     MINMAX_UPDATED = "minmaxevent",
     RANGE_UPDATED = "rangeevent",
     CURSOR_UPDATED = "cursorevent",
-    OPACITY_UPDATED = "opacityevent"
+    OPACITY_UPDATED = "opacityevent",
+
+    READY = "ready",
 
 }
 
@@ -183,6 +185,10 @@ export class ThermalEventsFactory {
                 }
             }
         );
+    }
+
+    public static ready() {
+        return new Event( ThermalEvents.READY )
     }
 
 }

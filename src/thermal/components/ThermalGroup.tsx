@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
-import { ThermalFileRequest } from "../ThermalRequest";
+import { ThermalFileRequest } from "../registry/ThermalRequest";
 import { useGroupListener } from "../context/useGroupListener";
 import { useGroupLoader } from "../context/useGroupLoader";
 import { ThermalInstance } from "./instance/ThermalInstance";
+import { Spinner } from "@nextui-org/react";
 
 type ThermalGroupProps = {
     groupId: string,
@@ -43,10 +44,9 @@ export const ThermalGroup: React.FC<ThermalGroupProps> = props => {
             </div>
 
             {loader.instances.length > 0 && <>
-                <div className="w-full h-[1px] bg-black mb-10"></div>
                 <div className="relative flex flex-wrap">
                     {loader.instances.map(instance => {
-                        return <ThermalInstance instance={instance} key={instance.id}/>
+                        return <ThermalInstance instance={instance} key={instance.id} />
                     })}
                 </div>
             </>}

@@ -41,8 +41,8 @@ export class ThermalFileInstance extends ThermalObjectBase {
     ) {
         super();
         this.id = `instance_${this.group.id}_${this.source.url}`;
-        this.horizontalLimit = ( this.width / 4 ) * 3;
-        this.verticalLimit = ( this.height / 4 ) * 3;
+        this.horizontalLimit = (this.width / 4) * 3;
+        this.verticalLimit = (this.height / 4) * 3;
     }
 
     // The root container
@@ -69,14 +69,14 @@ export class ThermalFileInstance extends ThermalObjectBase {
 
     protected _binded: boolean = false;
     public get binded() { return this._binded; }
-    protected set binded( value: boolean ) { this._binded = value; }
+    protected set binded(value: boolean) { this._binded = value; }
 
     public bind(
         container: HTMLDivElement
     ) {
 
-        if ( this.root ) {
-            console.info( "The instance already exists. Removing the old and proceeding creating the new." );
+        if (this.root) {
+            console.info("The instance already exists. Removing the old and proceeding creating the new.");
             // this.unbind();
             return;
         }
@@ -84,37 +84,21 @@ export class ThermalFileInstance extends ThermalObjectBase {
         this.root = container;
 
         // Create the visible layer if necessary
-        if ( this.visibleUrl ) {
-            this.visibleLayer = new VisibleLayer( this, this.visibleUrl );
+        if (this.visibleUrl) {
+            this.visibleLayer = new VisibleLayer(this, this.visibleUrl);
         }
 
         // Create the canvas layer
-        this.canvasLayer = new ThermalCanvasLayer( this );
+        this.canvasLayer = new ThermalCanvasLayer(this);
 
         // Create the cursor layer
-        this.cursorLayer = new ThermalCursorLayer( this );
+        this.cursorLayer = new ThermalCursorLayer(this);
 
         // Create the listener layer
         this.listenerLayer = ThermalDomFactory.createListener();
 
 
-        // Bind it all together
-        if ( this.visibleLayer )
-            this.root.appendChild( this.visibleLayer.getLayerRoot() );
-        this.root.appendChild( this.canvasLayer.getLayerRoot() );
-        this.root.appendChild( this.cursorLayer.getLayerRoot() );
-        this.root.appendChild( this.listenerLayer );
 
-        // Update the root element
-        this.root.setAttribute( "id", this.id );
-        this.root.dataset.binded = "true";
-        this.root.style.zIndex = "10";
-
-        // Mark this instance as binded
-        this.binded = true;
-
-        // Dispatch the event
-        this.dispatchEvent( new Event( ThermalFileInstance.BINDED ) );
 
 
     }
@@ -129,11 +113,34 @@ export class ThermalFileInstance extends ThermalObjectBase {
 
     public initialise() {
 
-        if ( this.binded && this.listenerLayer && this.root && this.cursorLayer ) {
+        if (this.root) {
+            // Bind it all together
+            if (this.visibleLayer)
+                this.root.appendChild(this.visibleLayer.getLayerRoot());
+            if (this.canvasLayer)
+                this.root.appendChild(this.canvasLayer.getLayerRoot());
+            if (this.cursorLayer)
+                this.root.appendChild(this.cursorLayer.getLayerRoot());
+            if (this.listenerLayer)
+                this.root.appendChild(this.listenerLayer);
+
+            // Update the root element
+            this.root.setAttribute("id", this.id);
+            this.root.dataset.binded = "true";
+            this.root.style.zIndex = "10";
+        }
+
+        // Mark this instance as binded
+        this.binded = true;
+
+        // Dispatch the event
+        this.dispatchEvent(new Event(ThermalFileInstance.BINDED));
+
+        if (this.binded && this.listenerLayer && this.root && this.cursorLayer) {
 
             this.draw();
 
-            this.listenerLayer.onmousemove = ( event: MouseEvent ) => {
+            this.listenerLayer.onmousemove = (event: MouseEvent) => {
 
                 // Show the cursor
                 this.cursorLayer!.show = true;
@@ -145,10 +152,10 @@ export class ThermalFileInstance extends ThermalObjectBase {
 
                 const aspect = client / parent;
 
-                const x = Math.round( event.offsetX * aspect );
-                const y = Math.round( event.offsetY * aspect );
+                const x = Math.round(event.offsetX * aspect);
+                const y = Math.round(event.offsetY * aspect);
 
-                this.imposeCursorPosition( { x, y } );
+                this.imposeCursorPosition({ x, y });
 
 
             }
@@ -159,18 +166,18 @@ export class ThermalFileInstance extends ThermalObjectBase {
 
                 this._isHover = false;
 
-                this.imposeCursorPosition( undefined );
+                this.imposeCursorPosition(undefined);
 
             }
 
-            this.dispatchEvent( new Event( ThermalFileInstance.INITIALISED ) );
+            this.dispatchEvent(new Event(ThermalFileInstance.INITIALISED));
 
         }
 
     }
 
     public draw() {
-        if ( this.binded && this.canvasLayer ) {
+        if (this.binded && this.canvasLayer) {
             this.canvasLayer.draw();
         }
     }
@@ -192,17 +199,17 @@ export class ThermalFileInstance extends ThermalObjectBase {
 
     public get range() { return this._range; }
     protected _range: ThermalRangeDataType = { from: this.min, to: this.max };
-    protected set range( value: ThermalRangeDataType ) {
+    protected set range(value: ThermalRangeDataType) {
         this._range = value;
-        this.dispatchEvent( ThermalEventsFactory.rangeUpdated( value ) );
-        this.onRangeUpdated( value );
+        this.dispatchEvent(ThermalEventsFactory.rangeUpdated(value));
+        this.onRangeUpdated(value);
     }
     public recieveRange(
         value: ThermalRangeDataType
     ) {
         this.range = value;
     }
-    protected onRangeUpdated( value: ThermalRangeDataType ) {
+    protected onRangeUpdated(value: ThermalRangeDataType) {
         this.draw();
     }
 
@@ -216,43 +223,43 @@ export class ThermalFileInstance extends ThermalObjectBase {
     protected _isHover: boolean = false;
     public get isHover() { return this._isHover }
 
-    protected _cursorValue: number|undefined;
+    protected _cursorValue: number | undefined;
     public get cursorValue() { return this._cursorValue; }
-    
+
     protected _cursorPosition: ThermalCursorPositionOrundefined;
     public get cursorPosition() { return this._cursorPosition; }
-    protected set cursorPosition( value: ThermalCursorPositionOrundefined ) {
+    protected set cursorPosition(value: ThermalCursorPositionOrundefined) {
 
         // Store it locally
         this._cursorPosition = value;
 
         // calculate and propagate the value
-        if ( this.cursorPosition !== undefined ) {
+        if (this.cursorPosition !== undefined) {
 
             // Calculate the value
-            this._cursorValue = this.getValueAtCoordinate( this.cursorPosition.x, this.cursorPosition.y );
+            this._cursorValue = this.getValueAtCoordinate(this.cursorPosition.x, this.cursorPosition.y);
 
             // Propagate the change to the DOM
-            if ( this.cursorLayer && this.cursorValue ) {
+            if (this.cursorLayer && this.cursorValue) {
                 this.cursorLayer.show = true;
-                this.cursorLayer.setCursor( this.cursorPosition.x, this.cursorPosition.y, this.cursorValue );
+                this.cursorLayer.setCursor(this.cursorPosition.x, this.cursorPosition.y, this.cursorValue);
             }
 
         } else {
 
             this._cursorValue = undefined;
-            if ( this.cursorLayer ) {
+            if (this.cursorLayer) {
                 this.cursorLayer.resetCursor();
                 this.cursorLayer.show = false;
             }
 
         }
 
-        this.dispatchEvent( ThermalEventsFactory.cursorUpdated(
+        this.dispatchEvent(ThermalEventsFactory.cursorUpdated(
             this.isHover,
             this.cursorPosition,
             this.cursorValue
-        ) );
+        ));
 
     }
 
@@ -267,7 +274,7 @@ export class ThermalFileInstance extends ThermalObjectBase {
     public imposeCursorPosition(
         position: ThermalCursorPositionOrundefined
     ) {
-        this.group.recieveCursorPosition( position );
+        this.group.recieveCursorPosition(position);
     }
 
 
@@ -291,12 +298,12 @@ export class ThermalFileInstance extends ThermalObjectBase {
 
     // opacity
 
-    public recieveOpacity( value: number ) {
+    public recieveOpacity(value: number) {
         this.opacity = value;
     }
 
     protected onOpacityUpdated(value: number): void {
-        if ( this.visibleLayer && this.binded && this.canvasLayer ) {
+        if (this.visibleLayer && this.binded && this.canvasLayer) {
             this.canvasLayer.opacity = value;
         }
     }

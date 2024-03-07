@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CursorEvent, MinmaxEvent, OpacityEvent, RangeEvent, ThermalEvents } from "../events";
-import { ThermalCursorPositionOrundefined, ThermalMinmaxOrUndefined, ThermalRangeOrUndefined } from "../interfaces";
+import { CursorEvent, MinmaxEvent, OpacityEvent, RangeEvent, ThermalEvents } from "../registry/events";
+import { ThermalCursorPositionOrundefined, ThermalMinmaxOrUndefined, ThermalRangeOrUndefined } from "../registry/interfaces";
 import { useGroupInstance } from "./useGroupInstance";
 
 

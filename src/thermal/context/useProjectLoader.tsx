@@ -4,7 +4,7 @@ import { FilesScopeContent } from "@/thermal/providers/lrcProvider";
 import { useQuery } from "@apollo/client";
 import gql from "graphql-tag";
 import { useCallback, useState } from "react";
-import { ThermalFileRequest } from "../ThermalRequest";
+import { ThermalFileRequest } from "../registry/ThermalRequest";
 
 export const PROJECT_FILES_QUERY = gql`
 

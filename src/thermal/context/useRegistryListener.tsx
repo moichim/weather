@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MinmaxEvent, OpacityEvent, RangeEvent, ThermalEvents } from "../events";
-import { ThermalMinmaxOrUndefined, ThermalRangeOrUndefined } from "../interfaces";
+import { MinmaxEvent, OpacityEvent, RangeEvent, ThermalEvents } from "../registry/events";
+import { ThermalMinmaxOrUndefined, ThermalRangeOrUndefined } from "../registry/interfaces";
 import { useRegistryContext } from "./RegistryContext";
 
 export const useRegistryListener = () => {
@@ -10,6 +10,7 @@ export const useRegistryListener = () => {
     const [opacity, setOpacity] = useState<number>(1);
     const [range, setRange] = useState<ThermalRangeOrUndefined>(undefined);
     const [minmax, setMinmax] = useState<ThermalMinmaxOrUndefined>(undefined);
+    const [ready, setReady] = useState<boolean>(false);
 
     const registry = useRegistryContext();
 
@@ -44,14 +45,40 @@ export const useRegistryListener = () => {
 
         registry.addEventListener(ThermalEvents.MINMAX_UPDATED, minmaxListener);
 
+        // Initialiser
+        const initialiser = (evt: Event) => {
+            setReady( true );
+        }
+        registry.addEventListener( ThermalEvents.READY, initialiser );
+
         return () => {
             registry.removeEventListener(ThermalEvents.OPACITY_UPDATED, opacityListener);
             registry.removeEventListener(ThermalEvents.RANGE_UPDATED, rangeListener);
             registry.removeEventListener(ThermalEvents.MINMAX_UPDATED, minmaxListener);
+            registry.removeEventListener( ThermalEvents.READY, initialiser );
         }
 
 
     }, [registry, setRange, setOpacity, setMinmax]);
+
+    useEffect( () => {
+
+        if (ready === false) {
+            return;
+        }
+
+        console.log( "prej jste ready!" );
+
+        const timeout = setTimeout( () => {
+            console.log( "Tak já se načtu" );
+            Object.values( registry.groups ).forEach( group => {
+                group.getInstancesArray().forEach( instance => instance.initialise() );
+            } );
+        }, 20 );
+
+        return () => clearTimeout( timeout );
+
+    }, [ready] );
 
     useEffect(() => {
 
@@ -83,6 +110,7 @@ export const useRegistryListener = () => {
     return {
         range, setRange,
         opacity, setOpacity,
-        minmax
+        minmax,
+        ready
     }
 }

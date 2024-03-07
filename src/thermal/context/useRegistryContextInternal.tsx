@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { ThermalRegistry } from "../ThermalRegistry";
+import { ThermalRegistry } from "../registry/ThermalRegistry";
 
 export const useRegistryContextInternal = () => {
 

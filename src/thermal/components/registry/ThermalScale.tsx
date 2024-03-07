@@ -45,20 +45,21 @@ export const ThermalScale: React.FC<ThermalScaleProps> = ({
     const [value, setValue] = useState<[number,number]>( [ props.min, props.max ] );
 
     useEffect( () => {
+
         const timeout = setTimeout( () => {
             if ( props.from !== value[0] || props.to !== value[1] ) 
             props.onChange( value )
-        }, 100 );
+        }, 40 );
         return () => clearTimeout( timeout );
     }, [value] );
 
     useEffect( () => {
 
-        // const timeout = setTimeout( () => {
+        const timeout = setTimeout( () => {
             if ( props.from !== value[0] || props.to !== value[1] ) {
                 setValue( [props.from, props.to] );
             }
-        // }, 1 );
+        }, 1 );
         
         //return () => clearTimeout( timeout );
     }, [props.from, props.to] );
@@ -78,13 +79,15 @@ export const ThermalScale: React.FC<ThermalScaleProps> = ({
         showTooltip={true}
         showSteps={true}
         step={step}
+        showOutline={true}
 
         color="foreground"
         classNames={{
             base: "px-1 min-w-screen",
             mark: "bg-black",
-            track: "bg-gray-400 h-6",
-            filler: "thermal-scale-gradient"
+            track: "bg-gray-400 h-6 cursor-pointer",
+            filler: "thermal-scale-gradient cursor-pointer",
+            
         }}
         renderThumb={renderThumb}
     />
