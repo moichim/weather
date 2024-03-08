@@ -122,8 +122,6 @@ export const ThermalInstance: React.FC<ThermalInstanceProps> = ({
                                     <div>Maximální teplota: {content.max} °C</div>
                                 </div>
 
-                                <h2>URL adresy</h2>
-
                                 {detail && <>
                                     <ThermalInstance
                                         instance={detail}
