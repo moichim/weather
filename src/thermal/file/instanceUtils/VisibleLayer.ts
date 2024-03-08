@@ -2,6 +2,7 @@ import { ThermalFileInstance } from "../ThermalFileInstance";
 import { AbstractLayer } from "./AbstractLayer";
 import ThermalDomFactory from "./domFactories";
 
+/** Contains the visible image. Needs to be placed on the bottom. */
 export class VisibleLayer extends AbstractLayer {
 
     protected container: HTMLDivElement;
@@ -28,6 +29,11 @@ export class VisibleLayer extends AbstractLayer {
 
     public getLayerRoot(): HTMLElement {
         return this.container;
+    }
+
+    protected onDestroy(): void {
+        this.image.remove();
+        this.container.remove();
     }
 
 

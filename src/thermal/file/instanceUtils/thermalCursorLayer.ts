@@ -2,6 +2,7 @@ import { ThermalFileInstance } from "../ThermalFileInstance";
 import { AbstractLayer } from "./AbstractLayer";
 import ThermalDomFactory from "./domFactories";
 
+/** Displays the cursor pointer and its value */
 export default class ThermalCursorLayer extends AbstractLayer {
 
     protected layerRoot: HTMLDivElement;
@@ -120,6 +121,14 @@ export default class ThermalCursorLayer extends AbstractLayer {
 
     public getLayerRoot(): HTMLDivElement {
         return this.layerRoot;
+    }
+
+    protected onDestroy(): void {
+        this.label.remove();
+        this.axisX.remove();
+        this.axisY.remove();
+        this.center.remove();
+        this.layerRoot.remove();
     }
 
 

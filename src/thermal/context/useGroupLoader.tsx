@@ -28,7 +28,7 @@ export const useGroupLoader = (
         group.requestFiles(files);
         group.resolveQuery();
 
-    }, [groupId, group]);
+    }, [groupId]);
 
     // Mirrir the loading state
     useEffect(() => {

@@ -61,6 +61,9 @@ export default class ThermalDomFactory {
         listener.style.position = "absolute";
         listener.style.top = "0px";
         listener.style.left = "0px";
+        listener.style.cursor = "pointer";
+        listener.setAttribute( "id", ( Math.random() ).toString() );
+
         return listener;
     }
 

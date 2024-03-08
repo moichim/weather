@@ -1,3 +1,5 @@
+"use client";
+
 
 import { ThermalFileInstance } from "../file/ThermalFileInstance";
 import { ThermalFileSource } from "../file/ThermalFileSource";
@@ -33,6 +35,32 @@ export class ThermalGroup extends ThermalObjectContainer {
 
     public readonly hash = Math.random();
 
+
+
+    public constructor(
+        public readonly registry: ThermalRegistry,
+        public readonly id: string
+    ) {
+        super();
+    }
+
+
+    protected onDestroySelf() {
+
+        this.getInstancesArray().forEach( instance => instance.destroySelf() );
+
+    }
+
+
+
+
+    /**
+     * Loading of the files
+     */
+
+
+
+
     // Requesting
     protected _loading: ThermalRequest[] = []
 
@@ -42,6 +70,8 @@ export class ThermalGroup extends ThermalObjectContainer {
 
         if (value !== this._isLoading) {
             this._isLoading = value;
+
+            console.log( "změna načítání", this.id, value );
             
             value
                 ? this.dispatchEvent(ThermalEventsFactory.groupLoadingStart(this))
@@ -93,14 +123,37 @@ export class ThermalGroup extends ThermalObjectContainer {
 
         // Calculate the minmax
 
-        this.minmax = this.calculateMinMax();
+        this.recalculateParameters();
 
-        this.registry.recalculateMinmax();
+        this.registry.recalculateParameters();
 
         // Dispatch the event on the end
         this.isLoading = false;
 
     }
+
+    public removeInstance(
+        url: string
+    ): void {
+
+        const instance = this.instancesByUrl[ url ];
+        instance.destroySelf();
+        delete this.instancesByUrl[ url ];
+        this.recalculateParameters();
+
+    }
+
+
+
+
+
+    /**
+     * Recalculation of parameters
+     */
+    public recalculateParameters(): void {
+        this.minmax = this.calculateMinMax();
+    }
+
 
     protected calculateMinMax() {
 
@@ -148,33 +201,68 @@ export class ThermalGroup extends ThermalObjectContainer {
 
 
 
-    protected instancesByUrl: {
+
+
+
+    /**
+     * Activation
+     */
+
+    protected onRecieveActivationStatus(status: boolean): void {
+
+        this.getInstancesArray().forEach( instance => instance.recieveActivationStatus( status ) );
+
+    }
+
+
+    protected onImposeActivationStatus(status: boolean): void {
+        
+        this.onRecieveActivationStatus( status );
+
+        this.registry.recalculateParameters();
+
+    }
+
+
+
+
+
+
+    protected _instancesByUrl: {
         [index: string]: ThermalFileInstance
     } = {}
+    public get instancesByUrl() { return this._instancesByUrl }
     public getInstancesArray() {
-        return Object.values(this.instancesByUrl);
+        return Object.values(this._instancesByUrl);
     }
     protected getInstancesUrls() {
-        return Object.keys(this.instancesByUrl);
+        return Object.keys(this._instancesByUrl);
     }
     public instantiateSource(
         source: ThermalFileSource
     ) {
         if (!this.getInstancesUrls().includes(source.url)) {
             const instance = source.createInstance(this);
-            this.instancesByUrl[source.url] = instance;
+            this._instancesByUrl[source.url] = instance;
             this.dispatchEvent( ThermalEventsFactory.instanceCreated( instance, this ) );
+            return instance;
+        } else {
+            return this.instancesByUrl[ source.url ];
         }
     }
 
 
 
-    public constructor(
-        public readonly registry: ThermalRegistry,
-        public readonly id: string
-    ) {
-        super();
-    }
+    
+
+
+
+
+
+
+    /**
+     * Range
+     */
 
 
     public recieveRange(value: ThermalRangeOrUndefined) {
@@ -215,7 +303,13 @@ export class ThermalGroup extends ThermalObjectContainer {
 
 
 
-    // Opacity
+
+
+
+    /**
+     * Opacity
+     */
+
     public recieveOpacity(value: number) {
         this.opacity = value;
     }

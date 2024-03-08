@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { useRegistryContext } from "./RegistryContext";
+import { ThermalEventsFactory } from "../registry/events";
 
 /** 
  * Returns the `ThermalGroup` instance 
@@ -9,14 +10,20 @@ import { useRegistryContext } from "./RegistryContext";
  * Creates the instance by ID or return the existing one.
 */
 export const useGroupInstance = (
-    groupId: string
+    groupId: string,
+    forceReady: boolean = false
 ) => {
 
     const registry = useRegistryContext();
 
     const group = useMemo( () => {
 
-        return registry.addOrGetGroup( groupId );
+        const g = registry.addOrGetGroup( groupId );
+        if ( forceReady ) {
+            g.dispatchEvent( ThermalEventsFactory.groupLoadingEnd( g ) )
+        }
+
+        return g;
 
     }, [groupId] );
 

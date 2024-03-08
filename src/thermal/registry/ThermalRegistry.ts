@@ -1,3 +1,5 @@
+"use client";
+
 import { ThermalFileSource } from "../file/ThermalFileSource";
 import { ThermalGroup } from "./ThermalGroup";
 import { ThermalObjectContainer } from "./abstractions/ThermalObjectContainer";
@@ -18,7 +20,40 @@ import { ThermalRangeOrUndefined } from "./interfaces";
  * - ThermalEvents.READY
  */
 export class ThermalRegistry extends ThermalObjectContainer {
+    
 
+    public readonly hash = Math.random();
+
+    protected onDestroySelf(): void {
+        this.getGroupsArray().forEach( group => group.destroySelf() );
+    }
+
+
+
+
+
+    /** 
+     * Activation status 
+    */
+
+
+    protected onRecieveActivationStatus(status: boolean): void {
+        this.getGroupsArray().forEach( group => group.recieveActivationStatus( status ) );
+    }
+
+    protected onImposeActivationStatus(status: boolean): void {
+        this.onRecieveActivationStatus( status );
+    }
+
+
+
+
+
+
+
+    /**
+     * Groups
+     */
 
     protected _groups: {
         [index: string]: ThermalGroup
@@ -63,8 +98,26 @@ export class ThermalRegistry extends ThermalObjectContainer {
         return this.groups[id];
     }
 
+    public removeGroup( id: string ) {
+
+        const group = this.groups[ id ];
+
+        if ( group ) {
+
+            group.destroySelf();
+
+            delete this.groups[ id ];
+
+            this.recalculateMinmax();
+        }
+
+    }
 
 
+
+    /**
+     * Sources handling
+     */
 
 
     protected _sourcesByUrl: {
@@ -101,6 +154,19 @@ export class ThermalRegistry extends ThermalObjectContainer {
 
 
     /**
+     * Parameters recalculation
+     */
+
+    public recalculateParameters(): void {
+        this.recalculateMinmax();
+    }
+
+
+
+
+
+
+    /**
      * Range
      */
 
@@ -111,6 +177,8 @@ export class ThermalRegistry extends ThermalObjectContainer {
     protected onRangeUpdated(value: ThermalRangeOrUndefined): void {
         this.getGroupsArray().forEach(group => group.recieveRange(value));
     }
+
+
 
 
 
@@ -153,6 +221,8 @@ export class ThermalRegistry extends ThermalObjectContainer {
 
 
 
+
+
     /**
      * Opacity
      */
@@ -163,5 +233,7 @@ export class ThermalRegistry extends ThermalObjectContainer {
     protected onOpacityUpdated(value: number): void {
         this.getGroupsArray().forEach(group => group.recieveOpacity(value));
     }
+
+
 
 }

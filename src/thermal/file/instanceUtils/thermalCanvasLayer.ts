@@ -3,6 +3,7 @@ import { ThermalFileInstance } from "../ThermalFileInstance";
 import { AbstractLayer } from "./AbstractLayer";
 import ThermalDomFactory from "./domFactories";
 
+/** Displays the canvas and renders it */
 export class ThermalCanvasLayer extends AbstractLayer {
 
     protected container: HTMLDivElement;
@@ -46,6 +47,11 @@ export class ThermalCanvasLayer extends AbstractLayer {
 
     public getLayerRoot(): HTMLElement {
         return this.container;
+    }
+
+    protected onDestroy(): void {
+        this.canvas.remove();
+        this.container.remove();
     }
 
     /** Returns an array of 255 RGB colors */

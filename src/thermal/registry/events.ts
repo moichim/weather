@@ -1,7 +1,7 @@
 import { ThermalFileInstance } from "../file/ThermalFileInstance";
 import { ThermalFileSource } from "../file/ThermalFileSource";
 import { ThermalGroup } from "./ThermalGroup";
-import { ThermalCursorPositionOrundefined, ThermalMinmaxOrUndefined, ThermalRangeOrUndefined } from "./interfaces";
+import { ThermalCursorPositionOrundefined, ThermalMinmaxOrUndefined, ThermalMinmaxType, ThermalRangeOrUndefined } from "./interfaces";
 
 export enum ThermalEvents {
 
@@ -15,10 +15,16 @@ export enum ThermalEvents {
     INSTANCE_BINDED = "instancebinded",
     INSTANCE_INITIALISED = "instanceinitialised",
 
+    OBJECT_DESTROYED = "objectremoved",
+    OBJECT_DEACTIVATED = "objectdeactivated",
+    OBJECT_ACTIVATED = "objectactivated",
+
     MINMAX_UPDATED = "minmaxevent",
     RANGE_UPDATED = "rangeevent",
     CURSOR_UPDATED = "cursorevent",
     OPACITY_UPDATED = "opacityevent",
+
+    INSTANCE_DETAIL_EMITTED = "instancedetailemitted",
 
     READY = "ready",
 
@@ -62,6 +68,17 @@ export type CursorEvent = CustomEvent<CursorUpdated>
 // Opacity event
 type OpacityUpdated = { opacity: number }
 export type OpacityEvent = CustomEvent<OpacityUpdated>;
+
+// Cursor event
+export type InstanceDetailEmittedDetail = {
+    min: number,
+    max: number,
+    time: number,
+    url: string,
+    visibleUrl?: string,
+    filename: string
+}
+export type InstanceDetailEmitted = CustomEvent<InstanceDetailEmittedDetail>
 
 /** All thermal events need to be created through this factory */
 export class ThermalEventsFactory {
@@ -191,6 +208,36 @@ export class ThermalEventsFactory {
 
     public static ready() {
         return new Event( ThermalEvents.READY )
+    }
+
+    public static destroyed() {
+        return new Event( ThermalEvents.OBJECT_DESTROYED );
+    }
+
+    public static activated() {
+        return new Event( ThermalEvents.OBJECT_ACTIVATED );
+    }
+
+    public static deactivated() {
+        return new Event( ThermalEvents.OBJECT_DEACTIVATED );
+    }
+
+    public static emitInstanceDetail(
+        instance: ThermalFileInstance
+    ) {
+        return new CustomEvent<InstanceDetailEmittedDetail>(
+            ThermalEvents.INSTANCE_DETAIL_EMITTED,
+            {
+                detail: {
+                    min: instance.min,
+                    max: instance.max,
+                    time: instance.timestamp,
+                    url: instance.url,
+                    visibleUrl: instance.visibleUrl,
+                    filename: instance.url.substring( instance.url.lastIndexOf("/") + 1 )
+                }
+            }
+        );
     }
 
 }

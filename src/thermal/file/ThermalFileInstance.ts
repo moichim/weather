@@ -8,6 +8,7 @@ import { VisibleLayer } from "./instanceUtils/VisibleLayer";
 import ThermalDomFactory from "./instanceUtils/domFactories";
 import { ThermalCanvasLayer } from "./instanceUtils/thermalCanvasLayer";
 import ThermalCursorLayer from "./instanceUtils/thermalCursorLayer";
+import { ThermalListenerLayer } from "./instanceUtils/thermalListenerLayer";
 
 /**
  * Instance of a thermal file takes care of its display and user interactions
@@ -35,6 +36,7 @@ import ThermalCursorLayer from "./instanceUtils/thermalCursorLayer";
  * - ThermalEvents.CURSOR_UPDATED
  */
 export class ThermalFileInstance extends ThermalObjectBase {
+    
 
 
     // Core properties are mirrored from the source
@@ -56,6 +58,7 @@ export class ThermalFileInstance extends ThermalObjectBase {
     protected readonly horizontalLimit: number;
     protected readonly verticalLimit: number;
 
+
     public constructor(
         protected readonly source: ThermalFileSource,
         protected readonly group: ThermalGroup
@@ -65,6 +68,14 @@ export class ThermalFileInstance extends ThermalObjectBase {
         this.horizontalLimit = (this.width / 4) * 3;
         this.verticalLimit = (this.height / 4) * 3;
     }
+
+
+    protected onDestroySelf() {
+        this.clearDom();
+    }
+
+
+
 
     // The root container
     public root: HTMLDivElement | null = null;
@@ -79,26 +90,28 @@ export class ThermalFileInstance extends ThermalObjectBase {
     protected cursorLayer: ThermalCursorLayer | null = null;
 
     // The listener layer
-    protected listenerLayer: HTMLDivElement | null = null;
+    protected listenerLayer: ThermalListenerLayer | null = null;
 
     protected palette = ThermalPalettes.IRON;
 
 
 
 
-    // DOM bindings
+    /**
+     * Dom bindings
+     */
 
     protected _binded: boolean = false;
     public get binded() { return this._binded; }
     protected set binded(value: boolean) { this._binded = value; }
 
-    public bind(
+    public buildDom(
         container: HTMLDivElement
     ) {
 
-        if (this.root) {
-            console.info("The instance already exists. Removing the old and proceeding creating the new.");
-            // this.unbind();
+        if ( this.root !== null || this.binded === true ) {
+            console.info("The instance already has its DOM.");
+            // this.clearDom();
             return;
         }
 
@@ -116,7 +129,7 @@ export class ThermalFileInstance extends ThermalObjectBase {
         this.cursorLayer = new ThermalCursorLayer(this);
 
         // Create the listener layer
-        this.listenerLayer = ThermalDomFactory.createListener();
+        this.listenerLayer = new ThermalListenerLayer( this );
 
 
 
@@ -124,26 +137,40 @@ export class ThermalFileInstance extends ThermalObjectBase {
 
     }
 
-    protected unbind() {
-        this.root?.remove();
+    protected clearDom() {
+        this.binded = false;
+        if ( this.root )
+            this.root.dataset.binded = "false";
+        // this.root?.remove();
+        this.visibleLayer?.destroy();
+        this.canvasLayer?.destroy();
+        this.cursorLayer?.destroy();
+        this.listenerLayer?.destroy();
         this.visibleLayer = null;
         this.canvasLayer = null;
         this.cursorLayer = null;
         this.listenerLayer = null;
+
     }
 
-    public initialise() {
+
+
+    /**
+     * Activation status
+     */
+
+    protected onActivateInternal() {
 
         if (this.root) {
-            // Bind it all together
+
             if (this.visibleLayer)
-                this.root.appendChild(this.visibleLayer.getLayerRoot());
+                this.visibleLayer.mount();
             if (this.canvasLayer)
-                this.root.appendChild(this.canvasLayer.getLayerRoot());
+                this.canvasLayer.mount();
             if (this.cursorLayer)
-                this.root.appendChild(this.cursorLayer.getLayerRoot());
+                this.cursorLayer.mount();
             if (this.listenerLayer)
-                this.root.appendChild(this.listenerLayer);
+                this.listenerLayer.mount();
 
             // Update the root element
             this.root.setAttribute("id", this.id);
@@ -154,55 +181,103 @@ export class ThermalFileInstance extends ThermalObjectBase {
         // Mark this instance as binded
         this.binded = true;
 
-        // Dispatch the event
-        this.dispatchEvent( new Event( ThermalEvents.INSTANCE_BINDED ) );
-
-        if (this.binded && this.listenerLayer && this.root && this.cursorLayer) {
+        if (this.active && this.listenerLayer && this.root && this.cursorLayer) {
 
             this.draw();
 
-            this.listenerLayer.onmousemove = (event: MouseEvent) => {
+            this.listenerLayer.getLayerRoot().onmousemove = (event: MouseEvent) => {
 
                 // Show the cursor
                 this.cursorLayer!.show = true;
-
+        
                 this._isHover = true;
-
+        
                 const client = this.width;
                 const parent = this.root!.clientWidth;
-
+        
                 const aspect = client / parent;
-
+        
                 const x = Math.round(event.offsetX * aspect);
                 const y = Math.round(event.offsetY * aspect);
-
+        
                 this.imposeCursorPosition({ x, y });
+        
+            };
 
-
-            }
-
-            this.listenerLayer.onmouseleave = () => {
+            this.listenerLayer.getLayerRoot().onmouseleave = () => {
 
                 this.cursorLayer!.show = false;
-
+        
                 this._isHover = false;
-
+        
                 this.imposeCursorPosition(undefined);
+        
+            };
 
-            }
+            this.listenerLayer.getLayerRoot().onclick = () => {
+                if ( this._emitsDetail ) 
+                    this.dispatchEvent( ThermalEventsFactory.emitInstanceDetail( this ) );
+            };
 
-            this.dispatchEvent(new Event(ThermalEvents.INSTANCE_INITIALISED));
+            
 
         }
 
     }
 
+    protected onDeactivateInternal() {
+
+        if ( this.visibleLayer ) {
+            this.visibleLayer.unmount();
+        }
+
+    }
+
+    protected onRecieveActivationStatus(status: boolean): void {
+        if ( status ) this.onActivateInternal();
+        else this.onDeactivateInternal();
+    }
+
+    protected onImposeActivationStatus(status: boolean): void {
+        this.onRecieveActivationStatus( status );
+        this.group.recalculateParameters();
+    }
+
+    public recalculateParameters(): void {}
+
+
+
+    public emit = () => {
+        this.dispatchEvent( ThermalEventsFactory.emitInstanceDetail( this ) );
+    }
+
+
+    /**
+     * User interactions
+     */
+    protected _emitsDetail: boolean = true;
+    public get emitsDetail() { return this._emitsDetail; }
+    public set emitsDetail( value: boolean ) {
+        this._emitsDetail = value;
+        if ( this.listenerLayer ) {
+            this.listenerLayer.getLayerRoot().style.cursor = value ? "pointer" : "normal";
+        }
+    }
+
+
+
+    /**
+     * Drawing
+     */
+
     public draw() {
-        if (this.binded && this.canvasLayer) {
+        if (this.active && this.canvasLayer) {
             this.canvasLayer.draw();
         }
     }
 
+
+    
 
 
 
@@ -324,7 +399,7 @@ export class ThermalFileInstance extends ThermalObjectBase {
     }
 
     protected onOpacityUpdated(value: number): void {
-        if (this.visibleLayer && this.binded && this.canvasLayer) {
+        if (this.visibleLayer && this.canvasLayer) {
             this.canvasLayer.opacity = value;
         }
     }

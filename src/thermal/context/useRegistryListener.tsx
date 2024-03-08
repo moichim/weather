@@ -70,12 +70,9 @@ export const useRegistryListener = () => {
             return;
         }
 
-        console.log( "prej jste ready!" );
-
         const timeout = setTimeout( () => {
-            console.log( "Tak já se načtu" );
             Object.values( registry.groups ).forEach( group => {
-                group.getInstancesArray().forEach( instance => instance.initialise() );
+                group.getInstancesArray().forEach( instance => instance.recieveActivationStatus( true ) );
             } );
         }, 20 );
 
@@ -114,6 +111,7 @@ export const useRegistryListener = () => {
         range, setRange,
         opacity, setOpacity,
         minmax,
-        ready
+        ready,
+        registry
     }
 }
