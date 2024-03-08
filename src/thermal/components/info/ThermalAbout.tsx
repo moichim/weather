@@ -42,7 +42,7 @@ export const ThermalAbout: React.FC = () => {
 
                                     <ul className="list-disc ml-4">
                                         <li>Obsahuje teplotní data ve stupních Celsia</li>
-                                        <li>Obsahuje časovoz značku a další metadata</li>
+                                        <li>Obsahuje časovou značku a další metadata</li>
                                         <li>Souborový formát vznikl na <Link href="https://irt.zcu.cz/cs/" target="_blank" className="text-primary">NTC ZČU v Plzni</Link> pro potřeby vzdělávacích termokamer</li>
                                     </ul>
 
