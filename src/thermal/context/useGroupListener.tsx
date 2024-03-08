@@ -5,7 +5,9 @@ import { CursorEvent, MinmaxEvent, OpacityEvent, RangeEvent, ThermalEvents } fro
 import { ThermalCursorPositionOrundefined, ThermalMinmaxOrUndefined, ThermalRangeOrUndefined } from "../registry/interfaces";
 import { useGroupInstance } from "./useGroupInstance";
 
-
+/**
+ * Binds the instance properties
+ */
 export const useGroupListener = (
     groupId: string
 ) => {

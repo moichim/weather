@@ -7,6 +7,11 @@ import { ThermalFileRequest } from "../registry/ThermalRequest";
 import { ThermalEvents } from "../registry/events";
 import { useGroupInstance } from "./useGroupInstance";
 
+/**
+ * Handles files and instances of a group
+ * 
+ * Provides methods for batch loading of files. Exposes the list of instances in the group.
+ */
 export const useGroupLoader = (
     groupId: string
 ) => {

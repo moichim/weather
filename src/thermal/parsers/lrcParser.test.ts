@@ -1,9 +1,8 @@
-import {expect, jest, describe,  test} from '@jest/globals';
-import LrcParser from './lrcParser';
+import { describe, expect, test } from '@jest/globals';
+import { ThermalFileSource } from '../file/ThermalFileSource';
 import { ThermalLoader } from './thermalLoader';
-import ThermalFile from './thermalFile';
 
-export const SAMPLE_URL = "http://localhost:3000/sample.lrc";
+export const SAMPLE_URL = "http://localhost:3000/sample2.lrc";
 
 describe( "ThermalLoader", () => {
     
@@ -38,7 +37,7 @@ describe( "ThermalLoader", () => {
 
         const file = await ThermalLoader.fromUrl( SAMPLE_URL );
 
-        expect( file ).toBeInstanceOf( ThermalFile );
+        expect( file ).toBeInstanceOf( ThermalFileSource );
 
     } );
 

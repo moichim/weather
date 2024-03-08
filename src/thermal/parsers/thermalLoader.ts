@@ -54,7 +54,7 @@ export class ThermalLoader {
 
     }
 
-    /** INTERNAL - determine the file type and return the corresponding parser. */
+    /** INTERNAL - determine the file type and return the corresponding parser. @todo In the future, new parsers shall be added. */
     protected assignParserInstance( blob: Blob ) {
         return new LrcParser( this.thermalUrl, blob, this.visibleUrl );
     }

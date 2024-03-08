@@ -3,6 +3,9 @@
 import { useMemo } from "react";
 import { ThermalRegistry } from "../registry/ThermalRegistry";
 
+/**
+ * Creates and stores the global instance of the `ThermalRegistry`
+ */
 export const useRegistryContextInternal = () => {
 
     const registry = useMemo(() => {

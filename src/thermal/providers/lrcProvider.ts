@@ -1,6 +1,10 @@
 import gql from "graphql-tag";
 import { getScopeContent, getScopeFolders } from "./utils/lrcProviderUtils";
 
+/**
+ * The GraphQL provider of thermal files and groups
+ */
+
 export const thermoTypeDefs = gql`
 
     extend type Query {

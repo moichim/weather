@@ -13,6 +13,11 @@ type ProjectControllerProps = {
     scope: string
 }
 
+/**
+ * The master controller of a scope.
+ * 
+ * There may be more scopes. The parameter `scope` corresponds to values returned by `/graphql/google/googleProvider`
+ */
 export const ProjectController: React.FC<ProjectControllerProps> = props => {
 
     const { groups, loading } = useProjectLoader(props.scope);

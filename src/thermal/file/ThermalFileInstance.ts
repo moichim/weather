@@ -1,7 +1,7 @@
 import { ThermalPalettes } from "./palettes";
 import { ThermalGroup } from "../registry/ThermalGroup";
 import { ThermalObjectBase } from "../registry/abstractions/ThermalObjectBase";
-import { ThermalEventsFactory } from "../registry/events";
+import { ThermalEvents, ThermalEventsFactory } from "../registry/events";
 import { ThermalCursorPositionOrundefined, ThermalRangeDataType } from "../registry/interfaces";
 import { ThermalFileSource } from "./ThermalFileSource";
 import { VisibleLayer } from "./instanceUtils/VisibleLayer";
@@ -9,11 +9,32 @@ import ThermalDomFactory from "./instanceUtils/domFactories";
 import { ThermalCanvasLayer } from "./instanceUtils/thermalCanvasLayer";
 import ThermalCursorLayer from "./instanceUtils/thermalCursorLayer";
 
+/**
+ * Instance of a thermal file takes care of its display and user interactions
+ * 
+ * Creation:
+ * - instances are created in `ThermalFileSource.createInstance()`
+ * - once the instance is created, it is necessary to do the following:
+ *   - bind the instance to an empty `HTMLDivElement`
+ *   - initialise the instance once it is binded
+ * 
+ * Initialisation
+ * - binds the instance's inner DOM to the container
+ * - creates event listeners for user interactions
+ * - performs the initial `draw()` of the `ThermalCanvasLayer`
+ * 
+ * Integration
+ * - as part of a `ThermalGroup`, the `ThermalFileInstance` synchronises its properties with the group
+ * 
+ * Events:
+ * - ThermalEvents.INSTANCE_BINDED
+ * - ThermalEvents.INSTANCE_INITIALISED
+ * - ThermalEvents.RANGE_UPDATED
+ * - ThermalEvents.MINMAX_UPDATED
+ * - ThermalEvents.OPACITY_UPDATED
+ * - ThermalEvents.CURSOR_UPDATED
+ */
 export class ThermalFileInstance extends ThermalObjectBase {
-
-
-    public static BINDED = "binded";
-    public static INITIALISED = "initialised";
 
 
     // Core properties are mirrored from the source
@@ -134,7 +155,7 @@ export class ThermalFileInstance extends ThermalObjectBase {
         this.binded = true;
 
         // Dispatch the event
-        this.dispatchEvent(new Event(ThermalFileInstance.BINDED));
+        this.dispatchEvent( new Event( ThermalEvents.INSTANCE_BINDED ) );
 
         if (this.binded && this.listenerLayer && this.root && this.cursorLayer) {
 
@@ -170,7 +191,7 @@ export class ThermalFileInstance extends ThermalObjectBase {
 
             }
 
-            this.dispatchEvent(new Event(ThermalFileInstance.INITIALISED));
+            this.dispatchEvent(new Event(ThermalEvents.INSTANCE_INITIALISED));
 
         }
 

@@ -7,6 +7,14 @@ export type ThermalFileRequest = {
     visibleUrl?: string
 }
 
+/**
+ * A request for a thermal file is created and stored by a `ThermalGroup`
+ * 
+ * - The request is created at first and triggered later.
+ * - All the group's requests need to be triggered at once
+ * 
+ * When triggered, the request looks for the file in the cache. If the file is not cached yet, the request tries to fetch it from the URL.
+ */
 export class ThermalRequest extends EventTarget {
 
     protected constructor(

@@ -14,14 +14,17 @@ type ThermalScaleProps = {
     onChange: (value: SliderValue) => void
 }
 
+/**
+ * Controls the global temperature scale.
+ * 
+ * Subscribes to `ThermalRegistry` properties `minmax` and `range`. Modifies its `range`.
+ */
 export const ThermalScale: React.FC<ThermalScaleProps> = ({
     label = "Teplotní škála",
     step = 1,
     scaleOffset = 2,
     ...props
 }) => {
-
-    // DOMAttributes<HTMLDivElement> & {index?: number}) => ReactNode	A function to render the thumbs. The 
 
     const renderThumb = useCallback((
         props: DOMAttributes<HTMLDivElement> & { index?: number }

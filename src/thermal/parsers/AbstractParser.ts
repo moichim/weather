@@ -1,6 +1,6 @@
 import { ThermalFileSource } from "../file/ThermalFileSource";
 
-/** Implement to add a new thermal file parser. */
+/** Implement this class to add a new thermal file parser. */
 export default abstract class AbstractParser {
 
     public constructor(

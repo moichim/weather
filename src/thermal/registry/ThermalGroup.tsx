@@ -7,6 +7,27 @@ import { ThermalObjectContainer } from "./abstractions/ThermalObjectContainer";
 import { ThermalEventsFactory } from "./events";
 import { ThermalCursorPositionOrundefined, ThermalMinmaxType, ThermalRangeOrUndefined } from "./interfaces";
 
+/**
+ * Group of thermal images
+ * 
+ * Creation:
+ * - created by `ThermalRegistry`
+ * 
+ * Integration
+ * - recieves the range from the registry and passes it down to instances
+ * - sends its minmax to the registry
+ * - recieves the cursor position from hovered instances and synchronise the value to all instances
+ * - recieves the opacity from the registry and passes it down to instances
+ * 
+ * Events:
+ * - ThermalEvents.INSTANCE_CREATED
+ * - ThermalEvents.RANGE_UPDATED
+ * - ThermalEvents.MINMAX_UPDATED
+ * - ThermalEvents.OPACITY_UPDATED
+ * - ThermalEvents.CURSOR_UPDATED
+ * - ThermalEvents.GROUP_LOADING_START
+ * - ThermalEvents.GROUP_LOADING_FINISH
+ */
 export class ThermalGroup extends ThermalObjectContainer {
 
 

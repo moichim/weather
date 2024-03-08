@@ -8,6 +8,11 @@ type ThermalInstanceProps = {
     instance: ThermalFileInstance
 }
 
+/** 
+ * Displays an instance
+ * 
+ * Creates the DOM inside which the instance shall be rendered.
+*/
 export const ThermalInstance: React.FC<ThermalInstanceProps> = props => {
 
     const ref = useRef<HTMLDivElement>(null);
@@ -17,7 +22,6 @@ export const ThermalInstance: React.FC<ThermalInstanceProps> = props => {
         if (ref !== null) {
             if (ref.current) {
                 props.instance.bind(ref.current);
-                // props.instance.initialise();
             }
         }
 

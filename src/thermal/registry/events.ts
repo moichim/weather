@@ -12,6 +12,8 @@ export enum ThermalEvents {
 
     SOURCE_REGISTERED = "sourceregistered",
     INSTANCE_CREATED = "instancecreated",
+    INSTANCE_BINDED = "instancebinded",
+    INSTANCE_INITIALISED = "instanceinitialised",
 
     MINMAX_UPDATED = "minmaxevent",
     RANGE_UPDATED = "rangeevent",
@@ -61,7 +63,7 @@ export type CursorEvent = CustomEvent<CursorUpdated>
 type OpacityUpdated = { opacity: number }
 export type OpacityEvent = CustomEvent<OpacityUpdated>;
 
-
+/** All thermal events need to be created through this factory */
 export class ThermalEventsFactory {
 
     public static groupInit(

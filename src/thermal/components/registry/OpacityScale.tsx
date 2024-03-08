@@ -2,6 +2,12 @@ import { Slider } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import { useRegistryListener } from "../../context/useRegistryListener";
 
+
+/**
+ * Controls the global oIR opacity
+ * 
+ * Subscribes to `ThermalRegistry` property `opacity` and modifies it.
+ */
 export const OpacityScale: React.FC = props => {
 
     const [ value, setValue ] = useState<number>( 1 );

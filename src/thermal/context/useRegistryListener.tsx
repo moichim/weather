@@ -5,6 +5,9 @@ import { MinmaxEvent, OpacityEvent, RangeEvent, ThermalEvents } from "../registr
 import { ThermalMinmaxOrUndefined, ThermalRangeOrUndefined } from "../registry/interfaces";
 import { useRegistryContext } from "./RegistryContext";
 
+/**
+ * Binds the registry properties
+ */
 export const useRegistryListener = () => {
 
     const [opacity, setOpacity] = useState<number>(1);

@@ -38,7 +38,9 @@ type ProjectFilesQueryResponse = {
     filesGetContent: FilesScopeContent
 }
 
-
+/**
+ * Requests information about the scope's files
+ */
 export const useProjectLoader = (
     scopeId: string
 ) => {

@@ -14,6 +14,11 @@ type ThermalGroupProps = {
     files: ThermalFileRequest[]
 }
 
+/** 
+ * Handles a single troup of images. 
+ * 
+ * Instantiated once the folder is loaded in `Project Controller`. Initialises the loading of files.
+ */
 export const ThermalGroup: React.FC<ThermalGroupProps> = props => {
 
     const loader = useGroupLoader(props.groupId);

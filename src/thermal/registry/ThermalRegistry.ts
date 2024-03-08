@@ -4,6 +4,19 @@ import { ThermalObjectContainer } from "./abstractions/ThermalObjectContainer";
 import { ThermalEvents, ThermalEventsFactory } from "./events";
 import { ThermalRangeOrUndefined } from "./interfaces";
 
+/**
+ * The global thermal registry
+ * 
+ * Creation:
+ * - the singleton should by stored globally and all groups and instances need to be part of this singleton
+ * 
+ * Events:
+ * - ThermalEvents.GROUP_INIT
+ * - ThermalEvents.MINMAX_UPDATED
+ * - ThermalEvents.OPACITY_UPDATED
+ * - ThermalEvents.RANGE_UPDATED
+ * - ThermalEvents.READY
+ */
 export class ThermalRegistry extends ThermalObjectContainer {
 
 

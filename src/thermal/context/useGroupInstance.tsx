@@ -3,6 +3,11 @@
 import { useMemo } from "react";
 import { useRegistryContext } from "./RegistryContext";
 
+/** 
+ * Returns the `ThermalGroup` instance 
+ * 
+ * Creates the instance by ID or return the existing one.
+*/
 export const useGroupInstance = (
     groupId: string
 ) => {
