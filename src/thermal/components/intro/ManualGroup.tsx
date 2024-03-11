@@ -51,8 +51,8 @@ export const ManualGroup: React.FC<ManualGroupProps> = props => {
         </style>
         <div className="relative flex flex-wrap w-full">
             {loader.instances.length > 0
-                ? loader.instances.map(instance => <ThermalInstance instance={instance} key={instance.url} className={getInstanceClasses(props.files, instance.url)} />)
-                : props.files.map(file => <Skeleton
+                ? loader.instances.map(instance => <ThermalInstance key={instance.url} instance={instance} className={getInstanceClasses(props.files, instance.url)} />)
+                : props.files.map(file => <Skeleton key={file.thermalUrl}
                     className={cn(file.className, "h-1/3")}
                 />)
             }
