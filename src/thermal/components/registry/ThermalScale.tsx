@@ -11,7 +11,8 @@ type ThermalScaleProps = {
     from: number,
     to: number,
     scaleOffset?: number,
-    onChange: (value: SliderValue) => void
+    onChange: (value: SliderValue) => void,
+    className?: string
 }
 
 /**
@@ -23,6 +24,7 @@ export const ThermalScale: React.FC<ThermalScaleProps> = ({
     label = "Teplotní škála",
     step = 1,
     scaleOffset = 2,
+    className = "w-[800px]",
     ...props
 }) => {
 

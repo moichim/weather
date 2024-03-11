@@ -7,6 +7,7 @@ import Link from 'next/link'
 
 import img from "../../../public/letecke-02.jpg";
 import { GoogleDocsViewer } from '../documents/googleDocumentViewer'
+import { IntroThermograms } from '@/thermal/components/intro/IntroThermograms'
 
 
 export default function Intro() {
@@ -52,28 +53,36 @@ export default function Intro() {
 
                     <div className="flex flex-wrap w-full items-center">
 
-                        <div className="w-full md:w-2/3 lg:w-1/2">
+                        <div className="w-full md:w-1/2">
 
-                            <div className="mb-8 flex justify-start">
-                                <div className="relative rounded-full px-3 py-1 text-sm leading-6 text-primary ring-1 ring-primary">
-                                    2023 / 2024 - Pilotní ročník
+                            <div className="md:pr-4">
+
+                                <div className="mb-8 flex justify-start">
+                                    <div className="relative rounded-full px-3 py-1 text-sm leading-6 text-primary ring-1 ring-primary">
+                                        2023 / 2024 - Pilotní ročník
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="text-left">
-                                <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
-                                    Mikroklima v mé obci
-                                </h1>
-                                <p className="mt-6 text-lg leading-8 text-primary">
-                                    10 týmů ze západočeských škol měří mikroklima ve svém okolí
-                                </p>
+                                <div className="text-left pb-6">
+                                    <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
+                                        Mikroklima v mé obci
+                                    </h1>
+                                    <p className="mt-6 text-xl leading-8 text-primary-100">
+                                        Dlouhodobý vzdělávací projekt pro 2. stupeň ZŠ zaměřený na environmentální výchovu.
+                                    </p>
+
+                                </div>
+
+                                <Timeline />
 
                             </div>
 
                         </div>
 
-                        <div className="w-full md:w-1/3 lg:w-1/2 py-5">
+                        <div className="w-full md:w-1/2 py-5">
 
-                            <Timeline />
+                            <IntroThermograms />
+
+
 
                         </div>
 
