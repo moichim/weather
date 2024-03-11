@@ -1,13 +1,12 @@
 import { ScopeHeading } from "@/components/scope/scopeHeading";
 import { googleSheetsProvider } from "@/graphql/google/googleProvider/googleProvider";
+import { GraphContextProvider } from "@/state/graph/graphContext";
+import { DisplayContextProvider } from "@/state/graph/useBarInternal";
+import { MeteoContextProvider } from "@/state/meteo/meteoContext";
 import { ScopeContextProvider } from "@/state/scope/scopeContext";
 import { notFound } from "next/navigation";
 import { PropsWithChildren } from "react";
 import { ScopePageProps } from "./page";
-import { GraphContextProvider } from "@/state/graph/graphContext";
-import { DisplayContextProvider } from "@/state/graph/useBarInternal";
-import { MeteoContextProvider } from "@/state/meteo/meteoContext";
-import { RegistryContextProvider } from "@/thermal/context/RegistryContext";
 
 type ScopeLayoutProps = PropsWithChildren & ScopePageProps;
 
