@@ -1,3 +1,5 @@
+"use client"
+
 import Timeline from './timeline'
 
 import Image from 'next/image'

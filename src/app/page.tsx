@@ -1,3 +1,5 @@
+"use client"
+
 import Intro from '@/components/content/intro';
 import { ContentContainer } from '@/components/content/ui/contentContainer';
 import { GoogleDocsViewer } from '@/components/documents/googleDocumentViewer';
