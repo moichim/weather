@@ -5,6 +5,7 @@ import { Providers } from '../components/providers'
 import './globals.css'
 import { NotificationListing } from '@/components/notifications/notificationListing'
 import { getMetadataTitle } from '@/utils/metadata'
+import { RegistryContextProvider } from '@/thermal/context/RegistryContext'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -26,8 +27,10 @@ export default function RootLayout({
           "h-[100vh]"
         ])}>
           <Providers>
-            {children}
-            <NotificationListing />
+            <RegistryContextProvider>
+              {children}
+              <NotificationListing />
+            </RegistryContextProvider>
           </Providers>
         </div>
       </body>
