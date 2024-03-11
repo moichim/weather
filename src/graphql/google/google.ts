@@ -53,20 +53,6 @@ export const googleTypeDefs = gql`
         rangeGoogle( scope: String, lat: Float!, lon: Float!, from:Float, to:Float, sheetId: String!, sheetTab: String! ): GoogleScopeData
     }
 
-    type GoogleScope {
-        name: String!
-        slug: String!
-        sheetId: String!
-        sheetTab: String!
-        lat: Float!
-        lon: Float!
-        hasNtc: Boolean!
-        isDefault: Boolean!
-        team: String!
-        locality: String!
-        description: String!
-    }
-
     type GoogleScopeData {
         data: [GoogleColumn]
     }
@@ -125,17 +111,6 @@ export const googleResolvers = {
             }
 
         },
-        googleScope: async (
-            parent: any,
-            args: {
-                scope: string
-            }
-        ) => {
-            return await googleSheetsProvider.fetchScopeDefinition( args.scope );
-        },
-        googleScopes: async () => {
-            return await googleSheetsProvider.fetchAllScopesDefinitions();
-        }
     }
 
 }

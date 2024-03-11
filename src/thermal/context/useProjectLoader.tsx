@@ -1,23 +1,26 @@
 "use client";
 
-import { FilesScopeContent } from "@/thermal/providers/lrcProvider";
 import { useQuery } from "@apollo/client";
 import gql from "graphql-tag";
 import { useCallback, useState } from "react";
+import { ThermoFileDefinition, ThermoFileScope } from "../graphql/files";
 import { ThermalFileRequest } from "../registry/ThermalRequest";
 
 export const PROJECT_FILES_QUERY = gql`
 
-query Query($scope: String) {
-    filesGetContent(scope: $scope) {
-      name
-      description
-      id
+query Scopes($scope: String!) {
+    scopeFiles(scope: $scope) {
       files {
         filename
-        ir
-        visu
         timestamp
+        thermalUrl
+        visibleUrl
+      }
+      info {
+        slug
+        name
+        scope
+        description
       }
     }
   }
@@ -35,7 +38,10 @@ type ProjectDescription = {
 }
 
 type ProjectFilesQueryResponse = {
-    filesGetContent: FilesScopeContent
+    scopeFiles: {
+        info: ThermoFileScope,
+        files: ThermoFileDefinition[]
+    }[]
 }
 
 /**
@@ -80,16 +86,18 @@ export const useProjectLoader = (
         },
         onCompleted: (result) => {
 
-            result.filesGetContent.forEach(folder => {
+            result.scopeFiles.forEach(folder => {
+
+                console.log( folder );
 
                 const files: ThermalFileRequest[] = folder.files.map(file => {
                     return {
-                        thermalUrl: file.ir,
-                        visibleUrl: file.visu
+                        thermalUrl: file.thermalUrl,
+                        visibleUrl: file.visibleUrl
                     }
                 });
 
-                addGroup(folder.id, files, folder.name, folder.description);
+                addGroup(folder.info.slug, files, folder.info.name, folder.info.description);
 
             });
 

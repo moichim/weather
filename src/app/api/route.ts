@@ -1,7 +1,8 @@
 import { googleResolvers, googleTypeDefs } from "@/graphql/google/google";
 import { integratedResolvers, integratedTypeDefs } from "@/graphql/integratedRoutes";
+import { scopeResolvers, scopesTypeDefs } from "@/graphql/scope/scope";
 import { weatherResolvers, weatherTypeDefs } from "@/graphql/weather/weather";
-import { thermoResolvers, thermoTypeDefs } from "@/thermal/providers/lrcProvider";
+import { fileResolvers, fileTypeDefs } from "@/thermal/graphql/files";
 import { ApolloServer } from "@apollo/server";
 import { buildSubgraphSchema } from "@apollo/subgraph";
 import { startServerAndCreateNextHandler } from "@as-integrations/next";
@@ -17,6 +18,16 @@ const server = new ApolloServer({
         },
 
         {
+            typeDefs: scopesTypeDefs,
+            resolvers: scopeResolvers
+        },
+
+        {
+            typeDefs: fileTypeDefs,
+            resolvers: fileResolvers
+        },
+
+        {
             typeDefs: googleTypeDefs,
             resolvers: googleResolvers
         },
@@ -24,11 +35,6 @@ const server = new ApolloServer({
         {
             typeDefs: integratedTypeDefs,
             resolvers: integratedResolvers
-        },
-
-        {
-            typeDefs: thermoTypeDefs,
-            resolvers: thermoResolvers
         }
 
     ]),
@@ -40,3 +46,4 @@ const handler = startServerAndCreateNextHandler<NextRequest>(server, {
 });
 
 export { handler as GET, handler as POST };
+

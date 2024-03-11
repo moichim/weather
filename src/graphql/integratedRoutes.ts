@@ -2,6 +2,7 @@ import gql from "graphql-tag";
 import { googleSheetsProvider } from "./google/googleProvider/googleProvider";
 import { Sources, WeatherSourceType } from "./weather/definitions/source";
 import { GoogleDataColumnDefinition, GoogleScope } from "./google/google";
+import { scopeProvider } from "./scope/ScopeProvider";
 
 export type ScopeMetaType = {
     info: GoogleScope,
@@ -13,7 +14,7 @@ export type ScopeMetaType = {
 export const integratedTypeDefs = gql`
 
     extend type Query {
-        scopeInformation( scope: String ): ScopeMeta
+        scopeInformation( scope: String ): ScopeMeta,
     }
 
     type ScopeMeta {
@@ -36,7 +37,7 @@ export const integratedResolvers = {
             args: ScopeIntormationArgs
         ) => {
 
-            const scopeDefinition = await googleSheetsProvider.fetchScopeDefinition( args.scope );
+            const scopeDefinition = await scopeProvider.fetchScopeDefinition( args.scope );
 
             const definitions = await googleSheetsProvider.fetchScopeColumnDefinitions( 
                 scopeDefinition.sheetId, 

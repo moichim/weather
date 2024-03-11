@@ -4,6 +4,8 @@ import { google } from "googleapis";
 import { AvailableWeatherProperties, Properties, WeatherProperty } from "../../weather/definitions/properties";
 import { GoogleColumn, GoogleColumnValue, GoogleDataColumnDefinition, GoogleRequest, GoogleScope } from "../google";
 import GoogleProviderUtils from "./googleProviderUtils";
+import fetch from "cross-fetch";
+import { ScopeProvider, scopeProvider } from "@/graphql/scope/ScopeProvider";
 
 export type ValueSerieDefinition = {
     name: string,
@@ -38,7 +40,7 @@ export type GoogleResponseType = {
 }
 
 
-
+/** Handles Google Sheets communication */
 class GoogleSheetsProvider {
 
     protected static CONFIG_SHEET_ID = "1YNjQNCUYUlw96uaQ6RYTq4MG5zUzhHwW-XM-chJWkjE";
@@ -47,36 +49,11 @@ class GoogleSheetsProvider {
 
 
     public readonly ID: string;
-    protected cachedResult: {
-        [index: string]: GoogleScope
-    } = {};
 
 
-    protected storeCachedResults(scopes: GoogleScope[]) {
-        this.cachedResult = Object.fromEntries(scopes.map(s => [s.slug, s]));
-    }
-
-
-    protected storeCachedResult(scope: GoogleScope) {
-        this.cachedResult[scope.slug] = scope;
-    }
-
-
-    protected getCachedResult(slug: string) {
-        return Object.keys(this.cachedResult).includes(slug)
-            ? this.cachedResult[slug]
-            : undefined;
-    }
-
-
-    protected getCachedResults() {
-        return Object.entries(this.cachedResult).length > 0
-            ? Object.values(this.cachedResult)
-            : undefined;
-    }
-
-
-    public constructor() {
+    public constructor(
+        protected readonly scopeProvider: ScopeProvider
+    ) {
         this.ID = randomUUID();
     }
 
@@ -129,40 +106,13 @@ class GoogleSheetsProvider {
     /** @deprecated Should use instances or be releted */
     public async fetchScopeDefinition(scope: string) {
 
-        const scopes = await this.fetchAllScopesDefinitions();
-
-        const result = scopes.find(row => row.slug === scope);
-
-        if (result === undefined)
-            throw new ApolloError({
-                errorMessage: `Scope ${scope} not found!`
-            });
-
-        return result;
+        return await this.scopeProvider.fetchScopeDefinition( scope );
 
     }
 
     public async fetchAllScopesDefinitions(): Promise<GoogleScope[]> {
 
-        const cached = this.getCachedResults();
-
-        if (cached) {
-            return cached;
-        }
-
-        const api = await this.getSheetsClient();
-        const response = await api.spreadsheets.values.get({
-            spreadsheetId: GoogleSheetsProvider.CONFIG_SHEET_ID,
-            range: GoogleProviderUtils.formatQueryRange("A2:Z", "Config")
-        });
-
-        const correctRows = response.data.values!.filter(row => GoogleProviderUtils.isValidScopeDefinition(row));
-
-        const scopes = correctRows.map(row => GoogleProviderUtils.parseScopeDefinition(row));
-
-        this.storeCachedResults(scopes);
-
-        return scopes;
+        return await this.scopeProvider.fetchAllScopesDefinitions();
 
     }
 
@@ -252,4 +202,4 @@ class GoogleSheetsProvider {
 }
 
 /** Create the global instance of the provider in order to prevent multiple calls */
-export const googleSheetsProvider = new GoogleSheetsProvider;
+export const googleSheetsProvider = new GoogleSheetsProvider( scopeProvider );
