@@ -1,3 +1,5 @@
+"use client"
+
 import { useCallback, useEffect, useState } from "react";
 import { ThermalFileRequest } from "../registry/ThermalRequest";
 import { ThermalFileInstance } from "../file/ThermalFileInstance";

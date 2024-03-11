@@ -1,3 +1,5 @@
+"use client";
+
 import { useRegistryListener } from "@/thermal/context/useRegistryListener";
 import { ThermalScale } from "./ThermalScale";
 import { SliderValue } from "@nextui-org/react";

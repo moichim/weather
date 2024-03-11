@@ -1,3 +1,5 @@
+"use client";
+
 import { Slider } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import { useRegistryListener } from "../../context/useRegistryListener";
