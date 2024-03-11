@@ -1,4 +1,4 @@
-"use query";
+"use client";
 
 import { ThermalFileInstance } from "@/thermal/file/ThermalFileInstance"
 import { useCallback, useEffect, useRef, useState } from "react";
