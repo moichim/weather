@@ -1,3 +1,5 @@
+"use client";
+
 import { WeatherStatistic } from "@/graphql/weather/weather";
 import { AvailableWeatherProperties, Properties } from "@/graphql/weather/definitions/properties";
 import { StatisticsProcessing } from "@/state/meteo/data/statisticsProcessing";

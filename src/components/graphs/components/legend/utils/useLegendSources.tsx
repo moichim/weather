@@ -1,3 +1,5 @@
+"use client";
+
 import { useMeteoContext } from "@/state/meteo/meteoContext";
 import { useMemo } from "react";
 

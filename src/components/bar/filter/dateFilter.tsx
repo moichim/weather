@@ -1,3 +1,5 @@
+"use client";
+
 import { useMeteoContext } from "@/state/meteo/meteoContext";
 import { DataActionsFactory } from "@/state/meteo/reducerInternals/actions";
 import { dateFromString, stringFromDate, timestampFromFromString, timestampToFromString } from "@/utils/time";

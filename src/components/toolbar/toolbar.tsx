@@ -1,3 +1,5 @@
+"use client";
+
 import { useGraphContext } from "@/state/graph/graphContext"
 import { StackActions } from "@/state/graph/reducerInternals/actions"
 import { GraphToolType, graphTools } from "@/state/graph/data/tools"

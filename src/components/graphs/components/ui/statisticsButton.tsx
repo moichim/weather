@@ -1,3 +1,4 @@
+"use client";
 import { Button, cn } from "@nextui-org/react";
 import React, { PropsWithChildren, useMemo } from "react";
 

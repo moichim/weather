@@ -1,3 +1,5 @@
+"use client";
+
 import { useThermalMinmax } from "@/thermal/hooks/propertyListeners/useThermalMinmax";
 import { useThermalRange } from "@/thermal/hooks/propertyListeners/useThermalRange"
 import { useThermalRegistry } from "@/thermal/hooks/retrieval/useThermalRegistry"
