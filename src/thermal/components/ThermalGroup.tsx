@@ -34,7 +34,7 @@ export const ThermalGroup: React.FC<ThermalGroupProps> = props => {
 
 
     return <div className="w-full md:w-1/2 lg:w-1/3 p-4">
-        <div className="rounded-xl bg-gray-200">
+        <div className="rounded-xl bg-white shadow-xl">
 
             <div style={{ minHeight: "10rem" }} className="p-4">
                 <h2 className="font-bold text-xl">{props.name}</h2>

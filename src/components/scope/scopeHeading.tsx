@@ -67,6 +67,17 @@ export const ScopeHeading: React.FC<GoogleScope> = props => {
                 href={`/${props.slug}/info`}
             >Informace</Button>
         </Divider>
+        <Divider>
+            <Button
+                color="default"
+                variant="shadow"
+                className={cn( 
+                    "bg-foreground text-background bg-opacity-50" ,
+                )}
+                as={Link}
+                href={`/${props.slug}/thermo`}
+            >Snímky</Button>
+        </Divider>
     </header>
 
 }

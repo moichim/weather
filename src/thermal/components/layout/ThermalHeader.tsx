@@ -7,6 +7,7 @@ import { ThermalScale } from "../registry/ThermalScale"
 import { useRegistryListener } from "@/thermal/context/useRegistryListener"
 import { useProjectLoader } from "@/thermal/context/useProjectLoader"
 import { ThermalScaleGlobal } from "../registry/ThermalScaleGlobal"
+import { ThermalRange } from "../controls/ThermalRange"
 
 export const ThermalHeader: React.FC = () => {
 
@@ -32,19 +33,7 @@ export const ThermalHeader: React.FC = () => {
         </NavbarBrand>
         <NavbarContent className="gap-4" justify="center" style={{ minWidth: "50%" }}>
 
-            {(listener.minmax !== undefined && listener.range !== undefined && listener.ready) && <div className="w-[800px] text-center">
-                <ThermalScale
-                    step={Math.round((listener.minmax.max - listener.minmax.min) / 50)}
-                    min={listener.minmax.min}
-                    max={listener.minmax.max}
-                    from={listener.range.from}
-                    to={listener.range.to}
-                    onChange={onSliderChange}
-                    scaleOffset={10}
-                />
-                <p className="text-small text-gray-600 pt-2">Klikněte na posuvník a upravte rozsah zobrazených teplot!</p>
-            </div>
-            }
+            {listener.registry.range !== undefined && <ThermalRange object={listener.registry} imposeInitialRange={listener.registry.range} description="Klikněte na posuvník a změňte rozsah zobrazených teplot!"/>}
         </NavbarContent>
         <NavbarContent justify="end">
             {listener.ready && <div className="text-center">

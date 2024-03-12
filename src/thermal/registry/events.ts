@@ -1,6 +1,7 @@
 import { ThermalFileInstance } from "../file/ThermalFileInstance";
 import { ThermalFileSource } from "../file/ThermalFileSource";
 import { ThermalGroup } from "./ThermalGroup";
+import { ThermalRegistry } from "./ThermalRegistry";
 import { ThermalCursorPositionOrundefined, ThermalMinmaxOrUndefined, ThermalMinmaxType, ThermalRangeOrUndefined } from "./interfaces";
 
 export enum ThermalEvents {
@@ -241,4 +242,3 @@ export class ThermalEventsFactory {
     }
 
 }
-

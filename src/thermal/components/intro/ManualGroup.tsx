@@ -8,6 +8,7 @@ import { useRegistryListener } from "@/thermal/context/useRegistryListener";
 import { ThermalScale } from "../registry/ThermalScale";
 import { Skeleton, SliderValue, cn } from "@nextui-org/react";
 import { OpacityScale } from "../registry/OpacityScale";
+import { ThermalRange } from "../controls/ThermalRange";
 
 export type CustomisedThermalFileRequest = ThermalFileRequest & {
     className?: string
@@ -58,18 +59,7 @@ export const ManualGroup: React.FC<ManualGroupProps> = props => {
             }
         </div>
 
-        {(listener.minmax !== undefined && listener.range !== undefined && listener.ready) && <div className="text-center pt-4">
-            <ThermalScale
-                step={Math.round((listener.minmax.max - listener.minmax.min) / 50)}
-                min={listener.minmax.min}
-                max={listener.minmax.max}
-                from={listener.range.from}
-                to={listener.range.to}
-                onChange={onSliderChange}
-                scaleOffset={10}
-            />
-        </div>
-        }
+        <ThermalRange object={ loader.group } imposeInitialRange={{from:-17, to: 13}} rangeOffset={5}/>
     </>
 
 }

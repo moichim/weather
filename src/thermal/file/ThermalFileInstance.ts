@@ -61,7 +61,7 @@ export class ThermalFileInstance extends ThermalObjectBase {
 
     public constructor(
         protected readonly source: ThermalFileSource,
-        protected readonly group: ThermalGroup
+        public readonly group: ThermalGroup
     ) {
         super();
         this.id = `instance_${this.group.id}_${this.source.url}`;

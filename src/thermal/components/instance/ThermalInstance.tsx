@@ -10,6 +10,7 @@ import { useRegistryContext } from "@/thermal/context/RegistryContext";
 import { ThermalScale } from "../registry/ThermalScale";
 import { ThermalScaleGlobal } from "../registry/ThermalScaleGlobal";
 import { useRegistryListener } from "@/thermal/context/useRegistryListener";
+import { ThermalRange } from "../controls/ThermalRange";
 
 type ThermalInstanceProps = {
     instance: ThermalFileInstance,
@@ -123,6 +124,7 @@ export const ThermalInstance: React.FC<ThermalInstanceProps> = ({
                                 </div>
 
                                 {detail && <>
+                                    <ThermalRange object={ detail } />
                                     <ThermalInstance
                                         instance={detail}
                                         className="w-full"
