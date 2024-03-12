@@ -1,3 +1,5 @@
+"use client";
+
 import { ThermalFileInstance } from "../file/ThermalFileInstance";
 import { ThermalFileSource } from "../file/ThermalFileSource";
 import { ThermalGroup } from "./ThermalGroup";
