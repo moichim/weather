@@ -20,7 +20,7 @@ import { useState } from "react";
 export type NavbarProps = NextuiNavbarProps & {
     brandContent?: React.ReactNode,
     links?: NavbarLinkDefinition[],
-    content?: React.ReactElement,
+    innerContent?: React.ReactNode,
     endContent?: React.ReactNode,
     closeLink?: string,
     closeLinkHint?: React.ReactNode
@@ -29,7 +29,7 @@ export type NavbarProps = NextuiNavbarProps & {
 export const Navbar: React.FC<NavbarProps> = ({
     closeLink,
     closeLinkHint,
-    content,
+    innerContent: content,
     links,
     brandContent,
     endContent,
