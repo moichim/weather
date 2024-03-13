@@ -24,7 +24,7 @@ export const ScopeTable: React.FC<ScopeTableProps> = props => {
 
     const rows = props.scopes.map(item => ({
         slug: item.slug,
-        school: <div className="flex w-full items-center gap-4">
+        school: <div className="flex w-full items-center gap-4 min-w-[250px]">
             <div className="group-hover:translate-x-1 text-gray-500 group-hover:text-primary-500 transform-all duration-200 ease-in-out group-hover:scale-[1.2]">
                 <ArrowRightIcon />
             </div>
@@ -34,39 +34,48 @@ export const ScopeTable: React.FC<ScopeTableProps> = props => {
         locality: item.locality,
         description: item.description,
         team: item.team,
-        link: <>
+        link: <div className="flex gap-2">
             <Button
                 as={Link}
-                href={`${item.slug}`}
+                href={`/project/${item.slug}`}
                 size="sm"
-            >Zobrazit data</Button>
-        </>
+            >Data</Button>
+            <Button
+                as={Link}
+                href={`/project/${item.slug}/info`}
+                size="sm"
+            >Informace</Button>
+            <Button
+                as={Link}
+                href={`/project/${item.slug}/thermo`}
+                size="sm"
+                color="primary"
+            >Termogramy</Button>
+        </div>
     }));
 
     return <Table
-        // removeWrapper
         isStriped
-        onRowAction={key => router.push(`/${key}`)}
     >
         <TableHeader columns={columns}>
             {column => <TableColumn className={cn(
-                ["team", "description"].includes(column.key.toString()) ? "hidden lg:table-cell" : "",
+                ["team", "description", "locality"].includes(column.key.toString()) ? "hidden lg:table-cell" : "",
                 ["locality"].includes(column.key.toString()) ? "hidden md:table-cell" : ""
             )}>{column.label}</TableColumn>}
         </TableHeader>
         <TableBody items={rows}>
             {row => <TableRow
                 key={row.slug}
-                className="group cursor-pointer hover:text-primary-700"
+                className="group hover:text-primary-500"
             >
                 {(key) => <TableCell className={cn(
                     ["team", "description"].includes(key.toString()) ? "hidden lg:table-cell" : "",
                     ["locality"].includes(key.toString()) ? "hidden md:table-cell" : ""
-                ) }>
-                    { getKeyValue(row, key) }
+                )}>
+                    {getKeyValue(row, key)}
                 </TableCell>}
-        </TableRow>}
-    </TableBody>
+            </TableRow>}
+        </TableBody>
     </Table >
 
 }

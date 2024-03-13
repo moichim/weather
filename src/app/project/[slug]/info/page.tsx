@@ -1,13 +1,12 @@
-// import { Map } from "@/components/ui/map";
 import { GraphLegendColumns } from "@/components/graphs/components/legend/graphLegendColumns";
 import { GraphLegendSources } from "@/components/graphs/components/legend/graphLegendSources";
 import { googleSheetsProvider } from "@/graphql/google/googleProvider/googleProvider";
+import { getMetadataPublisher, getMetadataTitle } from "@/utils/metadata";
+import { Metadata, ResolvingMetadata } from "next";
 import dynamic from "next/dynamic";
 import { ScopePageProps } from "../page";
-import { getMetadataPublisher, getMetadataTitle } from "@/utils/metadata";
-import { ResolvingMetadata, Metadata } from "next";
 
-const Map = dynamic(() => import("../../../components/ui/map"), { ssr: false });
+const Map = dynamic(() => import("../../../../components/ui/map"), { ssr: false });
 
 export const generateStaticParams = async () => {
 
@@ -76,15 +75,11 @@ const InfoPage: React.FC<ScopePageProps> = async props => {
 
             <Section>
 
-                <h2>Tento tým se rozhodl měřit následující údaje:</h2>
-
                 <GraphLegendColumns showDescription={true} />
 
             </Section>
 
             <Section>
-
-                <h2 className="pb-4">Pro porovnání jsou k dispozici data z těchto zdrojů:</h2>
 
                 <GraphLegendSources showDescription={true} />
 

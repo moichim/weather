@@ -1,9 +1,11 @@
 "use client";
 
+import { Navbar } from "@/components/navigation/utils/Navbar";
 import { Spinner } from "@nextui-org/react";
 import { useProjectLoader } from "../context/useProjectLoader";
 import { useRegistryListener } from "../context/useRegistryListener";
 import { ThermalGroup } from "./ThermalGroup";
+import { ThermalRangeInline } from "./controls/ThermalRangeInline";
 
 type ProjectControllerProps = {
     scope: string
@@ -22,22 +24,33 @@ export const ProjectController: React.FC<ProjectControllerProps> = props => {
 
     return <>
 
+        <Navbar
+            className="bg-slate-200"
+            innerContent={listener.registry.range === undefined
+                ? <div className="flex items-center gap-4 text-primary"><Spinner size="sm"/><span>Načítám a zpracovávám soubory</span></div>
+
+                : <ThermalRangeInline
+                    object={listener.registry}
+                    imposeInitialRange={listener.registry.range}
+                    description="Klikněte na posuvník a změňte rozsah zobrazených teplot!" />}
+        />
+
         {(loading === true || listener.ready === false) &&
-            <div className="text-center text-white py-40" style={{ padding: "10rem 0rem" }}>
+            <div className="text-center text-primary py-40" style={{ padding: "10rem 0rem" }}>
                 <Spinner />
-                <p>Načítám</p>
+                <p>Načítám a zpracovávám soubory</p>
             </div>
         }
 
         <div className="flex flex-wrap">
             {Object.entries(groups).map(([groupId, definition]) => {
                 return <ThermalGroup
-                        key={groupId}
-                        groupId={groupId}
-                        name={definition.name}
-                        description={definition.description}
-                        files={definition.files}
-                    />
+                    key={groupId}
+                    groupId={groupId}
+                    name={definition.name}
+                    description={definition.description}
+                    files={definition.files}
+                />
             })}
         </div>
     </>

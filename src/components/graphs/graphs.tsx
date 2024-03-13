@@ -13,20 +13,23 @@ export const Graphs: React.FC = () => {
 
     return <div>
 
-<GraphTour />
-            
-            <div id="one" className="w-full h-full bg-gray-200 pb-[10rem] pt-3 min-h-full" >
+        <GraphTour />
 
-                {Object.values(state.graphs).map((graph, index) => <GraphInstance 
-                    key={graph.property.slug} 
-                    id={`graph${index}`}
-                    {...graph} 
-                />)}
+        <div id="one" className="w-full h-full bg-gray-200 pb-[10rem] pt-3 min-h-full flex" >
 
-                <GraphAdd />
-
+            <div className="pl-4" style={{width:"4rem"}}>
                 <Toolbar />
-
             </div>
+
+            <div className="flex-grow">
+                {Object.values(state.graphs).map((graph, index) => <GraphInstance
+                    key={graph.property.slug}
+                    id={`graph${index}`}
+                    {...graph}
+                />)}
+                <GraphAdd />
+            </div>
+
+        </div>
     </div >
 }

@@ -1,4 +1,4 @@
-import { ScopeHeading } from "@/components/scope/scopeHeading";
+import { Navbar } from "@/components/navigation/utils/Navbar";
 import { googleSheetsProvider } from "@/graphql/google/googleProvider/googleProvider";
 import { GraphContextProvider } from "@/state/graph/graphContext";
 import { DisplayContextProvider } from "@/state/graph/useBarInternal";
@@ -7,8 +7,6 @@ import { ScopeContextProvider } from "@/state/scope/scopeContext";
 import { notFound } from "next/navigation";
 import { PropsWithChildren } from "react";
 import { ScopePageProps } from "./page";
-import { Navbar } from "@/components/navigation/utils/Navbar";
-import { Link } from "@nextui-org/react";
 
 type ScopeLayoutProps = PropsWithChildren & ScopePageProps;
 
@@ -32,20 +30,23 @@ const ScopeLayout: React.FC<ScopeLayoutProps> = async ({ ...props }) => {
                         links={[
                             {
                                 text: "Naměřená data",
-                                href:  `/${scope.slug}`,
+                                href: `/project/${scope.slug}`,
                             },
                             {
                                 text: "Informace o týmu",
-                                href: `/${scope.slug}/info`
+                                href: `/project/${scope.slug}/info`
                             },
                             {
                                 text: "Termogramy",
-                                href: `/${scope.slug}/thermo`
+                                href: `/project/${scope.slug}/thermo`
                             },
                         ]}
                         closeLink="/"
                         closeLinkHint={`Zavřít projekt ${scope.name}`}
                         className="bg-slate-100"
+                        classNames={{
+                            // menu: "top-32 bg-red-300"
+                        }}
                     />
 
                     <main className="w-full h-full min-h-screen bg-gray-200 pb-[10rem]">

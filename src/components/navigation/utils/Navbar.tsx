@@ -39,21 +39,23 @@ export const Navbar: React.FC<NavbarProps> = ({
     const [open, setOpen] = useState<boolean>(false);
 
     return <NextuiNavbar
+        {...props}
         maxWidth="full"
         isBordered={true}
         {...props}
         className={cn(
             props.className,
-            "data-[menu-open=true]:z-50"
+            "data-[menu-open=true]:z-50 group"
         )}
         classNames={{
-            menu: "z-50"
+            ...props.classNames,
+            menu: cn(props.classNames?.menu, "group-data-[menu-open=true]:z-50", "z-50")
         }}
         isMenuOpen={open}
         onMenuOpenChange={setOpen}
     >
 
-        {(links || content || endContent) && <NavbarContent
+        {(links) && <NavbarContent
             justify="start"
             className="md:hidden flex-grow-0"
             style={{
@@ -72,9 +74,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                 className="flex-grow-0 flex gap-8"
             >
                 {brandContent}
-                <div className="text-gray-400 pr-4 hidden md:block">
-                    <ArrowRightIcon />
-                </div>
+                {(links || content) &&
+                    <div className="text-gray-400 pr-4 hidden md:block">
+                        <ArrowRightIcon />
+                    </div>
+                }
             </NavbarBrand>
         </>}
 
@@ -84,7 +88,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
                 {links.map((item, index) => {
                     return <NavbarMenuItem key={`item-${item.text?.toString().substring(0, 5)}_${index}`}>
-                        <NavbarLink 
+                        <NavbarLink
                             {...item}
                             activeVariant={{
                                 color: "primary"

@@ -1,14 +1,12 @@
 "use client";
 
 import { useManualLoader } from "@/thermal/context/useManualLoader";
-import { ThermalFileRequest } from "@/thermal/registry/ThermalRequest";
-import { ThermalInstance } from "../instance/ThermalInstance";
-import { useEffect } from "react";
 import { useRegistryListener } from "@/thermal/context/useRegistryListener";
-import { ThermalScale } from "../registry/ThermalScale";
-import { Skeleton, SliderValue, cn } from "@nextui-org/react";
-import { OpacityScale } from "../registry/OpacityScale";
+import { ThermalFileRequest } from "@/thermal/registry/ThermalRequest";
+import { Skeleton, cn } from "@nextui-org/react";
+import { useEffect } from "react";
 import { ThermalRange } from "../controls/ThermalRange";
+import { ThermalInstance } from "../instance/ThermalInstance";
 
 export type CustomisedThermalFileRequest = ThermalFileRequest & {
     className?: string
@@ -19,21 +17,17 @@ type ManualGroupProps = {
     files: CustomisedThermalFileRequest[]
 }
 
-const getInstanceClasses = (files: CustomisedThermalFileRequest[], url: string) => {
-    return files.find(file => file.thermalUrl == url)?.className;
-}
+
 
 export const ManualGroup: React.FC<ManualGroupProps> = props => {
+
+    const getInstanceClasses = (files: CustomisedThermalFileRequest[], url: string) => {
+        return files.find(file => file.thermalUrl == url)?.className;
+    }
 
     const loader = useManualLoader(props.id, props.files);
 
     const listener = useRegistryListener();
-
-    const onSliderChange = (value: SliderValue) => {
-        if (Array.isArray(value)) {
-            listener.setRange({ from: value[0], to: value[1] });
-        }
-    }
 
     useEffect(() => {
         loader.load();

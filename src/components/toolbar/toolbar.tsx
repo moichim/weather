@@ -52,11 +52,13 @@ const Tool: React.FC<GraphToolType> = props => {
 
 export const Toolbar: React.FC = () => {
 
-    return <div className="fixed left-5 flex flex-col gap-1" style={{top: "4rem"}}>
+    return <div className="sticky top-20 left-5">
+        <div className="flex flex-col gap-1">
         {Object.values(graphTools).map(tool => <Tool
             key={tool.name}
             {...tool}
         />)}
+    </div>
     </div>
 
 }

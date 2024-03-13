@@ -1,12 +1,12 @@
+import { Navbar } from '@/components/navigation/utils/Navbar'
+import { NotificationListing } from '@/components/notifications/notificationListing'
+import { RegistryContextProvider } from '@/thermal/context/RegistryContext'
+import { getMetadataTitle } from '@/utils/metadata'
 import { Link, cn } from '@nextui-org/react'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { Providers } from '../components/providers'
 import './globals.css'
-import { NotificationListing } from '@/components/notifications/notificationListing'
-import { getMetadataTitle } from '@/utils/metadata'
-import { RegistryContextProvider } from '@/thermal/context/RegistryContext'
-import { Navbar } from '@/components/navigation/utils/Navbar'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -30,33 +30,29 @@ export default function RootLayout({
           <Providers>
             <RegistryContextProvider>
               <Navbar
-                brandContent={<Link href="/" color="foreground" className="font-bold">LabIR Edu</Link>}
+                brandContent={<Link href="/" color="foreground" className="font-bold hover:text-primary">LabIR Edu Mikroklima</Link>}
                 endContent={<>
-                  <Link href="https://github.com/moichim/weather" isBlock color="primary" isExternal showAnchorIcon size='sm'>Github</Link>
+                  <Link href="https://github.com/moichim/weather" isBlock color="primary" isExternal showAnchorIcon size='sm' className="hidden md:flex">Github</Link>
                   <Link href="" isBlock color="primary" isExternal showAnchorIcon size='sm'>Discord</Link>
                 </>}
                 links={[
                   {
-                    text: "Neaktivní",
-                    href: "/lrc",
+                    text: "Týmy",
+                    href: "/about/teams",
                   },
                   {
-                    text: "Aktivní",
-                    href:"/"
+                    text: "O projektu",
+                    href: "/about/project",
                   },
                   {
-                    text: "Submenu",
-                    href: "/lrc",
-                    links: [
-                      {
-                        text: "Neaktivní",
-                        href: "/lrc",
-                      },
-                      {
-                        text: "Neaktivní",
-                        href: "/",
-                      },
-                    ]
+                    text: "O aplikaci",
+                    href: "/about/aplication"
+                  },
+                  {
+                    text: "edu.labir.cz",
+                    href: "https://edu.labir.cz",
+                    target: "_blank",
+                    showAnchorIcon: true
                   },
                 ]}
               />

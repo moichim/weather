@@ -1,8 +1,5 @@
 "use client";
 
-import { useRegistryListener } from "@/thermal/context/useRegistryListener";
-import { ThermalFileRequest } from "@/thermal/registry/ThermalRequest";
-import { ThermalGroup } from "../ThermalGroup";
 import { CustomisedThermalFileRequest, ManualGroup } from "./ManualGroup";
 
 const files: CustomisedThermalFileRequest[] = [

@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
-import { ThermalFileRequest } from "../registry/ThermalRequest";
 import { useGroupListener } from "../context/useGroupListener";
 import { useGroupLoader } from "../context/useGroupLoader";
+import { ThermalFileRequest } from "../registry/ThermalRequest";
 import { ThermalInstance } from "./instance/ThermalInstance";
-import { Spinner } from "@nextui-org/react";
 
 type ThermalGroupProps = {
     groupId: string,

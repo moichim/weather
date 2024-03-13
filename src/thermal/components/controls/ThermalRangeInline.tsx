@@ -81,31 +81,31 @@ export const ThermalRangeInline: React.FC<ThermalRangeProps> = ({
             if (range.from !== final[0] || range.to !== final[1]) {
                 imposeRange({ from: final[0], to: final[1] });
             }
-            if ( final[0] !== value[0] || final[1] !== value[1] ) {
+            if (final[0] !== value[0] || final[1] !== value[1]) {
                 setValue(final);
             }
         }
-            
+
 
     }, [final]);
 
 
     // Reflect global changes to the local state
-    useEffect( () => {
+    useEffect(() => {
 
-        if ( range !== undefined ) {
+        if (range !== undefined) {
 
-            if ( 
-                range.from !== final[0] 
+            if (
+                range.from !== final[0]
                 || range.to !== final[1]
             ) {
-                setFinal( [ range.from, range.to ] );
-                setValue( [ range.from, range.to ] );
+                setFinal([range.from, range.to]);
+                setValue([range.from, range.to]);
             }
 
         }
 
-    }, [ range ] );
+    }, [range]);
 
 
 
@@ -137,7 +137,7 @@ export const ThermalRangeInline: React.FC<ThermalRangeProps> = ({
         placement="bottom"
         isDisabled={props.tooltip === undefined}
     >
-        <div className={cn( className, "flex gap-4 w-full items-center" )}>
+        <div className={cn(className, "flex gap-4 w-full items-center")}>
             <ThermalRangeSlider
 
                 step={step}
@@ -164,58 +164,60 @@ export const ThermalRangeInline: React.FC<ThermalRangeProps> = ({
                 }}
 
             />
-            <FromControl 
+            <FromControl
                 step={step}
                 range={range}
                 minmax={minmax}
                 label="od"
-                doValidateFinalValue={ value => {
+                className="md:hidden"
+                doValidateFinalValue={value => {
 
-                    const parsedValue = parseFloat( value );
+                    const parsedValue = parseFloat(value);
 
-                    if ( isNaN( parsedValue ) ) {
+                    if (isNaN(parsedValue)) {
                         return false;
                     }
 
-                    if ( parsedValue < minmax.min ) {
+                    if (parsedValue < minmax.min) {
                         return false
                     }
 
                     return parsedValue;
-                } }
-                onSetValid={ value => {
-                    imposeRange( { from: value, to: range.to } );
-                } }
-                getExternalValue={ () => range.from }
+                }}
+                onSetValid={value => {
+                    imposeRange({ from: value, to: range.to });
+                }}
+                getExternalValue={() => range.from}
 
             />
 
-<FromControl 
+            <FromControl
                 step={step}
                 range={range}
                 minmax={minmax}
                 label="do"
-                doValidateFinalValue={ value => {
+                className="md:hidden"
+                doValidateFinalValue={value => {
 
-                    const parsedValue = parseFloat( value );
+                    const parsedValue = parseFloat(value);
 
-                    if ( isNaN( parsedValue ) ) {
+                    if (isNaN(parsedValue)) {
                         return false;
                     }
 
-                    if ( parsedValue > minmax.max ) {
+                    if (parsedValue > minmax.max) {
                         return false
                     }
 
                     return parsedValue;
-                } }
-                onSetValid={ value => {
-                    imposeRange( { from: range.from, to: value } );
-                } }
-                getExternalValue={ () => range.to }
+                }}
+                onSetValid={value => {
+                    imposeRange({ from: range.from, to: value });
+                }}
+                getExternalValue={() => range.to}
 
             />
-            
+
 
         </div>
     </Tooltip>

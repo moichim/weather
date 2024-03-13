@@ -1,5 +1,4 @@
-import { Badge } from "@nextui-org/react";
-import React from "react"
+import React from "react";
 
 type TimelineItemProps = {
     icon: React.ReactNode,
@@ -13,15 +12,15 @@ const TimelineItem: React.FC<TimelineItemProps> = props => {
 
     return <li role="article" className="relative pl-12 group">
 
-        <span className={`absolute left-0 z-10 flex items-center justify-center w-12 h-12 -translate-x-1/2 rounded-full bg-foreground text-background transition-all duration-300 group-hover:scale-110 ring-2 ring-white`}>
+        <span className={`absolute left-0 z-10 flex items-center justify-center w-12 h-12 -translate-x-1/2 rounded-full bg-slate-100 text-primary transition-all duration-300 group-hover:scale-110 ring-2 ring-primary`}>
 
             {props.icon}
 
             {props.isDone &&
-                <div className="absolute -right-2 -top-3 bg-success ring-2 ring-background rounded-full aspect-square">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
+                <div className="absolute -right-2 -top-3 bg-success p-1 text-white rounded-full aspect-square">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3}
                         stroke="currentColor"
-                        className="w-6 h-6"
+                        className="w-4 h-4"
                     >
                         <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                     </svg>
@@ -32,7 +31,7 @@ const TimelineItem: React.FC<TimelineItemProps> = props => {
             <h4 className="text-base font-medium opacity-70 transition-all duration-300 group-hover:opacity-100">
                 {props.title}
             </h4>
-            <p className="text-sm opacity-30 text-background transition-all duration-300 group-hover:opacity-70 group-hover:text-primary">{props.time}</p>
+            <p className="text-sm opacity-30 text-foreground transition-all duration-300 group-hover:opacity-70 group-hover:text-primary">{props.time}</p>
         </div>
     </li>
 }
@@ -43,7 +42,7 @@ export default function Timeline() {
             <ul
                 aria-label="Timeline projektu"
                 role="feed"
-                className="relative flex flex-col gap-12 py-12 pl-8 before:absolute before:top-0 before:left-8 before:h-full before:-translate-x-1/2 before:border before:border-dashed before:border-slate-200 after:absolute after:top-6 after:left-8 after:bottom-6 after:-translate-x-1/2 after:border after:border-slate-200 "
+                className="relative flex flex-col gap-12 py-12 pl-8 before:absolute before:top-0 before:left-8 before:h-full before:-translate-x-1/2 before:border before:border-dashed before:border-primary-200 after:absolute after:top-6 after:left-8 after:bottom-6 after:-translate-x-1/2 after:border after:border-primary-200 "
             >
                 <TimelineItem
                     isDone={true}

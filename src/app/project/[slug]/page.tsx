@@ -3,9 +3,6 @@ import { Graphs } from '@/components/graphs/graphs';
 import { googleSheetsProvider } from '@/graphql/google/googleProvider/googleProvider';
 import { getMetadataPublisher, getMetadataTitle } from '@/utils/metadata';
 import { Metadata, NextPage, ResolvingMetadata } from 'next';
-import { GraphContextProvider } from "@/state/graph/graphContext";
-import { DisplayContextProvider } from "@/state/graph/useBarInternal";
-import { MeteoContextProvider } from "@/state/meteo/meteoContext";
 
 export const generateStaticParams = async () => {
 

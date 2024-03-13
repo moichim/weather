@@ -1,11 +1,10 @@
 "use client";
 
-import { GoogleScope } from "@/graphql/google/google"
-import { MapContainer } from "react-leaflet"
-import { MapMarker } from "./MapMarker"
-import { MapMultipleWrapperElement } from "./MapWrapperElement"
+import { GoogleScope } from "@/graphql/google/google";
+import { Button, ButtonGroup } from "@nextui-org/react";
 import Link from "next/link";
-import { Button } from "@nextui-org/react";
+import { MapMarker } from "./MapMarker";
+import { MapMultipleWrapperElement } from "./MapWrapperElement";
 
 type MapMultipleInternalProps = {
     items: GoogleScope[],
@@ -27,12 +26,13 @@ export const MapMultipleInternal: React.FC<MapMultipleInternalProps> = props => 
                     lng: item.lon
                 }}
             >
-                
-                    <h2 className="text-lg">{item.name}</h2>
-                    <p>{item.description}</p>
-                    <Link href={`/${item.slug}`}>
-                        <Button>Zobrazit data</Button>
-                    </Link>
+                <h2 className="text-lg font-bold">{item.name}</h2>
+                <p className="text-xs text-foreground-500">{item.team}</p>
+                <p className="text-xs text-foreground-500">{item.locality}</p>
+                <ButtonGroup variant="flat">
+                    <Button size="sm" as={Link} href={`/project/${item.slug}`}>Data</Button>
+                    <Button size="sm" as={Link} href={`/project/${item.slug}/thermo`} color="primary">Termogramy</Button>
+                </ButtonGroup>
             </MapMarker>)}
         </MapMultipleWrapperElement>
     </div>

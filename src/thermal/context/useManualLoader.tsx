@@ -1,11 +1,11 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react";
-import { ThermalFileRequest } from "../registry/ThermalRequest";
 import { ThermalFileInstance } from "../file/ThermalFileInstance";
-import { useGroupInstance } from "./useGroupInstance";
-import { ThermalEvents } from "../registry/events";
+import { useThermalGroup } from "../hooks/retrieval/useThernalGroup";
 import { ThermalGroup } from "../registry/ThermalGroup";
+import { ThermalFileRequest } from "../registry/ThermalRequest";
+import { ThermalEvents } from "../registry/events";
 
 export const useManualLoader = (
     groupId: string,
@@ -15,7 +15,7 @@ export const useManualLoader = (
     const [ loading, setLoading ] = useState<boolean>(false);
     const [ instances, setInstances ] = useState<ThermalFileInstance[]>([]);
 
-    const group = useGroupInstance( groupId );
+    const group = useThermalGroup( groupId );
 
     const load = useCallback( () => {
 
