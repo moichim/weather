@@ -7,6 +7,8 @@ import { ScopeContextProvider } from "@/state/scope/scopeContext";
 import { notFound } from "next/navigation";
 import { PropsWithChildren } from "react";
 import { ScopePageProps } from "./page";
+import { Navbar } from "@/components/navigation/utils/Navbar";
+import { Link } from "@nextui-org/react";
 
 type ScopeLayoutProps = PropsWithChildren & ScopePageProps;
 
@@ -24,13 +26,31 @@ const ScopeLayout: React.FC<ScopeLayoutProps> = async ({ ...props }) => {
         <MeteoContextProvider>
             <GraphContextProvider>
                 <DisplayContextProvider>
-                        <header className="fixed w-0 h-0 top-5 left-5 z-[20]">
-                            <ScopeHeading {...scope} />
-                        </header>
 
-                        <main className="w-full h-full min-h-screen bg-gray-200 pb-[10rem] pt-20">
-                            {props.children}
-                        </main>
+                    <Navbar
+                        brandContent={<strong>{scope.name}</strong>}
+                        links={[
+                            {
+                                text: "Naměřená data",
+                                href:  `/${scope.slug}`,
+                            },
+                            {
+                                text: "Informace o týmu",
+                                href: `/${scope.slug}/info`
+                            },
+                            {
+                                text: "Termogramy",
+                                href: `/${scope.slug}/thermo`
+                            },
+                        ]}
+                        closeLink="/"
+                        closeLinkHint={`Zavřít projekt ${scope.name}`}
+                        className="bg-slate-100"
+                    />
+
+                    <main className="w-full h-full min-h-screen bg-gray-200 pb-[10rem]">
+                        {props.children}
+                    </main>
                 </DisplayContextProvider>
             </GraphContextProvider>
         </MeteoContextProvider>

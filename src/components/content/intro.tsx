@@ -17,6 +17,7 @@ export default function Intro() {
     return (
         <>
 
+            {/*
             <header className="absolute inset-x-0 top-0 z-50">
                 <nav className="flex items-center justify-between p-6 lg:px-8 maw-w-screen-xl" aria-label="Global">
                     <div className="flex lg:flex-1">
@@ -37,6 +38,7 @@ export default function Intro() {
                     </div>
                 </nav>
             </header>
+            */}
 
             <div className="relative isolate px-6 pt-14 lg:px-8 text-background">
                 <div
@@ -82,7 +84,7 @@ export default function Intro() {
 
                         <div className="w-full md:w-1/2 py-5">
 
-                            <IntroThermograms />
+                            {/*<IntroThermograms />*/}
 
 
 

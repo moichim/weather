@@ -53,7 +53,7 @@ const InfoPage: React.FC<ScopePageProps> = async props => {
 
     const scope = await googleSheetsProvider.fetchScopeDefinition(props.params.slug);
 
-    return <article className="w-full overflow-hidden">
+    return <article className="w-full overflow-hidden py-8">
 
         <header className="w-full hidden">
 

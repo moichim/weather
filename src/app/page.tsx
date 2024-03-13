@@ -1,6 +1,7 @@
 import Intro from '@/components/content/intro';
 import { ContentContainer } from '@/components/content/ui/contentContainer';
 import { GoogleDocsViewer } from '@/components/documents/googleDocumentViewer';
+import { ScopeMap } from '@/components/scope/scopeMap';
 import { ScopeSelectScreen } from '@/components/scope/scopeSelectScreen';
 import { googleSheetsProvider } from '@/graphql/google/googleProvider/googleProvider';
 
@@ -11,6 +12,8 @@ export default async function Home() {
   return <div className="bg-foreground pb-20">
     
     <Intro />
+
+    <ScopeMap scopes={data}/>
 
     <ContentContainer element="main" id="main">
       <ScopeSelectScreen scopes={data}/>

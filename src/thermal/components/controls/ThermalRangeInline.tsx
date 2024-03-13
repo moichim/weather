@@ -6,10 +6,11 @@ import { useThermalRange } from "@/thermal/hooks/propertyListeners/useThermalRan
 import { ThermalGroup } from "@/thermal/registry/ThermalGroup";
 import { ThermalRegistry } from "@/thermal/registry/ThermalRegistry";
 import { ThermalRangeType } from "@/thermal/registry/interfaces";
-import { Skeleton, SliderValue, Tooltip } from "@nextui-org/react";
+import { Input, Skeleton, SliderValue, Tooltip, cn } from "@nextui-org/react";
 import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import { SliuderValueInput } from "./SliderValueInput";
 import { ThermalRangeSlider } from "./ThermalRangeSlider";
+import { FromControl } from "./textInputs/fromControl";
 
 type ThermalRangeProps = {
     object: ThermalRegistry | ThermalGroup | ThermalFileInstance,
@@ -21,7 +22,7 @@ type ThermalRangeProps = {
     tooltip?: React.ReactNode
 }
 
-export const ThermalRange: React.FC<ThermalRangeProps> = ({
+export const ThermalRangeInline: React.FC<ThermalRangeProps> = ({
     object,
     label = "Teplotní škála",
     imposeInitialRange = undefined,
@@ -76,13 +77,35 @@ export const ThermalRange: React.FC<ThermalRangeProps> = ({
     // Impose the local change to global context
     useEffect(() => {
 
-        if (range !== undefined)
+        if (range !== undefined) {
             if (range.from !== final[0] || range.to !== final[1]) {
                 imposeRange({ from: final[0], to: final[1] });
+            }
+            if ( final[0] !== value[0] || final[1] !== value[1] ) {
                 setValue(final);
             }
+        }
+            
 
     }, [final]);
+
+
+    // Reflect global changes to the local state
+    useEffect( () => {
+
+        if ( range !== undefined ) {
+
+            if ( 
+                range.from !== final[0] 
+                || range.to !== final[1]
+            ) {
+                setFinal( [ range.from, range.to ] );
+                setValue( [ range.from, range.to ] );
+            }
+
+        }
+
+    }, [ range ] );
 
 
 
@@ -114,10 +137,8 @@ export const ThermalRange: React.FC<ThermalRangeProps> = ({
         placement="bottom"
         isDisabled={props.tooltip === undefined}
     >
-        <div className={className}>
+        <div className={cn( className, "flex gap-4 w-full items-center" )}>
             <ThermalRangeSlider
-
-                label={label}
 
                 step={step}
                 showSteps={step !== -Infinity}
@@ -142,45 +163,59 @@ export const ThermalRange: React.FC<ThermalRangeProps> = ({
                     label: "text-xl"
                 }}
 
+            />
+            <FromControl 
+                step={step}
+                range={range}
+                minmax={minmax}
+                label="od"
+                doValidateFinalValue={ value => {
 
-                renderValue={({ children, ...props }) => (
-                    <div className="flex gap-3">
+                    const parsedValue = parseFloat( value );
 
-                        <SliuderValueInput
-                            {...props}
-                            startContent="od"
-                            value={final[0]}
-                            onChange={(e) => {
+                    if ( isNaN( parsedValue ) ) {
+                        return false;
+                    }
 
-                                const event = e as ChangeEvent<HTMLInputElement>
+                    if ( parsedValue < minmax.min ) {
+                        return false
+                    }
 
-                                setFinal([parseFloat(event.target.value), final[1]]);
-                                
-                            }}
-                            tooltipContent="Minimální zobrazená teplota"
-                        />
-
-                        <SliuderValueInput
-                            {...props}
-                            startContent="do"
-                            value={final[1]}
-                            onChange={(e) => {
-
-                                // const v = e.target.value;
-
-                                // setFinal([parseFloat(v), final[1]]);
-                            }}
-                            tooltipContent="Maximální zobrazená teplota"
-                        />
-
-
-                    </div>
-                )}
-
+                    return parsedValue;
+                } }
+                onSetValid={ value => {
+                    imposeRange( { from: value, to: range.to } );
+                } }
+                getExternalValue={ () => range.from }
 
             />
 
-            {props.description && <div className="text-sm text-center text-gray-500 pt-4">{props.description}</div>}
+<FromControl 
+                step={step}
+                range={range}
+                minmax={minmax}
+                label="do"
+                doValidateFinalValue={ value => {
+
+                    const parsedValue = parseFloat( value );
+
+                    if ( isNaN( parsedValue ) ) {
+                        return false;
+                    }
+
+                    if ( parsedValue > minmax.max ) {
+                        return false
+                    }
+
+                    return parsedValue;
+                } }
+                onSetValid={ value => {
+                    imposeRange( { from: range.from, to: value } );
+                } }
+                getExternalValue={ () => range.to }
+
+            />
+            
 
         </div>
     </Tooltip>
