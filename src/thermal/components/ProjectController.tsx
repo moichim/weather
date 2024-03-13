@@ -6,6 +6,7 @@ import { useProjectLoader } from "../context/useProjectLoader";
 import { useRegistryListener } from "../context/useRegistryListener";
 import { ThermalGroup } from "./ThermalGroup";
 import { ThermalRangeInline } from "./controls/ThermalRangeInline";
+import { OpacityScale } from "./registry/OpacityScale";
 
 type ProjectControllerProps = {
     scope: string
@@ -29,10 +30,15 @@ export const ProjectController: React.FC<ProjectControllerProps> = props => {
             innerContent={listener.registry.range === undefined
                 ? <div className="flex items-center gap-4 text-primary"><Spinner size="sm"/><span>Načítám a zpracovávám soubory</span></div>
 
-                : <ThermalRangeInline
+                : <><ThermalRangeInline
                     object={listener.registry}
                     imposeInitialRange={listener.registry.range}
-                    description="Klikněte na posuvník a změňte rozsah zobrazených teplot!" />}
+                    description="Klikněte na posuvník a změňte rozsah zobrazených teplot!" />
+                    <div className="w-30 md:w-40 lg:w-60">
+                        <OpacityScale />
+                    </div>
+                </>
+                }
         />
 
         {(loading === true || listener.ready === false) &&
