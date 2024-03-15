@@ -17,7 +17,7 @@ import { NavbarDesktopLinks } from "./NnavbarDesktopLinks";
 import { ArrowRightIcon, CloseIcon } from "@/components/ui/icons";
 import { useState } from "react";
 
-export type NavbarProps = NextuiNavbarProps & {
+export type NavbarProps = React.PropsWithChildren & NextuiNavbarProps & {
     brandContent?: React.ReactNode,
     links?: NavbarLinkDefinition[],
     innerContent?: React.ReactNode,
@@ -33,6 +33,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     links,
     brandContent,
     endContent,
+    children,
     ...props
 }) => {
 
@@ -115,10 +116,14 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             {content && content}
 
+            {children}
+
         </NavbarContent>
 
         {(endContent || closeLink) && <NavbarContent
             justify="end"
+            className="flex-grow-0"
+            style={{flexGrow: 0}}
         >
 
             {endContent && endContent}

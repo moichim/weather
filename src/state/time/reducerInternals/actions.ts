@@ -1,28 +1,36 @@
-import { GoogleScope } from "@/graphql/google/google";
 import { TimeStoragePresetType } from "./storage";
-import { SelectionStartAction } from "@/state/graph/reducerInternals/actions";
+
 
 export enum TimeEvents {
-    INIT_FROM_SCOPE = 1,
-    RESET = 7,
-    
-    SET_RANGE = 2,
+    RESET = 2,
 
-    SET_SELECTION = 9,
-    START_SELECTING = 3,
-    END_SELECTING = 4,
+    SET_RANGE = 3,
+    PICK_RANGE = 4,
+
+    SET_SELECTION = 5,
+    START_SELECTING = 6,
+    END_SELECTING = 7,
     CLEAR_SELECTION = 8,
-    
-    ADD_PRESET = 5,
-    ACTIVATE_PRESET = 6,
+    PICK_SELECTION = 9,
+
+    ACTIVATE_PRESET = 11,
+
+    MODIFY_SELECTION_FROM = 12,
+    MODIFY_SELECTION_TO = 13,
+    MODIFY_RANGE_FROM = 14,
+    MODIFY_RANGE_TO = 15,
+
+    SET_MODIFICATION_MODE = 16,
 
 }
 
-export enum RoundTo {
-    HOUR = 1,
-    DAY = 2,
-    WEEK = 3,
-    MONTH = 4
+export enum TimePeriod {
+    HOUR = "jednu hodinu",
+    DAY = "jeden den",
+    WEEK = "jeden týden",
+    MONTH = "jeden měsíc",
+    YEAR = "jeden rok"
+
 }
 
 type TimePayloadBase = {};
@@ -31,31 +39,10 @@ type TimeEventBase<T extends TimePayloadBase> = {
     payload: T
 }
 
-// init from scope
-
-export type InitFromScopePayload = TimePayloadBase & {
-    scope: GoogleScope
-}
-
-type InitFromScopeAction = TimeEventBase<InitFromScopePayload> & {
-    type: TimeEvents.INIT_FROM_SCOPE
-}
-
-const initFromScope = (
-    scope: GoogleScope
-): InitFromScopeAction => {
-    return {
-        type: TimeEvents.INIT_FROM_SCOPE,
-        payload: {
-            scope
-        }
-    }
-}
-
 
 // Reset
 
-type ResetAction = TimeEventBase<TimePayloadBase> & {
+export type ResetAction = TimeEventBase<TimePayloadBase> & {
     type: TimeEvents.RESET
 }
 
@@ -67,50 +54,22 @@ const reset = (): ResetAction => {
 }
 
 
-// Add preset
-
-export type AddPresetPayload = TimePayloadBase & TimeStoragePresetType & {
-    slug: string
-}
-
-type AddPresetAction = TimeEventBase<AddPresetPayload> & {
-    type: TimeEvents.ADD_PRESET
-}
-
-const addPreset = (
-    slug: string,
-    name: string,
-    from: number,
-    to: number
-): AddPresetAction => {
-    return {
-        type: TimeEvents.ADD_PRESET,
-        payload: {
-            name,
-            slug,
-            from,
-            to,
-            active: false
-        }
-    }
-}
-
 
 // Activate preset
 
-export type ActivatePresetType = TimePayloadBase & {
-    presetSlug: string
+type ActivatePresetType = TimePayloadBase & {
+    preset: string | TimeStoragePresetType
 }
 
-type ActivatePresetAction = TimeEventBase<ActivatePresetType> & {
+export type ActivatePresetAction = TimeEventBase<ActivatePresetType> & {
     type: TimeEvents.ACTIVATE_PRESET
 }
 
-const activatePreset = ( presetSlug: string ): ActivatePresetAction => {
+const activatePreset = (presetSlug: string): ActivatePresetAction => {
     return {
         type: TimeEvents.ACTIVATE_PRESET,
         payload: {
-            presetSlug
+            preset: presetSlug
         }
     }
 }
@@ -119,20 +78,20 @@ const activatePreset = ( presetSlug: string ): ActivatePresetAction => {
 // Selection
 
 
-export type SlectionPayload = TimePayloadBase & {
+type SlectionPayload = TimePayloadBase & {
     value: number,
-    roundTo: RoundTo
+    roundTo: TimePeriod
 }
 
 // Start selection
 
-type StartSelectionAction = TimeEventBase<SlectionPayload> & {
+export type StartSelectionAction = TimeEventBase<SlectionPayload> & {
     type: TimeEvents.START_SELECTING
 }
 
 const startSelection = (
     value: number,
-    roundTo: RoundTo
+    roundTo: TimePeriod
 ): StartSelectionAction => {
     return {
         type: TimeEvents.START_SELECTING,
@@ -145,13 +104,13 @@ const startSelection = (
 
 // End selection
 
-type EndSelectionAction = TimeEventBase<SlectionPayload> & {
+export type EndSelectionAction = TimeEventBase<SlectionPayload> & {
     type: TimeEvents.END_SELECTING
 }
 
 const endSelection = (
     value: number,
-    roundTo: RoundTo
+    roundTo: TimePeriod
 ): EndSelectionAction => {
     return {
         type: TimeEvents.END_SELECTING,
@@ -180,22 +139,22 @@ const clearSelection = (): ClearSelectionAction => {
 // Seting
 
 
-export type SetPayload = TimePayloadBase & {
+type SetPayload = TimePayloadBase & {
     from: number,
     to: number,
-    roundTo: RoundTo
+    roundTo: TimePeriod
 }
 
 // Set selection
 
-type SetSelectionAction = TimeEventBase<SetPayload> & {
+export type SetSelectionAction = TimeEventBase<SetPayload> & {
     type: TimeEvents.SET_SELECTION
 }
 
 const setSelection = (
     from: number,
     to: number,
-    roundTo: RoundTo
+    roundTo: TimePeriod
 ): SetSelectionAction => {
     return {
         type: TimeEvents.SET_SELECTION,
@@ -207,17 +166,42 @@ const setSelection = (
     }
 }
 
+// Pick a period of time
 
-// Set selection
+type SelectionPickPayload = TimePayloadBase & {
+    value: number,
+    period: TimePeriod
+}
 
-type SetRangeAction = TimeEventBase<SetPayload> & {
+export type SelectionPickAction = TimeEventBase<SelectionPickPayload> & {
+    type: TimeEvents.PICK_SELECTION,
+}
+
+const pickSelection = (
+    value: number,
+    period: TimePeriod
+): SelectionPickAction => {
+    return {
+        type: TimeEvents.PICK_SELECTION,
+        payload: {
+            value,
+            period
+        }
+    }
+}
+
+
+
+// Set range
+
+export type SetRangeAction = TimeEventBase<SetPayload> & {
     type: TimeEvents.SET_RANGE
 }
 
 const setRange = (
     from: number,
     to: number,
-    roundTo: RoundTo
+    roundTo: TimePeriod
 ): SetRangeAction => {
     return {
         type: TimeEvents.SET_RANGE,
@@ -229,14 +213,98 @@ const setRange = (
     }
 }
 
+// Pick a period of time
+
+type RangePickPayload = TimePayloadBase & {
+    value: number,
+    period: TimePeriod
+}
+
+export type RangePickAction = TimeEventBase<RangePickPayload> & {
+    type: TimeEvents.PICK_RANGE
+}
+
+const pickRange = (
+    value: number,
+    period: TimePeriod
+): RangePickAction => {
+    return {
+        type: TimeEvents.PICK_RANGE,
+        payload: {
+            value,
+            period
+        }
+    }
+}
+
+
+// Modification
+
+type ModificationPayload = TimePayloadBase & {
+    amount: number
+}
+
+export type RangeFromModificationAction = TimeEventBase<ModificationPayload> & {
+    type: TimeEvents.MODIFY_RANGE_FROM
+}
+
+export type RangeToModificationAction = TimeEventBase<ModificationPayload> & {
+    type: TimeEvents.MODIFY_RANGE_TO
+}
+
+export type SelectionFromModificationAction = TimeEventBase<ModificationPayload> & {
+    type: TimeEvents.MODIFY_SELECTION_FROM
+}
+
+export type SelectionToModificationAction = TimeEventBase<ModificationPayload> & {
+    type: TimeEvents.MODIFY_SELECTION_TO
+}
+
+type ModificationEvents = RangeFromModificationAction
+    | RangeToModificationAction
+    | SelectionFromModificationAction
+    | SelectionToModificationAction;
+
+type ModificationEventsKeys = TimeEvents.MODIFY_RANGE_FROM | TimeEvents.MODIFY_RANGE_TO | TimeEvents.MODIFY_SELECTION_FROM | TimeEvents.MODIFY_SELECTION_TO;
+
+
+// Set modification mode
+
+type SetModificationModePayload = TimePayloadBase & {
+    mode: TimePeriod
+}
+export type SetModificationModeAction = TimeEventBase<SetModificationModePayload> & {
+    type: TimeEvents.SET_MODIFICATION_MODE
+}
+
+
+
+const modificationActionFactory = <T extends ModificationEvents>(
+    eventType: ModificationEventsKeys
+) => {
+    return (value: number) => ({
+        type: eventType as ModificationEventsKeys,
+        payload: {
+            amount: value
+        }
+    } as T)
+}
+
+const setModificationMode = (mode: TimePeriod): SetModificationModeAction => {
+    return {
+        type: TimeEvents.SET_MODIFICATION_MODE,
+        payload: {
+            mode
+        }
+    }
+}
+
 
 /** Dispatch time events from the data */
 export class TimeEventsFactory {
 
-    public static initFromScope = initFromScope;
     public static reset = reset;
 
-    public static addPreset = addPreset;
     public static activatePreset = activatePreset;
 
     public static startSelection = startSelection;
@@ -245,17 +313,36 @@ export class TimeEventsFactory {
 
     public static setSelection = setSelection;
     public static setRange = setRange;
+    public static pickSelection = pickSelection;
+    public static pickRange = pickRange;
+
+    public static modifyRangeFrom = modificationActionFactory<RangeFromModificationAction>(TimeEvents.MODIFY_RANGE_FROM);
+
+    public static modifyRangeTo = modificationActionFactory<RangeToModificationAction>(TimeEvents.MODIFY_RANGE_TO);
+
+    public static modifySelectionFrom = modificationActionFactory<SelectionFromModificationAction>(TimeEvents.MODIFY_RANGE_FROM);
+
+    public static modifySelectionTo = modificationActionFactory<SelectionToModificationAction>(TimeEvents.MODIFY_RANGE_TO);
+
+    public static setModificationMode = setModificationMode;
+
+
 
 }
 
 
 /** All available time actions */
-export type TimeEventsType = InitFromScopeAction
-    | ResetAction
-    | AddPresetAction
+export type TimeEventsType = ResetAction
     | ActivatePresetAction
-    | SelectionStartAction
+    | StartSelectionAction
     | EndSelectionAction
     | ClearSelectionAction
     | SetSelectionAction
-    | SetRangeAction;
+    | SetRangeAction
+    | SelectionPickAction
+    | RangePickAction
+    | RangeFromModificationAction
+    | RangeToModificationAction
+    | SelectionFromModificationAction
+    | SelectionToModificationAction
+    | SetModificationModeAction;

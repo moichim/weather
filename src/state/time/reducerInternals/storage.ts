@@ -1,21 +1,281 @@
+import { GoogleScope } from "@/graphql/google/google"
+import { addDays, differenceInDays, subDays, subMonths } from "date-fns"
+import { TimePeriod } from "./actions"
+import { correct } from "./reducer"
+import { TimeRound } from "./timeUtils/rounding"
+
 type TimeType = {
     from: number,
     to: number
 }
 
 export type TimeStoragePresetType = TimeType & {
-    name: string,
-    active: boolean
+    name: string
 }
 
 export type TimeStorageType = TimeType & {
-    default: TimeType,
+    defaultFrom: number,
+    defaultTo: number,
+    modificationMode: TimePeriod,
+    currentPreset?: TimeStoragePresetType,
+    mayLowerFrom: boolean,
+    mayRiseFrom: boolean,
+    mayLowerTo: boolean,
+    mayRiseTo: boolean,
     presets: {
         [index: string]: TimeStoragePresetType
     },
     selectionFrom?: number,
     selectionTo?: number,
-    cursorFrom?: number,
-    cursorTo?: number
+    selectionCursor?: number
+
+}
+
+export const timeStorageDefaults: TimeStorageType = {
+    defaultFrom: 0,
+    defaultTo: 0,
+    modificationMode: TimePeriod.DAY,
+    presets: {},
+    from: 0,
+    to: 0,
+    mayLowerFrom: false,
+    mayLowerTo: false,
+    mayRiseFrom: false,
+    mayRiseTo: false
+}
+
+const MONTHS = {
+    1: "leden",
+    2: "únor",
+    3: "březen",
+    4: "duben",
+    5: "květen",
+    6: "červen",
+    7: "červenec",
+    8: "srpen",
+    9: "září",
+    10: "říjen",
+    11: "listopad",
+    12: "prosinec"
+};
+
+const calculatePresets = (from: number, to: number): {
+    [index: string]: TimeStoragePresetType
+} => {
+
+    const f = TimeRound.down(from, TimePeriod.DAY);
+    const t = TimeRound.up(to, TimePeriod.DAY);
+
+    const durationInDays = Math.abs(differenceInDays(f, t));
+
+    console.log(f, t, durationInDays);
+
+    // If less than a week, return no preset
+    if (durationInDays <= 7) {
+        return {};
+    }
+
+    const presets: { [index: string]: TimeStoragePresetType } = {
+        LAST_7_DAYS: {
+            from: subDays(t, 7).getTime(),
+            to: t.getTime(),
+            name: "Posledních 7 dní",
+        },
+        WHOLE: {
+            from: f.getTime(),
+            to: t.getTime(),
+            name: "Celé období"
+        }
+    };
+
+    // If less than a month, return last week or entire month
+    if (durationInDays <= 31) {
+
+        return presets;
+    }
+
+    // If more than month, return a predefined set and all months
+
+    let { LAST_7_DAYS, WHOLE } = presets;
+
+    const minMonth = f.getUTCMonth() + 1;
+    const minYear = f.getUTCFullYear();
+    const maxMonth = t.getUTCMonth() + 1;
+    const maxYear = t.getUTCFullYear();
+
+    const months: { [index: string]: TimeStoragePresetType } = {};
+
+    const getPresetID = (year: number, month: number) => `preset_${year}_${month}`;
+
+    for (let year = minYear; year <= maxYear; year++) {
+
+        if (minYear === maxYear) {
+
+            for (let month = minMonth; month <= maxMonth; month++) {
+
+                let calculatedFrom = f;
+
+                if (month !== minMonth) {
+                    const frm = new Date();
+                    frm.setUTCDate(5);
+                    frm.setUTCFullYear(year);
+                    frm.setUTCMonth(month - 1);
+                    calculatedFrom = TimeRound.down(frm, TimePeriod.MONTH);
+                }
+
+                let calculatedTo = t;
+
+                if (month !== maxMonth) {
+                    const tto = new Date;
+                    tto.setUTCDate(6);
+                    tto.setUTCFullYear(year);
+                    tto.setUTCMonth(month - 1);
+                    calculatedTo = TimeRound.up(tto, TimePeriod.MONTH);
+                }
+
+
+                months[getPresetID(year, month)] = {
+                    name: [
+                        MONTHS[month as keyof typeof MONTHS],
+                        year
+                    ].join(" "),
+                    from: calculatedFrom.getTime(),
+                    to: calculatedTo.getTime()
+                }
+
+            }
+
+        } else if (year === minYear) {
+
+            for (let month = minMonth; month <= 12; month++) {
+
+                let calculatedFrom = f;
+
+                if (month !== minMonth) {
+                    const frm = new Date();
+                    frm.setUTCDate(5);
+                    frm.setUTCFullYear(year);
+                    frm.setUTCMonth(month - 1);
+                    calculatedFrom = TimeRound.down(frm, TimePeriod.MONTH);
+                }
+
+                let calculatedTo = new Date;
+                calculatedTo.setUTCDate(5);
+                calculatedTo.setUTCFullYear(year);
+                calculatedTo.setUTCMonth(month - 1);
+                calculatedTo = TimeRound.up(calculatedTo, TimePeriod.MONTH);
+
+
+                months[getPresetID(year, month)] = {
+                    name: [
+                        MONTHS[month as keyof typeof MONTHS],
+                        year
+                    ].join(" "),
+                    from: calculatedFrom.getTime(),
+                    to: calculatedTo.getTime()
+                }
+
+            }
+
+        } else if (year === maxYear) {
+
+            for (let month = 1; month <= maxMonth; month++) {
+
+                let calculatedFrom = new Date();
+                calculatedFrom.setUTCDate(5);
+                calculatedFrom.setUTCFullYear(year);
+                calculatedFrom.setUTCMonth(month - 1);
+                calculatedFrom = TimeRound.down(calculatedFrom, TimePeriod.MONTH);
+
+                let calculatedTo = t;
+
+                if (month !== maxMonth) {
+                    calculatedTo = new Date;
+                    calculatedTo.setUTCDate(8);
+                    calculatedTo.setUTCFullYear(year);
+                    calculatedTo.setUTCMonth(month - 1);
+                    calculatedTo = TimeRound.up(calculatedTo, TimePeriod.MONTH);
+                }
+
+                months[getPresetID(year, month)] = {
+                    name: [
+                        MONTHS[month as keyof typeof MONTHS],
+                        year
+                    ].join(" "),
+                    from: calculatedFrom.getTime(),
+                    to: calculatedTo.getTime()
+                }
+
+            }
+
+        } else {
+
+            for (let month = 1; month <= 12; month++) {
+
+                let calculatedFrom = new Date();
+                calculatedFrom.setUTCDate(5);
+                calculatedFrom.setUTCFullYear(year);
+                calculatedFrom.setUTCMonth(month - 1);
+                calculatedFrom = TimeRound.down(calculatedFrom, TimePeriod.MONTH);
+
+                let calculatedTo = new Date();
+                calculatedTo.setUTCDate(5);
+                calculatedTo.setUTCFullYear(year);
+                calculatedTo.setUTCMonth(month - 1);
+                calculatedTo = TimeRound.up(calculatedTo, TimePeriod.MONTH);
+
+                months[getPresetID(year, month)] = {
+                    name: [
+                        MONTHS[month as keyof typeof MONTHS],
+                        year
+                    ].join(" "),
+                    from: calculatedFrom.getTime(),
+                    to: calculatedTo.getTime()
+                }
+
+            }
+
+        }
+
+    }
+
+
+    return {
+        LAST_7_DAYS,
+        ...months,
+        WHOLE
+    }
+
+
+}
+
+export const getDefaultsFromScope = (
+    scope: GoogleScope
+): TimeStorageType => {
+
+    const initialFrom = subMonths(new Date, 20).getTime();
+    const initialTo = addDays(TimeRound.up(new Date, TimePeriod.DAY), 3).getTime();
+
+    const presets = calculatePresets(initialFrom, initialTo);
+
+    const currentPreset = presets.WHOLE;
+
+
+    return correct({
+
+        ...timeStorageDefaults,
+
+        defaultFrom: initialFrom,
+        defaultTo: initialTo,
+
+        modificationMode: TimePeriod.DAY,
+
+        from: currentPreset.from,
+        to: currentPreset.to,
+
+        presets: presets,
+        currentPreset: currentPreset
+
+    })
 
 }
