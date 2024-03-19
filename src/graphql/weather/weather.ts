@@ -1,6 +1,6 @@
 import { MeteoRequestType } from "@/state/meteo/data/query";
 import gql from "graphql-tag";
-import { GoogleRequest } from "../google/google";
+import { GoogleColumnStats, GoogleRequest } from "../google/google";
 import { Properties } from "./definitions/properties";
 import { Sources, WeatherSourceType } from "./definitions/source";
 import { AbstractWeatherProvider } from "./weatherProviders/abstractProvider";
@@ -60,8 +60,7 @@ export type WeatherSerieIndexType = {
 
 export type WeatherSerie = {
     source: WeatherSourceType,
-    entries: WeatherEntryType[],
-    statistics: WeatherStatistics
+    entries: WeatherEntryType[]
 }
 
 export type WeatherProviderRequest = GoogleRequest;
@@ -75,13 +74,19 @@ export const weatherTypeDefs = gql`
 
     extend type Query {
         rangeMeteo(scope: String, lat: Float!, lon: Float!, from:Float,to:Float, hasNtc: Boolean!): WeatherResponse
+        statisticsMeteo(scope: String, lat: Float!, lon: Float!, from:Float,to:Float, hasNtc: Boolean!): [Statistic]
     }
 
     type Statistic {
+        name: String!
+        slug: String!
+        color: String!
+        in: Property!
+        description: String
         min: Float
         max: Float
         avg: Float
-        count: Float!
+        count: Float
     }
 
     type Statistics {
@@ -184,6 +189,34 @@ export const weatherResolvers = {
                 });
 
         },
+
+        statisticsMeteo: async (
+            parent: any,
+            args: MeteoRequestType
+        ) => {
+
+            const providers: AbstractWeatherProvider[] = [openMeteoForecastProvider, openMeteoHistoryProvider];
+
+            if (args.hasNtc) {
+                providers.push(ntcProvider);
+            }
+
+            const response =  await Promise.all(providers.map(p => p.fetchStatistics(args)));
+
+            let result: GoogleColumnStats[] = [];
+
+            response.forEach( resp => {
+                result = [
+                    ...result,
+                    ...resp
+                ]
+            } );
+
+            return result;
+
+        },
+
+
         sources: () => Sources.all(),
         properties: () => Properties.all()
     }

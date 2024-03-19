@@ -26,7 +26,7 @@ export const ToControl: React.FC = () => {
                 mayDo={ timeState.mayLowerTo }
             />
 
-            <div className="py-1 px-3 text-center bg-background text-foreground border-2 border-s-0 border-r-0 border-gray-300 group-hover:border-primary-300 h-14 relative">
+            <div className="py-1 px-3 text-center bg-background text-foreground border-2 border-s-0 border-r-0 border-gray-300 group-hover:border-primary-300 h-14 relative min-w-[7rem]">
                 <div className="">{TimeFormat.humanDate(timeState.to)}</div>
                 <div className="text-xs w-full flex justify-between">
                     <span className="group-hover:text-primary-500 opacity-50 group-hover:opacity-100">DO</span>

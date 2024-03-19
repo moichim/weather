@@ -43,6 +43,15 @@ export type GoogleColumn = GoogleDataColumnDefinition & {
 
 }
 
+export type GoogleColumnStats = GoogleDataColumnDefinition & {
+
+    min: number|null,
+    max: number|null,
+    avg: number|null,
+    count: number
+
+}
+
 export type GoogleScopeData = {
     data: GoogleColumn[]
 }
@@ -51,6 +60,7 @@ export const googleTypeDefs = gql`
 
     extend type Query {
         rangeGoogle( scope: String, lat: Float!, lon: Float!, from:Float, to:Float, sheetId: String!, sheetTab: String! ): GoogleScopeData
+        statisticsGoogle(scope: String, lat: Float!, lon: Float!, from:Float, to:Float, sheetId: String!, sheetTab: String!): [GoogleColumnStats]
     }
 
     type GoogleScopeData {
@@ -72,6 +82,18 @@ export const googleTypeDefs = gql`
         in: Property!
         description: String
         values: [GoogleColumnValue]
+        min: Float
+        max: Float
+        avg: Float
+        count: Float
+    }
+
+    type GoogleColumnStats {
+        name: String!
+        slug: String!
+        color: String!
+        in: Property!
+        description: String
         min: Float
         max: Float
         avg: Float
@@ -111,6 +133,13 @@ export const googleResolvers = {
             }
 
         },
+
+        statisticsGoogle: async (
+            parent: any,
+            args: GoogleRequest
+        ) => {
+            return await googleSheetsProvider.fetchScopeStatisticsInRange( args );
+        }
     }
 
 }

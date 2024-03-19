@@ -30,6 +30,7 @@ const properties: {
         min: -10,
         max: 40
     },
+    /*
     wind_dir: {
         type: "Float",
         name: "Směr větru",
@@ -38,6 +39,7 @@ const properties: {
         min: 0,
         max: 360
     },
+    */
     wind_speed: {
         type: "Float",
         name: "Rychlost větru",
@@ -99,6 +101,8 @@ const properties: {
         min: 0,
         max: 255
     },
+
+    /*
     snow_depth: {
         type: "Float",
         name: "Sníh - hloubka",
@@ -107,6 +111,7 @@ const properties: {
         min: 0,
         max: 255
     },
+    */
     evapotranspiration: {
         type: "Float",
         name: "Evapotranspirace",

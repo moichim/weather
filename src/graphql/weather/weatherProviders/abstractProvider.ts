@@ -2,6 +2,7 @@ import { MeteoRequestType } from "@/state/meteo/data/query";
 import { WeatherSerie, WeatherEntryType, WeatherProviderRequest, WeatherSerieIndexType, WeatherStatistics, WeatherStatistic } from "../weather";
 import { WeatherSourceType } from "../definitions/source";
 import { Properties } from "../definitions/properties";
+import { GoogleColumnStats } from "@/graphql/google/google";
 
 export interface IProvider {
 
@@ -33,10 +34,19 @@ export abstract class AbstractWeatherProvider {
         return await this.doRequest( args ).then( response => {
             return {
                 source: this.getSource(),
-                entries: response,
-                statistics: this.calculateStatistics( response )
+                entries: response
             }
         } )
+
+    }
+
+    public async fetchStatistics(
+        args: MeteoRequestType
+    ): Promise<GoogleColumnStats[]> {
+
+        return await this.doRequest( args ).then( response => {
+            return this.calculateStatistics( response )
+        } );
 
     }
 
@@ -44,11 +54,11 @@ export abstract class AbstractWeatherProvider {
         args: MeteoRequestType 
     ): Promise<WeatherEntryType[]>;
 
-    protected calculateStatistics( payload: WeatherSerie["entries"] ): WeatherStatistics {
+    protected calculateStatistics( payload: WeatherSerie["entries"] ): GoogleColumnStats[] {
 
         const properties = Properties.all().map( p => p.slug );
 
-        return Object.fromEntries( properties.map( propertySlug => {
+        const result = properties.map( propertySlug => {
 
             let min: number|undefined = payload.reduce( (state, current) => {
 
@@ -77,19 +87,27 @@ export abstract class AbstractWeatherProvider {
 
             const property = Properties.one( propertySlug )!;
 
-            const statistics: WeatherStatistic = {
-                type: "line",
-                name: property.name!,
-                color: property.color!,
-                slug: propertySlug,
-                min: min,
-                max: max,
-                avg: isNaN(avg) ? undefined : avg, 
+            const source = this.getSource();
+
+            const statistics: GoogleColumnStats = {
+                name: source.name,
+                color: source.color,
+                slug: [
+                    propertySlug, 
+                    source.slug
+                ].join( "_" ),
+                description: property.description,
+                in: property,
+                min: min ?? null,
+                max: max ?? null,
+                avg: isNaN(avg) ? null : avg, 
                 count
             }
 
-            return [propertySlug, statistics]
-        } ) );
+            return statistics;
+        } );
+
+        return result;
 
     }
 

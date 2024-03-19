@@ -2,7 +2,7 @@
 
 import { WeatherStatistic } from "@/graphql/weather/weather";
 import { AvailableWeatherProperties, Properties } from "@/graphql/weather/definitions/properties";
-import { StatisticsProcessing } from "@/state/meteo/data/statisticsProcessing";
+import { StatisticsProcessing } from "@/state/data/processors/statisticsProcessing";
 import { useMeteoContext } from "@/state/meteo/meteoContext";
 import { useMemo } from "react";
 import { useTimeContext } from "@/state/time/timeContext";

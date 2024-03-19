@@ -64,7 +64,7 @@ const LinkWithoutDropdown: React.FC<NavbarLinkDefinition> = props => {
 
 export const NavbarDesktopLinks: React.FC<NavbarDesktopLinks> = props => {
 
-    return <div className="gap-4 items-center hidden md:flex">
+    return <div className="gap-4 items-center hidden lg:flex">
         {props.links.map( item => {
 
             if ( item.links === undefined )

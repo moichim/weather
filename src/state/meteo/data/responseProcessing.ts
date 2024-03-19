@@ -4,7 +4,7 @@ import { Properties } from "@/graphql/weather/definitions/properties";
 import { current } from "tailwindcss/colors";
 import { Sources } from "@/graphql/weather/definitions/source";
 
-type BufferEntryType = {
+export type BufferEntryType = {
     [index:string]: number|undefined
 } & {
     time: number,

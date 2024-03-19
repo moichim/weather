@@ -6,9 +6,9 @@ import { useEffect, useState } from "react";
 import { useTimeContext } from "../time/timeContext";
 import { METEO_DATA_QUERY, METEO_RANGE_QUERY, MeteoQueryResponseType, MeteoRequestType } from "./data/query";
 import { MeteoDataProcessed, MeteoResponseProcessor } from "./data/responseProcessing";
-import { GraphStatisticsDataType, StatisticsProcessing } from "./data/statisticsProcessing";
+import { GraphStatisticsDataType, StatisticsProcessing } from "../data/processors/statisticsProcessing";
 
-/** Hook used by reducer. DO NOT USE IN COMPONENTS! */
+/** Hook used by reducer. DO NOT USE IN COMPONENTS! @deprecated */
 export const useMeteoInternal = (
     scope: GoogleScope
 ) => {

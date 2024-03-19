@@ -255,8 +255,8 @@ export const getDefaultsFromScope = (
     scope: GoogleScope
 ): TimeStorageType => {
 
-    const initialFrom = subMonths(new Date, 1).getTime();
-    const initialTo = addDays(TimeRound.up(new Date, TimePeriod.DAY), 1).getTime();
+    const initialFrom = subMonths(new Date, 3).getTime();
+    const initialTo = addDays(TimeRound.up(new Date, TimePeriod.DAY), 0).getTime();
 
     const presets = calculatePresets(initialFrom, initialTo);
 

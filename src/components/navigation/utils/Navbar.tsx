@@ -58,7 +58,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {(links) && <NavbarContent
             justify="start"
-            className="md:hidden flex-grow-0"
+            className="lg:hidden flex-grow-0"
             style={{
                 width: "5rem !important",
                 flexGrow: "0"
@@ -76,7 +76,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
                 {brandContent}
                 {(links || content) &&
-                    <div className="text-gray-400 pr-4 hidden md:block">
+                    <div className="text-gray-400 pr-4 hidden lg:block">
                         <ArrowRightIcon />
                     </div>
                 }

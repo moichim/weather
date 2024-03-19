@@ -1,11 +1,9 @@
-import { ApolloError } from "@apollo/client";
+import { ScopeProvider, scopeProvider } from "@/graphql/scope/ScopeProvider";
 import { randomUUID } from "crypto";
 import { google } from "googleapis";
-import { AvailableWeatherProperties, Properties, WeatherProperty } from "../../weather/definitions/properties";
-import { GoogleColumn, GoogleColumnValue, GoogleDataColumnDefinition, GoogleRequest, GoogleScope } from "../google";
+import { WeatherProperty } from "../../weather/definitions/properties";
+import { GoogleColumn, GoogleColumnStats, GoogleDataColumnDefinition, GoogleRequest, GoogleScope } from "../google";
 import GoogleProviderUtils from "./googleProviderUtils";
-import fetch from "cross-fetch";
-import { ScopeProvider, scopeProvider } from "@/graphql/scope/ScopeProvider";
 
 export type ValueSerieDefinition = {
     name: string,
@@ -106,7 +104,7 @@ class GoogleSheetsProvider {
     /** @deprecated Should use instances or be releted */
     public async fetchScopeDefinition(scope: string) {
 
-        return await this.scopeProvider.fetchScopeDefinition( scope );
+        return await this.scopeProvider.fetchScopeDefinition(scope);
 
     }
 
@@ -172,6 +170,60 @@ class GoogleSheetsProvider {
 
     }
 
+    /** A public method for retrieving any kind of statistics */
+    public async fetchScopeStatisticsInRange(
+        args: GoogleRequest
+    ): Promise<GoogleColumnStats[]> {
+
+        const sheetId = args.sheetId;
+        const from = args.from;
+        const to = args.to;
+
+        const api = await this.getSheetsClient();
+        const response = await api.spreadsheets.values.get({
+            spreadsheetId: sheetId,
+            range: GoogleProviderUtils.formatQueryRange("A1:Z", args.sheetTab)
+        });
+
+        const definitions = GoogleProviderUtils.extractAllColumnDefinitionsFromResponse(response.data.values);
+
+
+        return definitions.map((column, index) => {
+
+            // Retrieve values from the response
+            const values = GoogleProviderUtils.extractSingleColumnValuesFromResponse(
+                response.data.values,
+                index,
+                from,
+                to
+            );
+
+            const min = values.reduce((state, current) => {
+                if (current.value < state) return current.value;
+                return state;
+            }, Infinity);
+
+            const max = values.reduce((state, current) => {
+                if (current.value > state) return current.value;
+                return state;
+            }, -Infinity);
+
+            const count = values.length;
+
+            const avg = values.reduce((state, current) => current.value + state, 0) / count;
+
+            return {
+                ...column,
+                min: min !== Infinity ? min : null,
+                max: max !== -Infinity ? max : null,
+                avg: count > 0 ? avg : null,
+                count
+            }
+        });
+
+    }
+
+    /** Fetch Column definitions for a scope */
     public async fetchScopeColumnDefinitions(
         sheetId: string,
         sheetTab: string
@@ -187,19 +239,7 @@ class GoogleSheetsProvider {
     }
 
 
-    public async getDocument() {
-
-        const client = await this.getDocsClient();
-
-        const response = await client.documents.get({
-            documentId: "1ju2ejVopG71HijyAjS9XZP3YWvGFHblncbLm2twrJRU"
-        });
-
-        return response;
-
-    }
-
 }
 
 /** Create the global instance of the provider in order to prevent multiple calls */
-export const googleSheetsProvider = new GoogleSheetsProvider( scopeProvider );
+export const googleSheetsProvider = new GoogleSheetsProvider(scopeProvider);
