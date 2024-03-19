@@ -9,13 +9,16 @@ import { Button, Kbd, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, 
 import dynamic from "next/dynamic";
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
 import { GraphLegend } from "./components/legend/graphLegend";
+import { useTimeContext } from "@/state/time/timeContext";
 
 /** Run the tour */
 export const GraphTour: React.FC = () => {
 
     const { graphState: state, graphDispatch } = useGraphContext();
 
-    const { data: contentData, response, selection } = useMeteoContext();
+    const { data: contentData, response } = useMeteoContext();
+
+    const time = useTimeContext();
 
     const { activeScope } = useScopeContext();
 
@@ -123,11 +126,11 @@ export const GraphTour: React.FC = () => {
 
     useEffect(() => {
         if (state.tourCurrentStep === 6) {
-            if (selection.hasRange === true) {
+            if (time.timeState.hasSelection === true) {
                 graphDispatch(StackActions.setTourCurrentStep(7));
             }
         }
-    }, [state.tourCurrentStep, selection.hasRange, graphDispatch]);
+    }, [state.tourCurrentStep, time.timeState.hasSelection, graphDispatch]);
 
     const queriedProperties: {
         name: string, color: string, in: string

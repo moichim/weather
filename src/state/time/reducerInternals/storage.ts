@@ -27,7 +27,9 @@ export type TimeStorageType = TimeType & {
     },
     selectionFrom?: number,
     selectionTo?: number,
-    selectionCursor?: number
+    selectionCursor?: number,
+    hasSelection: boolean,
+    isSelecting: boolean
 
 }
 
@@ -41,7 +43,9 @@ export const timeStorageDefaults: TimeStorageType = {
     mayLowerFrom: false,
     mayLowerTo: false,
     mayRiseFrom: false,
-    mayRiseTo: false
+    mayRiseTo: false,
+    hasSelection: false,
+    isSelecting: false
 }
 
 const MONTHS = {
@@ -67,8 +71,6 @@ const calculatePresets = (from: number, to: number): {
     const t = TimeRound.up(to, TimePeriod.DAY);
 
     const durationInDays = Math.abs(differenceInDays(f, t));
-
-    console.log(f, t, durationInDays);
 
     // If less than a week, return no preset
     if (durationInDays <= 7) {
@@ -253,8 +255,8 @@ export const getDefaultsFromScope = (
     scope: GoogleScope
 ): TimeStorageType => {
 
-    const initialFrom = subMonths(new Date, 20).getTime();
-    const initialTo = addDays(TimeRound.up(new Date, TimePeriod.DAY), 3).getTime();
+    const initialFrom = subMonths(new Date, 1).getTime();
+    const initialTo = addDays(TimeRound.up(new Date, TimePeriod.DAY), 1).getTime();
 
     const presets = calculatePresets(initialFrom, initialTo);
 

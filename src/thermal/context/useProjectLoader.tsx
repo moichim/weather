@@ -88,8 +88,6 @@ export const useProjectLoader = (
 
             result.scopeFiles.forEach(folder => {
 
-                console.log( folder );
-
                 const files: ThermalFileRequest[] = folder.files.map(file => {
                     return {
                         thermalUrl: file.thermalUrl,

@@ -30,8 +30,6 @@ export const FromControl: React.FC<FromControlProps> = props => {
     // Any chynges in the range applies to the current value
     useEffect(() => {
 
-        console.log("range se změnila");
-
         const externalValue = props.getExternalValue();
 
         if (externalValue.toString() !== value) {
@@ -42,9 +40,6 @@ export const FromControl: React.FC<FromControlProps> = props => {
 
     // Any changes to the value applies to the valid value if they are valid
     useEffect(() => {
-
-        console.log("value se změnila");
-
 
         const validatedValue = props.doValidateFinalValue(value);
 
@@ -76,10 +71,6 @@ export const FromControl: React.FC<FromControlProps> = props => {
                 if (event.key === "Enter") {
                     if (!isInvalid)
                         props.onSetValid(validValue);
-                }
-
-                if (event.key === "Up") {
-                    console.log("Up");
                 }
 
             }}

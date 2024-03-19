@@ -10,8 +10,8 @@ import { ScopePageProps } from "./page";
 import { TimeContextProvider } from "@/state/time/timeContext";
 import { PresetDropdown } from "@/state/time/components/presetDropdown";
 import { ReducerState } from "@/state/time/components/reducerState";
-import { FromControl } from "@/state/time/components/fromControl";
-import { ToControl } from "@/state/time/components/toControl";
+import { FromControl } from "@/state/time/components/controls/fromControl";
+import { ToControl } from "@/state/time/components/controls/toControl";
 
 type ScopeLayoutProps = PropsWithChildren & ScopePageProps;
 
@@ -29,48 +29,41 @@ const ScopeLayout: React.FC<ScopeLayoutProps> = async ({ ...props }) => {
 
         <TimeContextProvider scope={scope}>
 
-            <MeteoContextProvider>
-                <GraphContextProvider>
-                    <DisplayContextProvider>
+            <Navbar
+                brandContent={<strong>{scope.name}</strong>}
+                links={[
+                    {
+                        text: "Naměřená data",
+                        href: `/project/${scope.slug}`,
+                    },
+                    {
+                        text: "Informace o týmu",
+                        href: `/project/${scope.slug}/info`
+                    },
+                    {
+                        text: "Termogramy",
+                        href: `/project/${scope.slug}/thermo`
+                    },
+                ]}
 
-                        <Navbar
-                            brandContent={<strong>{scope.name}</strong>}
-                            links={[
-                                {
-                                    text: "Naměřená data",
-                                    href: `/project/${scope.slug}`,
-                                },
-                                {
-                                    text: "Informace o týmu",
-                                    href: `/project/${scope.slug}/info`
-                                },
-                                {
-                                    text: "Termogramy",
-                                    href: `/project/${scope.slug}/thermo`
-                                },
-                            ]}
+                closeLink="/"
+                closeLinkHint={`Zavřít projekt ${scope.name}`}
+                className="bg-slate-100"
+                classNames={{
+                    // menu: "top-32 bg-red-300"
+                }}
+            >
+                <div className="flex gap-0 items-center group">
+                    <FromControl />
+                    <div className="h-[2px] bg-gray-300 w-3 group-hover:bg-primary-300"></div>
+                    <ToControl />
+                </div>
+                <PresetDropdown />
+            </Navbar>
 
-                            closeLink="/"
-                            closeLinkHint={`Zavřít projekt ${scope.name}`}
-                            className="bg-slate-100"
-                            classNames={{
-                                // menu: "top-32 bg-red-300"
-                            }}
-                        >
-                            <div className="flex gap-0 items-center group">
-                                <FromControl />
-                                <div className="h-[2px] bg-gray-300 w-3 group-hover:bg-primary-300"></div>
-                                <ToControl />
-                            </div>
-                            <PresetDropdown />
-                        </Navbar>
-
-                        <main className="w-full h-full min-h-screen bg-gray-200 pb-[10rem]">
-                            {props.children}
-                        </main>
-                    </DisplayContextProvider>
-                </GraphContextProvider>
-            </MeteoContextProvider>
+            <main className="w-full h-full min-h-screen bg-gray-200 pb-[10rem]">
+                {props.children}
+            </main>
 
         </TimeContextProvider>
     </ScopeContextProvider>

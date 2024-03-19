@@ -7,6 +7,8 @@ import { useGraphInstanceMeteo } from "../utils/useGraphInstancData";
 import { GraphTable } from "./ui/graphTable";
 import { StatisticsButton } from "./ui/statisticsButton";
 import { StatisticsContent } from "./ui/statisticsContent";
+import { useTimeContext } from "@/state/time/timeContext";
+import { TimeFormat } from "@/state/time/reducerInternals/timeUtils/formatting";
 
 export const GraphStatistics: React.FC<GraphInstanceState> = props => {
 
@@ -15,9 +17,10 @@ export const GraphStatistics: React.FC<GraphInstanceState> = props => {
         isLoadingData,
         rangeStatistics,
         isLoadingRange,
-        selection,
         data
     } = useGraphInstanceMeteo(props.property.slug);
+
+    const time = useTimeContext();
 
 
     // Content switching
@@ -26,14 +29,14 @@ export const GraphStatistics: React.FC<GraphInstanceState> = props => {
 
     useEffect(() => {
 
-        if (selection.hasRange === true && activeView !== "range") {
+        if (time.timeState.hasSelection === true && activeView !== "range") {
             setActiveView("range");
         }
-        if (selection.hasRange === false && activeView === "range") {
+        if (time.timeState.hasSelection === false && activeView === "range") {
             setActiveView("view");
         }
 
-    }, [selection.hasRange]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [time.timeState.hasSelection]); // eslint-disable-line react-hooks/exhaustive-deps
 
 
     // Expanding
@@ -98,13 +101,21 @@ export const GraphStatistics: React.FC<GraphInstanceState> = props => {
                 className="peer relative transition-all duration-300 ease-in-out"
             >
 
-                {activeView === "view" && <StatisticsContent id={`${props.id}StatisticsView`}>
-                    <GraphTable statisticsData={viewStatistics} property={props.property} primaryLabel={`${selection.fromHumanReadable} - ${selection.toHumanReadable}`} />
-                </StatisticsContent>}
+                {(
+                    activeView === "view"
+                    && time.timeState.selectionFrom !== undefined
+                    && time.timeState.selectionTo !== undefined
+                ) && <StatisticsContent id={`${props.id}StatisticsView`}>
+                        <GraphTable statisticsData={viewStatistics} property={props.property} primaryLabel={TimeFormat.humanRangeDates(time.timeState.selectionFrom!, time.timeState.selectionTo!)} />
+                    </StatisticsContent>}
 
                 {activeView === "range" && <StatisticsContent id={`${props.id}StatisticsRange`}>
-                    {rangeStatistics !== undefined
-                        ? <GraphTable statisticsData={rangeStatistics!} property={props.property} primaryLabel={`${selection.rangeMinHumanReadable} - ${selection.rangeMaxMumanReadable}`}/>
+                    {(
+                        rangeStatistics !== undefined
+                        && time.timeState.selectionFrom !== undefined
+                        && time.timeState.selectionTo !== undefined
+                    )
+                        ? <GraphTable statisticsData={rangeStatistics!} property={props.property} primaryLabel={TimeFormat.humanRangeDates(time.timeState.selectionFrom, time.timeState.selectionTo)} />
                         : <Skeleton className="h-30 rounded-xl bg-gray-500" />
                     }
                 </StatisticsContent>}

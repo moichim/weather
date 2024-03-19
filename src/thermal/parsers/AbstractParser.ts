@@ -103,8 +103,6 @@ export default abstract class AbstractParser {
     }
     protected async parsePixels() {
         const value = await this.getPixels();
-        // console.log( value, value.length, this.width! * this.height! );
-
         this.pixels = value;
     }
 
@@ -198,7 +196,6 @@ export default abstract class AbstractParser {
     protected read64bNumber(index: number) {
 
         const big = this.data.getBigUint64( index );
-        // console.log( big );
 
         const epoch = new Date;
         epoch.setUTCFullYear(0, 0, 0);

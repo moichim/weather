@@ -16,7 +16,6 @@ export const ModificationModeSwitch: React.FC<ModificationModeSwitchProps> = () 
             aria-label="O kolik bude měněn časový rozsah?"
             value={timeState.modificationMode}
             onValueChange={value => {
-                console.log(value);
                 timeDispatch(TimeEventsFactory.setModificationMode(value as TimePeriod))
             }}
             size="sm"

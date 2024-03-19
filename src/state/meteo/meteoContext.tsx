@@ -2,13 +2,18 @@
 
 import { PropsWithChildren, createContext, useContext } from "react";
 import { useMeteoDataReturnType, useMeteoInternal, useMeteoDataDefaults } from "./useMeteoInternal";
+import { GoogleScope } from "@/graphql/google/google";
 
 
 const MeteoContext = createContext<useMeteoDataReturnType>(useMeteoDataDefaults);
 
-export const MeteoContextProvider: React.FC<PropsWithChildren> = props => {
+type MeteoContextProps = React.PropsWithChildren & {
+    scope: GoogleScope
+}
 
-    const value = useMeteoInternal();
+export const MeteoContextProvider: React.FC<MeteoContextProps> = props => {
+
+    const value = useMeteoInternal( props.scope );
 
     return <MeteoContext.Provider value={value}>
         {props.children}

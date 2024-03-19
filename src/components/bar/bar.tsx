@@ -5,7 +5,6 @@ import { StackActions } from "@/state/graph/reducerInternals/actions";
 import { Button } from "@nextui-org/react";
 import { PropsWithChildren } from "react";
 import { BarContainer } from "./barContainer";
-import { Filter } from "./filter/filter";
 import { GraphSizesButtonGroup } from "./graphSizesButtonGroup";
 import { RangeDisplay } from "./rangeDisplay";
 
@@ -16,12 +15,6 @@ export const Bar: React.FC<PropsWithChildren> = props => {
     return <div className="w-full bottom-0 left-0 fixed lg:p-5 z-10">
         <div className="lg:rounded-xl shadow-2xl bg-foreground text-background p-3 bg-opacity-90 lg:bg-opacity-90">
             <div className="flex flex-wrap xl:flex-nowrap items-center gap-3">
-                <BarContainer
-                    id="barFilter"
-                    label="Časový rozsah"
-                >
-                    <Filter />
-                </BarContainer>
 
                 <BarContainer id="barSizing" label="Nastavit velikost grafů">
                     <GraphSizesButtonGroup />
@@ -32,10 +25,7 @@ export const Bar: React.FC<PropsWithChildren> = props => {
                         onClick={() => graphDispatch(StackActions.setTourRunning(true))}
                     >Prohlídka funkcí</Button>
                 </BarContainer>
-
-                <RangeDisplay />
-
-
+                
             </div>
         </div>
     </div>

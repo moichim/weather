@@ -284,7 +284,9 @@ const pickSelection = (
         selectionFrom,
         selectionTo,
 
-        selectionCursor: undefined
+        selectionCursor: undefined,
+        hasSelection: true,
+        isSelecting: false
     });
 
 }
@@ -297,7 +299,9 @@ const clearSelection = (
         ...storage,
         selectionCursor: undefined,
         selectionFrom: undefined,
-        selectionTo: undefined
+        selectionTo: undefined,
+        hasSelection: false,
+        isSelecting: false
     });
 
 }
@@ -308,7 +312,8 @@ const startSelecting = (
 ): TimeStorageType => {
     return correct({
         ...storage,
-        selectionCursor: action.payload.value
+        selectionCursor: action.payload.value,
+        isSelecting: true
     });
 }
 
@@ -330,12 +335,20 @@ const endSelecting = (
             TimeRound.up(to, action.payload.roundTo).getTime()
         );
 
-        return correct({
+        const result = {
             ...storage,
             selectionFrom,
             selectionTo,
-            selectionCursor: undefined
-        });
+            selectionCursor: undefined,
+            isSelecting: false
+        };
+
+        console.log( result );
+
+        return result;
+
+        return correct(result);
+
 
     }
 
@@ -354,6 +367,7 @@ const modifyRangeFrom = (
     return correct({
         ...storage,
         from,
+        currentPreset: undefined,
         ...clampSelectionWithinRange(
             from,
             storage.to,
@@ -377,6 +391,7 @@ const modifyRangeTo = (
     return correct({
         ...storage,
         to,
+        currentPreset: undefined,
         ...clampSelectionWithinRange(
             storage.from,
             to,

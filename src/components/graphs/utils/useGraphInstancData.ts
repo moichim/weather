@@ -5,6 +5,7 @@ import { AvailableWeatherProperties, Properties } from "@/graphql/weather/defini
 import { StatisticsProcessing } from "@/state/meteo/data/statisticsProcessing";
 import { useMeteoContext } from "@/state/meteo/meteoContext";
 import { useMemo } from "react";
+import { useTimeContext } from "@/state/time/timeContext";
 
 export type ViewInstanceStatisticsType = {
     [index: string]: WeatherStatistic
@@ -15,7 +16,7 @@ export const useGraphInstanceMeteo = (
     propertySlug: AvailableWeatherProperties
 ) => {
 
-    const { data, dispatch, selection, isLoadingData, isLoadingRange, viewStatistics, rangeStatistics } = useMeteoContext();
+    const { data, isLoadingData, isLoadingRange, viewStatistics, rangeStatistics } = useMeteoContext();
 
     const property = useMemo(() => {
         return Properties.one(propertySlug);
@@ -40,8 +41,6 @@ export const useGraphInstanceMeteo = (
 
     return {
         data: graphData,
-        dispatch,
-        selection,
         isLoadingData,
         isLoadingRange,
         viewStatistics: viewInstanceStatistics,

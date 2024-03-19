@@ -12,13 +12,17 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { CartesianGrid, Line, LineChart, ReferenceArea, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { CategoricalChartFunc } from "recharts/types/chart/generateCategoricalChart";
 import { useGraphInstanceMeteo } from "../utils/useGraphInstancData";
+import { useTimeContext } from "@/state/time/timeContext";
+import { TimeEventsFactory, TimePeriod } from "@/state/time/reducerInternals/actions";
 
 
 export const GraphView: React.FC<GraphInstanceState> = props => {
 
     const { graphState, graphDispatch } = useGraphContext();
 
-    const { data: graphData, selection, dispatch, isLoadingData } = useGraphInstanceMeteo(props.property.slug);
+    const { data: graphData, isLoadingData } = useGraphInstanceMeteo(props.property.slug);
+
+    const time = useTimeContext();
 
     const domain = props.domain === GraphDomain.DEFAULT || props.domain === GraphDomain.MANUAL
         ? [props.domainMin ?? "auto", props.domainMax ?? "auto"]
@@ -40,15 +44,15 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
             else setCursor(parseInt(event.activeLabel!));
         } else {
             if (isHovering) setIsHovering(false);
-            if (selection.isSelectingRange) {
-                dispatch(DataActionsFactory.removeRange());
+            if (time.timeState.isSelecting) {
+                time.timeDispatch( TimeEventsFactory.clearSelection() );
             }
             if (isSelectingLocal) {
                 setIsSelectingLocal(false);
                 setCursor(undefined);
             }
         }
-    }, [isHovering, selection.isSelectingRange, isSelectingLocal, dispatch])
+    }, [isHovering, time.timeState.isSelecting, isSelectingLocal, time.timeDispatch])
 
     const onClick: CategoricalChartFunc = useCallback(event => {
 
@@ -58,16 +62,16 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
 
             if (isSelectingLocal) {
 
-                let from = selection.rangeTempFromTimestamp!;
+                let from = time.timeState.selectionCursor!;
                 let to = parseInt(event.activeLabel!);
 
-                dispatch(DataActionsFactory.endSelectingRange(to));
+                time.timeDispatch( TimeEventsFactory.endSelection( to, TimePeriod.HOUR ) );
 
                 setIsSelectingLocal(false);
 
                 if (graphState.activeTool === GraphTools.ZOOM) {
 
-                    dispatch(DataActionsFactory.setFilterTimestamp(from, to));
+                    time.timeDispatch( TimeEventsFactory.setRange( from, to, TimePeriod.DAY ) );
 
                     graphDispatch(StackActions.selectTool(GraphTools.INSPECT));
                 }
@@ -75,7 +79,10 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
                 return;
 
             } else {
-                dispatch(DataActionsFactory.startSelectingRange(parseInt(event.activeLabel!)));
+
+                time.timeDispatch( TimeEventsFactory.startSelection( parseInt( event.activeLabel! ), TimePeriod.HOUR ) );
+
+                // dispatch(DataActionsFactory.startSelectingRange(parseInt(event.activeLabel!)));
                 setCursor(parseInt(event.activeLabel!));
                 setIsSelectingLocal(true);
                 return;
@@ -83,7 +90,7 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
 
         }
 
-    }, [graphState.activeTool, selection.rangeTempFromTimestamp, isSelectingLocal, dispatch, graphDispatch]);
+    }, [graphState.activeTool, time.timeState.selectionCursor, isSelectingLocal, time.timeDispatch, graphDispatch]);
 
     let mouse = useMemo(() => isHovering ?
         graphState.activeTool === GraphTools.INSPECT
@@ -173,16 +180,16 @@ export const GraphView: React.FC<GraphInstanceState> = props => {
                     style={{ cursor: mouse }}
                 >
 
-                    {selection.isSelectingRange ?
-                        selection.rangeTempFromTimestamp && <ReferenceLine
-                            x={selection.rangeTempFromTimestamp}
+                    {time.timeState.isSelecting ?
+                        time.timeState.selectionCursor && <ReferenceLine
+                            x={time.timeState.selectionCursor}
                             stroke="black"
                         />
-                        : (selection.rangeMinTimestamp && selection.rangeMaxTimestamp) && <ReferenceArea x1={selection.rangeMinTimestamp} x2={selection.rangeMaxTimestamp} />
+                        : (time.timeState.selectionFrom && time.timeState.selectionTo) && <ReferenceArea x1={time.timeState.selectionFrom} x2={time.timeState.selectionTo} />
                     }
 
-                    {(isSelectingLocal && selection.rangeTempFromTimestamp) && <ReferenceArea
-                        x1={selection.rangeTempFromTimestamp}
+                    {(isSelectingLocal && time.timeState.selectionCursor) && <ReferenceArea
+                        x1={time.timeState.selectionCursor}
                         x2={cursor}
                     />}
 

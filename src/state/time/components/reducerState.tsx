@@ -2,9 +2,9 @@
 
 import { TimeFormat } from "../reducerInternals/timeUtils/formatting";
 import { useTimeContext } from "../timeContext";
-import { FromControl } from "./fromControl";
+import { FromControl } from "./controls/fromControl";
 import { ModificationModeSwitch } from "./modificationModeSwitch";
-import { ToControl } from "./toControl";
+import { ToControl } from "./controls/toControl";
 
 export const ReducerState: React.FC = () => {
 

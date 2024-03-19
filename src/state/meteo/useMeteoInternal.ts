@@ -1,21 +1,19 @@
 "use client"
 
-import { useApolloClient, useLazyQuery, useQuery } from "@apollo/client";
-import { useEffect, useMemo, useReducer, useState } from "react";
-import { MeteoStateFactory } from "./data/meteoStateFactory";
+import { GoogleScope } from "@/graphql/google/google";
+import { useApolloClient, useLazyQuery } from "@apollo/client";
+import { useEffect, useState } from "react";
+import { useTimeContext } from "../time/timeContext";
 import { METEO_DATA_QUERY, METEO_RANGE_QUERY, MeteoQueryResponseType, MeteoRequestType } from "./data/query";
 import { MeteoDataProcessed, MeteoResponseProcessor } from "./data/responseProcessing";
 import { GraphStatisticsDataType, StatisticsProcessing } from "./data/statisticsProcessing";
-import { meteoReducer } from "./reducerInternals/reducer";
-import { useScopeContext } from "../scope/scopeContext";
-import { checkDomainOfScale } from "recharts/types/util/ChartUtils";
 
 /** Hook used by reducer. DO NOT USE IN COMPONENTS! */
-export const useMeteoInternal = () => {
+export const useMeteoInternal = (
+    scope: GoogleScope
+) => {
 
-    const { activeScope } = useScopeContext();
-
-    const [selection, dispatch] = useReducer(meteoReducer, MeteoStateFactory.defaultState());
+    const time = useTimeContext();
 
     const [processedData, setProcessedData] = useState<MeteoDataProcessed>();
 
@@ -29,17 +27,19 @@ export const useMeteoInternal = () => {
     const [fetchQuery, query] = useLazyQuery<MeteoQueryResponseType, MeteoRequestType>(METEO_DATA_QUERY, {
 
         variables: {
-            scope: selection.scope,
-            sheetId: activeScope?.sheetId ?? "",
-            sheetTab: activeScope?.sheetTab ?? "",
-            from: selection.fromTimestamp,
-            to: selection.toTimestamp,
-            lat: 0,//activeScope.lat,
-            lon: 0,//activeScope.lon,
-            hasNtc: false
+            scope: scope.slug,
+            sheetId: scope.sheetId,
+            sheetTab: scope.sheetTab,
+            from: time.timeState.from,
+            to: time.timeState.to,
+            lat: scope.lat,
+            lon: scope.lon,
+            hasNtc: scope.hasNtc
         },
 
         onCompleted: data => {
+
+            console.log("přišla odpověď", data);
 
             // Process the graph data
             const processedResponse = MeteoResponseProcessor.process(data);
@@ -51,7 +51,7 @@ export const useMeteoInternal = () => {
         },
 
         ssr: false,
-        nextFetchPolicy: "no-cache",
+        // nextFetchPolicy: "no-cache",
 
         onError: (e) => {
             console.error("error loading weather data", e, e.graphQLErrors, e.message);
@@ -67,33 +67,46 @@ export const useMeteoInternal = () => {
     }
 
     useEffect(() => {
-        if (activeScope !== undefined)
-            fetchQuery({
-                variables: {
-                    lat: activeScope.lat ?? 0,
-                    lon: activeScope.lon ?? 0,
-                    scope: activeScope.slug,
-                    sheetId: activeScope?.sheetId,
-                    sheetTab: activeScope?.sheetTab,
-                    from: selection.fromTimestamp,
-                    to: selection.toTimestamp,
-                    hasNtc: activeScope.hasNtc
-                },
-                ssr: false
-            })
-    }, [activeScope, activeScope?.lat, activeScope?.lon, selection.fromTimestamp, selection.toTimestamp, fetchQuery]);
+
+        const action = () => fetchQuery({
+            variables: {
+                lat: scope.lat,
+                lon: scope.lon,
+                scope: scope.slug,
+                sheetId: scope.sheetId,
+                sheetTab: scope.sheetTab,
+                from: time.timeState.from,
+                to: time.timeState.to,
+                hasNtc: scope.hasNtc
+            },
+            ssr: false
+        });
+
+        let timeout: NodeJS.Timeout | undefined;
+
+        if ( processedData === undefined && query.loading === false ) {
+            action();
+        } else {
+            timeout = setTimeout( action, 300 );
+        }
+
+
+
+        return () =>  clearTimeout( timeout );
+
+    }, [time.timeState.from, time.timeState.to, fetchQuery]);
 
 
     const [fetchRange, rangeQuery] = useLazyQuery<MeteoQueryResponseType>(METEO_RANGE_QUERY, {
         variables: {
-            scope: selection.scope,
-            sheetId: activeScope?.sheetId,
-            sheetTab: activeScope?.sheetTab,
-            from: selection.rangeMinTimestamp,
-            to: selection.rangeMaxTimestamp,
-            lat: activeScope?.lat,
-            lon: activeScope?.lon,
-            hasNtc: activeScope?.hasNtc
+            scope: scope,
+            sheetId: scope.sheetId,
+            sheetTab: scope.sheetTab,
+            from: time.timeState.from,
+            to: time.timeState.to,
+            lat: scope.lat,
+            lon: scope.lon,
+            hasNtc: scope?.hasNtc
         },
 
         onCompleted: (data) => {
@@ -113,39 +126,41 @@ export const useMeteoInternal = () => {
     });
 
     useEffect(() => {
-        if (selection.hasRange === false && rangeStatistics) {
+        if (time.timeState.hasSelection === false && rangeStatistics) {
             setRangeStatistics(undefined);
         }
-    }, [selection.hasRange, rangeStatistics]);
+    }, [time.timeState.hasSelection, rangeStatistics]);
 
 
-    useEffect( () => {
+    useEffect(() => {
 
-        if ( selection.hasRange === true ) {
-            if ( activeScope !== undefined ) {
+        if (
+            time.timeState.hasSelection === true
+            && time.timeState.selectionFrom !== undefined
+            && time.timeState.selectionTo !== undefined
+        ) {
+            if (scope !== undefined) {
                 fetchRange({
                     variables: {
-                        scope: activeScope.slug,
-                        sheetId: activeScope.sheetId,
-                        sheetTab: activeScope.sheetTab,
-                        from: selection.rangeMinTimestamp,
-                        to: selection.rangeMaxTimestamp,
-                        lat: activeScope.lat,
-                        lon: activeScope.lon,
-                        hasNtc: activeScope?.hasNtc
+                        scope: scope.slug,
+                        sheetId: scope.sheetId,
+                        sheetTab: scope.sheetTab,
+                        from: time.timeState.selectionFrom,
+                        to: time.timeState.selectionTo,
+                        lat: scope.lat,
+                        lon: scope.lon,
+                        hasNtc: scope.hasNtc
                     }
                 });
             }
         } else {
-            setRangeStatistics( undefined );
+            setRangeStatistics(undefined);
         }
 
-    }, [selection.hasRange, activeScope?.lat, activeScope?.lon, selection.rangeMinTimestamp, selection.rangeMaxTimestamp, activeScope, fetchRange] );
+    }, [time.timeState.hasSelection, scope?.lat, scope?.lon, time.timeState.selectionFrom, time.timeState.selectionTo, scope, fetchRange]);
 
 
     return {
-        selection,
-        dispatch,
         refetch: refetchView,
         response: query.data,
         data: processedData,
@@ -160,8 +175,6 @@ export const useMeteoInternal = () => {
 export type useMeteoDataReturnType = ReturnType<typeof useMeteoInternal>
 
 export const useMeteoDataDefaults: useMeteoDataReturnType = {
-    selection: MeteoStateFactory.defaultState(),
-    dispatch: () => { },
     refetch: () => { },
     data: {},
     response: undefined,

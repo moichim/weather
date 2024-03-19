@@ -14,8 +14,6 @@ export const ThermalScaleGlobal: React.FC = () => {
         }
     }
 
-    console.log( listener );
-
     return <>
         {(listener.minmax !== undefined && listener.range !== undefined && listener.ready) &&
             <ThermalScale
