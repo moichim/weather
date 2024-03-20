@@ -344,8 +344,6 @@ const endSelecting = (
             TimeRound.up(to, action.payload.roundTo).getTime()
         );
 
-        console.log( "nová oblast", selectionFrom, selectionTo );
-
         const result = {
             ...storage,
             selectionFrom,
@@ -356,10 +354,6 @@ const endSelecting = (
             selectionCursor: undefined,
             isSelecting: false
         };
-
-        console.log( result );
-
-        // return result;
 
         return correct(result);
 
@@ -475,8 +469,6 @@ const setModificationMode = (
     storage: TimeStorageType,
     action: SetModificationModeAction
 ): TimeStorageType => {
-
-    console.log(action.payload.mode, storage.modificationMode);
 
     if (action.payload.mode === storage.modificationMode) {
         return storage;

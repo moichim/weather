@@ -256,7 +256,7 @@ export const getDefaultsFromScope = (
 ): TimeStorageType => {
 
     const fromTmp = new Date;
-    fromTmp.setUTCMonth( 10 );
+    fromTmp.setUTCMonth( 9 );
     fromTmp.setUTCDate(30);
     fromTmp.setUTCFullYear( 2023 );
     fromTmp.setUTCMinutes( 0 );

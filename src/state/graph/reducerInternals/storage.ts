@@ -56,7 +56,7 @@ export class GraphStateFactory {
         return {
             sharedScale: "md",
             isSelecting: false,
-            activeTool: GraphTools.INSPECT,
+            activeTool: GraphTools.SELECT,
             tourActive: false,
             tourCurrentStep: 0,
             graphs: Object.fromEntries( properties.map( property => {

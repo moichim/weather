@@ -6,11 +6,10 @@ import { useThermalRange } from "@/thermal/hooks/propertyListeners/useThermalRan
 import { ThermalGroup } from "@/thermal/registry/ThermalGroup";
 import { ThermalRegistry } from "@/thermal/registry/ThermalRegistry";
 import { ThermalRangeType } from "@/thermal/registry/interfaces";
-import { Input, Skeleton, SliderValue, Tooltip, cn } from "@nextui-org/react";
-import { ChangeEvent, useEffect, useMemo, useState } from "react";
-import { SliuderValueInput } from "./SliderValueInput";
+import { Skeleton, SliderValue, Tooltip, cn } from "@nextui-org/react";
+import { useEffect, useMemo, useState } from "react";
 import { ThermalRangeSlider } from "./ThermalRangeSlider";
-import { FromControl } from "./textInputs/fromControl";
+import { TemperatureControl } from "./textInputs/TemperatureControl";
 
 type ThermalRangeProps = {
     object: ThermalRegistry | ThermalGroup | ThermalFileInstance,
@@ -164,12 +163,13 @@ export const ThermalRangeInline: React.FC<ThermalRangeProps> = ({
                 }}
 
             />
-            <FromControl
+            <TemperatureControl
                 step={step}
                 range={range}
                 minmax={minmax}
                 label="od"
                 className="md:hidden"
+                currentValue={range.from}
                 doValidateFinalValue={value => {
 
                     const parsedValue = parseFloat(value);
@@ -187,15 +187,15 @@ export const ThermalRangeInline: React.FC<ThermalRangeProps> = ({
                 onSetValid={value => {
                     imposeRange({ from: value, to: range.to });
                 }}
-                getExternalValue={() => range.from}
 
             />
 
-            <FromControl
+            <TemperatureControl
                 step={step}
                 range={range}
                 minmax={minmax}
                 label="do"
+                currentValue={range.to}
                 className="md:hidden"
                 doValidateFinalValue={value => {
 
@@ -214,7 +214,6 @@ export const ThermalRangeInline: React.FC<ThermalRangeProps> = ({
                 onSetValid={value => {
                     imposeRange({ from: range.from, to: value });
                 }}
-                getExternalValue={() => range.to}
 
             />
 

@@ -29,7 +29,6 @@ export const GraphView: React.FC<GraphViewProps> = props => {
         isSelectingLocal
     } = useGraphViewInteractions();
 
-    console.log(timeState.hasSelection, timeState.selectionFrom, timeState.selectionTo);
 
     const formatLabel = useCallback((value: number) => stringLabelFromTimestamp(value), []);
 
@@ -83,7 +82,7 @@ export const GraphView: React.FC<GraphViewProps> = props => {
                 data={props.graphData.data}
                 margin={{ left: 50 }}
                 syncId={"syncId"}
-                onMouseMove={onMouseMove}
+                onMouseMove={ isSelectingLocal ? onMouseMove : undefined}
                 onClick={onClick}
 
             >

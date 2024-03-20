@@ -15,7 +15,7 @@ export const ScopeDropdownMenu: React.FC<GoogleScope> = props => {
     }) ), [availableScopes] );
 
     return <DropdownMenu items={items}>
-        {item => <DropdownItem href={`/${item.key}`} key={item.key}>{item.label}</DropdownItem>}
+        {item => <DropdownItem href={`/project/${item.key}/data`} key={item.key}>{item.label}</DropdownItem>}
     </DropdownMenu>
 
 }
