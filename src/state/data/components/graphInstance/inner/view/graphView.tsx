@@ -1,10 +1,14 @@
+"use client";
+
 import { GraphInstanceProps } from "@/state/data/context/useDataContextInternal"
-import { GraphDomain } from "@/state/graph/reducerInternals/storage"
-import { TimeFormat } from "@/state/time/reducerInternals/timeUtils/formatting"
-import { Spinner } from "@nextui-org/react"
-import { format } from "date-fns"
-import { useMemo } from "react"
-import { CartesianGrid, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
+import { useTimeContext } from "@/state/time/timeContext"
+import { Progress } from "@nextui-org/react"
+import { CartesianGrid, Line, LineChart, ReferenceArea, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
+import { useGraphViewDomain } from "./useGraphDomain"
+import { useGraphViewInteractions } from "./useGraphViewInteractions"
+import { useGraphViewTicks } from "./useGraphViewTicks"
+import { useCallback } from "react";
+import { stringLabelFromTimestamp } from "@/utils/time";
 
 type GraphViewProps = GraphInstanceProps & {
     height: number
@@ -12,59 +16,70 @@ type GraphViewProps = GraphInstanceProps & {
 
 export const GraphView: React.FC<GraphViewProps> = props => {
 
-    if (props.graphData === undefined) {
-        return <Spinner />
+    const { timeState } = useTimeContext();
+
+    const domain = useGraphViewDomain(props.state.domain, props.state.domainMin);
+
+    const ticks = useGraphViewTicks(props);
+
+    const {
+        onMouseMove,
+        onClick,
+        cursor,
+        isSelectingLocal
+    } = useGraphViewInteractions();
+
+
+
+    let CursorMarkerForAllGraphs: JSX.Element = <></>;
+
+    // If is selecting, return the cursor marker or the selection highlight
+    if (timeState.isSelecting) {
+
+        // If the selection is incomplete, show the marker
+        if (timeState.selectionCursor) {
+            CursorMarkerForAllGraphs = <ReferenceLine
+                x={timeState.selectionCursor}
+                stroke="black"
+            />
+        }
+        // If the selection is complete, return the reference area
+        if (timeState.selectionFrom !== undefined && timeState.selectionTo !== undefined) {
+            <ReferenceArea
+                x1={timeState.selectionFrom}
+                x2={timeState.selectionTo}
+            />
+        }
     }
 
-    const domain = props.state.domain === GraphDomain.DEFAULT || props.state.domain === GraphDomain.MANUAL
-        ? [props.state.domainMin ?? "auto", props.state.domainMax ?? "auto"]
-        : ["auto", "auto"];
+    let CursorMarkerForCurrentlySelectingGraph: JSX.Element = <></>;
+
+    if (isSelectingLocal && timeState.selectionCursor) {
+        CursorMarkerForCurrentlySelectingGraph = <ReferenceArea
+            x1={timeState.selectionCursor}
+            x2={cursor}
+        />
+    }
+
+    console.log(timeState.selectionFrom, timeState.selectionTo);
+
+    const formatLabel = useCallback((value: number) => stringLabelFromTimestamp(value), []);
+
+    const formatTooltip = useCallback((value: number, property: any) => value.toFixed(3), []);
 
 
-    const ticks = useMemo(() => {
-
-        let durationInHours = props.graphData ? props.graphData.data.length : 0;
-
-        let times = (durationInHours > 0 && props.graphData) ? Object.values(props.graphData.data)
-            .map(entry => entry.time) : [];
-
-        let formatter: ((value: any, index: number) => string) | undefined = name => {
-            return format(new Date(name), "H");
-        };
-
-        if (durationInHours >= 26 && durationInHours < 24 * 10) {
-            times = times.filter(timestamp => {
-                const hour = timestamp / 1000 / 60 / 60 % 24;
-                const minute = timestamp / 1000 / 60 % 60;
-                const second = timestamp / 1000 % 60;
-                const result = (hour === 23 || hour === 11) && minute === 0 && second === 0;
-                return result;
-            });
-            formatter = name => {
-                return format(new Date(name), "H:mm");
-            };
-        }
-
-        if (durationInHours >= 24 * 10) {
-            times = times.filter(timestamp => {
-                const hour = timestamp / 1000 / 60 / 60 % 24;
-                const minute = timestamp / 1000 / 60 % 60;
-                const second = timestamp / 1000 % 60;
-                const result = (hour === 23) && minute === 0 && second === 0;
-                return result;
-            });
-            formatter = name => {
-                return format(new Date(name), "d.M.");
-            };
-        }
-
-        return {
-            times,
-            formatter
-        }
-
-    }, [props.graphData]);
-
+    if (props.graphData === undefined) {
+        return <div className="pl-[100px] pb-4 w-full h-full">
+            <div className="flex w-full h-full border-2 border-gray-400 border-dashed items-center justify-center">
+                <Progress
+                    size="sm"
+                    isIndeterminate
+                    aria-label="Loading..."
+                    className="max-w-md"
+                />
+            </div>
+        </div>
+    }
 
     return <div className="relative w-full">
 
@@ -76,9 +91,20 @@ export const GraphView: React.FC<GraphViewProps> = props => {
                 data={props.graphData.data}
                 margin={{ left: 50 }}
                 syncId={"syncId"}
-            // style={{cursor: }}
+                onMouseMove={onMouseMove}
+                onClick={onClick}
 
             >
+
+                {CursorMarkerForAllGraphs}
+
+                {CursorMarkerForCurrentlySelectingGraph}
+
+                {(timeState.selectionFrom !== undefined && timeState.selectionTo) && <ReferenceArea
+                    x1={timeState.selectionFrom}
+                    x2={timeState.selectionTo}
+                />}
+
 
                 <CartesianGrid strokeDasharray={"2 2"} />
 
@@ -118,6 +144,14 @@ export const GraphView: React.FC<GraphViewProps> = props => {
                     dataKey="time"
                     tickFormatter={ticks.formatter}
                     ticks={ticks.times}
+                />
+
+                <Tooltip
+                    labelFormatter={formatLabel}
+                    formatter={formatTooltip}
+
+                    isAnimationActive={false}
+                    coordinate={{ x: cursor, y: 0 }}
                 />
 
             </LineChart>

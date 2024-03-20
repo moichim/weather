@@ -335,6 +335,8 @@ const endSelecting = (
             TimeRound.up(to, action.payload.roundTo).getTime()
         );
 
+        console.log( "nová oblast", selectionFrom, selectionTo );
+
         const result = {
             ...storage,
             selectionFrom,

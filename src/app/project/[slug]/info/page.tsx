@@ -1,10 +1,8 @@
-import { GraphLegendColumns } from "@/components/graphs/components/legend/graphLegendColumns";
-import { GraphLegendSources } from "@/components/graphs/components/legend/graphLegendSources";
 import { googleSheetsProvider } from "@/graphql/google/googleProvider/googleProvider";
 import { getMetadataPublisher, getMetadataTitle } from "@/utils/metadata";
 import { Metadata, ResolvingMetadata } from "next";
 import dynamic from "next/dynamic";
-import { ScopePageProps } from "../page";
+import { ScopePageProps } from "../layout";
 
 const Map = dynamic(() => import("../../../../components/ui/map"), { ssr: false });
 
@@ -24,7 +22,7 @@ export async function generateMetadata(
     const scope = await googleSheetsProvider.fetchScopeDefinition(params.slug);
 
     return {
-        title: getMetadataTitle("Informace o měření " + scope.name),
+        title: getMetadataTitle( scope.name + " ℹ️"),
         description: scope.description,
         publisher: getMetadataPublisher()
     }
@@ -48,7 +46,7 @@ const Section: React.FC<React.PropsWithChildren> = props => {
 }
 
 
-const InfoPage: React.FC<ScopePageProps> = async props => {
+const InfoPage = async ( props: ScopePageProps ) => {
 
     const scope = await googleSheetsProvider.fetchScopeDefinition(props.params.slug);
 
@@ -75,13 +73,10 @@ const InfoPage: React.FC<ScopePageProps> = async props => {
 
             <Section>
 
-                <GraphLegendColumns showDescription={true} />
-
             </Section>
 
             <Section>
 
-                <GraphLegendSources showDescription={true} />
 
             </Section>
 

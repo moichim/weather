@@ -4,9 +4,8 @@ import { CloseIcon } from "@/components/ui/icons";
 import { useGraphContext } from "@/state/graph/graphContext";
 import { StackActions } from "@/state/graph/reducerInternals/actions";
 import { GraphInstanceState } from "@/state/graph/reducerInternals/storage";
-import { Button, ButtonGroup, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure, Skeleton } from "@nextui-org/react";
+import { Button, ButtonGroup, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@nextui-org/react";
 import { GraphSettingButton } from "../ui/graphSettingButton";
-import { useMeteoContext } from "@/state/meteo/meteoContext";
 
 export const GraphRemoveButton: React.FC<GraphInstanceState> = props => {
 

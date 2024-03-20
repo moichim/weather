@@ -37,7 +37,7 @@ export const ScopeTable: React.FC<ScopeTableProps> = props => {
         link: <div className="flex gap-2">
             <Button
                 as={Link}
-                href={`/project/${item.slug}`}
+                href={`/project/${item.slug}/data`}
                 size="sm"
             >Data</Button>
             <Button
@@ -50,7 +50,7 @@ export const ScopeTable: React.FC<ScopeTableProps> = props => {
                 href={`/project/${item.slug}/thermo`}
                 size="sm"
                 color="primary"
-            >Termogramy</Button>
+            >Smínky</Button>
         </div>
     }));
 

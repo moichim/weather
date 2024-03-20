@@ -49,7 +49,7 @@ export class TimeFormat extends TimeUtilsBase {
 
         return [
             TimeFormat.humanDate(from),
-            TimeFormat.humanDate(from)
+            TimeFormat.humanDate(to)
         ].join(" - ");
 
     }

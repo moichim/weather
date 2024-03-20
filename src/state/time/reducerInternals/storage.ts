@@ -79,7 +79,7 @@ const calculatePresets = (from: number, to: number): {
 
     const presets: { [index: string]: TimeStoragePresetType } = {
         LAST_7_DAYS: {
-            from: subDays(t, 7).getTime(),
+            from: TimeRound.down( subDays(t, 7), TimePeriod.DAY ).getTime(),
             to: t.getTime(),
             name: "Posledních 7 dní",
         },

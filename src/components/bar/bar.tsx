@@ -6,7 +6,6 @@ import { Button } from "@nextui-org/react";
 import { PropsWithChildren } from "react";
 import { BarContainer } from "./barContainer";
 import { GraphSizesButtonGroup } from "./graphSizesButtonGroup";
-import { RangeDisplay } from "./rangeDisplay";
 
 export const Bar: React.FC<PropsWithChildren> = props => {
 

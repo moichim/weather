@@ -2,7 +2,7 @@
 
 import { InfoIcon } from "@/components/ui/icons";
 import { GoogleColumnStats } from "@/graphql/google/google"
-import { Button, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip, cn } from "@nextui-org/react";
+import { Button, Progress, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip, cn } from "@nextui-org/react";
 
 type StatisticsProps = {
     data?: GoogleColumnStats[],
@@ -12,18 +12,23 @@ type StatisticsProps = {
 
 export const Statistics: React.FC<StatisticsProps> = props => {
 
-    console.log("statistika", props.data);
-
     if (props.data === undefined || props.loading === true) {
-        return <div className="bg-white rounded-xl w-full min-h-40 flex items-center justify-center">
-            <Spinner />
+        return <div className="border-2 border-dashed border-gray-400 rounded-xl w-full min-h-40 flex items-center justify-center">
+            <Progress
+                    size="sm"
+                    isIndeterminate
+                    aria-label="Loading..."
+                    className="max-w-md"
+                />
         </div>
     } else return <Table
         isCompact
         shadow="none"
+        aria-label={props.label?.toString()}
+        removeWrapper
     >
         <TableHeader>
-            <TableColumn>Zdroj</TableColumn>
+            <TableColumn>{props.label}</TableColumn>
             <TableColumn>AVG</TableColumn>
             <TableColumn>MIN</TableColumn>
             <TableColumn>MAX</TableColumn>
@@ -32,6 +37,7 @@ export const Statistics: React.FC<StatisticsProps> = props => {
             {props.data.map(row =>
                 <TableRow
                     style={{ color: row.color }}
+                    key={row.name}
                 >
                     <TableCell>
                         <Tooltip

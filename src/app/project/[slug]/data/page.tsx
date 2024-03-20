@@ -1,7 +1,9 @@
 import { googleSheetsProvider } from "@/graphql/google/googleProvider/googleProvider";
-import { DataDebugger } from "@/state/data/components/DataDebugger";
+import { GraphGrid } from "@/state/data/components/GraphGrid";
+import { GraphContextProvider } from "@/state/graph/graphContext";
 import { getMetadataPublisher, getMetadataTitle } from "@/utils/metadata";
-import { Metadata, NextPage, ResolvingMetadata } from "next";
+import { Metadata, ResolvingMetadata } from "next";
+import { ScopePageProps } from "../layout";
 
 export const generateStaticParams = async () => {
 
@@ -9,12 +11,6 @@ export const generateStaticParams = async () => {
     return scopes;
 
 }
-
-export type ScopePageProps = {
-    params: {
-        slug: string
-    }
-};
 
 export async function generateMetadata(
     { params }: ScopePageProps,
@@ -25,18 +21,20 @@ export async function generateMetadata(
     const scope = await googleSheetsProvider.fetchScopeDefinition(params.slug);
 
     return {
-        title: getMetadataTitle(scope.name),
+        title: getMetadataTitle(scope.name + " 📈"),
         description: scope.description,
         publisher: getMetadataPublisher()
     }
 }
 
 
-const ScopePage: NextPage<ScopePageProps> = async (props) => {
+const ScopePage = async (props: ScopePageProps) => {
 
     const scope = await googleSheetsProvider.fetchScopeDefinition(props.params.slug);
 
-    return <DataDebugger {...scope}/>
+    return <GraphContextProvider>
+        <GraphGrid {...scope}/>
+    </GraphContextProvider>
 }
 
 export default ScopePage;

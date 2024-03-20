@@ -4,10 +4,9 @@ import { SettingIcon } from "@/components/ui/icons";
 import { useGraphContext } from "@/state/graph/graphContext";
 import { StackActions } from "@/state/graph/reducerInternals/actions";
 import { GraphDomain, GraphInstanceState } from "@/state/graph/reducerInternals/storage";
-import { Badge, Button, ButtonGroup, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Radio, RadioGroup, Skeleton, useDisclosure } from "@nextui-org/react";
+import { Badge, Button, ButtonGroup, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Radio, RadioGroup, useDisclosure } from "@nextui-org/react";
 import { useCallback, useEffect, useState } from "react";
 import { GraphSettingButton } from "../ui/graphSettingButton";
-import { useMeteoContext } from "@/state/meteo/meteoContext";
 
 export const GraphConfigPopup: React.FC<GraphInstanceState> = props => {
 

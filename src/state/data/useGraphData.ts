@@ -1,10 +1,10 @@
 import { GoogleScope, GoogleScopeData } from "@/graphql/google/google";
 import { WeatherResponse } from "@/graphql/weather/weather";
-import { MeteoQueryResponseType, MeteoRequestType } from "@/state/meteo/data/query";
-import { MeteoResponseProcessor } from "@/state/meteo/data/responseProcessing";
+import { MeteoResponseProcessor } from "@/state/data/processors/responseProcessing";
+import { MeteoRequestType } from "@/state/data/processors/query";
 import { useLazyQuery } from "@apollo/client";
 import gql from "graphql-tag";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo } from "react";
 
 export const useGraphData = (
   scope: GoogleScope

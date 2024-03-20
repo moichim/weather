@@ -7,18 +7,22 @@ import { GraphInstanceSizes } from "./inner/graphInstanceSizes";
 import { useMemo } from "react";
 import { Statistics } from "./inner/statistics";
 import { GraphView } from "./inner/view/graphView";
+import { TimeFormat } from "@/state/time/reducerInternals/timeUtils/formatting";
+import { useTimeContext } from "@/state/time/timeContext";
 
 export const GraphInstance: React.FC<GraphInstanceProps> = props => {
 
     const height = useMemo(() => graphInstanceHeights[props.state.scale], [props.state.scale]);
 
+    const { timeState } = useTimeContext();
+
     return <div
-        className="w-full gap-4"
+        className="w-full pb-4"
     >
 
         <div className="flex flex-wrap w-full" style={{ minHeight: `${height}px` }}>
 
-            <div className="w-full md:w-1/3 lg:w-1/6 flex flex-wrap flex-col gap-4 justify-cener items-center md:items-end">
+            <div className="w-full md:w-1/3 lg:w-1/6 flex flex-wrap flex-col gap-4 justify-cener items-center md:items-end md:pr-4">
 
                     <GraphinstanceSelector
                         setter={props.setProperty}
@@ -42,10 +46,10 @@ export const GraphInstance: React.FC<GraphInstanceProps> = props => {
                 />
             </div>
 
-            <div className="w-full lg:w-1/3 ">
+            <div className="w-full lg:w-1/3 md:pl-4">
                 <Statistics 
                     data={props.viewStats}
-                    label="Rozsah"
+                    label={ `${props.state.property.name} v oddobí ${TimeFormat.humanRangeDates( timeState.from, timeState.to )}` }
                     loading={props.viewStatsLoading}
                 />
             </div>

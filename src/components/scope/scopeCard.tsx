@@ -32,16 +32,16 @@ export const ScopeCard: React.FC<ScopeCardProps> = props => {
                     <Button
                         color="primary"
                         as={Link}
-                        href={`/project/${props.slug}`}
+                        href={`/project/${props.slug}/data`}
                     >
-                        Data měření
+                        Data
                     </Button>
                     <Button
                         color="primary"
                         as={Link}
                         href={`/project/${props.slug}/thermo`}
                     >
-                        Termogramy
+                        Smínky
                     </Button>
                 </ButtonGroup>
             </CardFooter>

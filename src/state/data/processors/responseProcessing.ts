@@ -1,8 +1,6 @@
-import { WeatherEntryType, WeatherSerie } from "@/graphql/weather/weather";
-import { MeteoQueryResponseType } from "./query";
 import { Properties } from "@/graphql/weather/definitions/properties";
-import { current } from "tailwindcss/colors";
 import { Sources } from "@/graphql/weather/definitions/source";
+import { MeteoQueryResponseType } from "./query";
 
 export type BufferEntryType = {
     [index:string]: number|undefined
@@ -22,8 +20,6 @@ export class MeteoResponseProcessor {
     public static process(
         response: MeteoQueryResponseType
     ) {
-
-        console.log( response );
 
         let drive = MeteoResponseProcessor.generateTheDrive( response );
 

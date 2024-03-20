@@ -23,9 +23,9 @@ export const GraphInstanceSizes: React.FC<GraphInstanceSizesProps> = props => {
                 content={size.label}
                 placement="bottom"
                 closeDelay={100}
+                key={size.key}
             >
                 <Button
-                    key={size.key}
                     isIconOnly
                     onClick={() => {
                         props.setter(size.key)

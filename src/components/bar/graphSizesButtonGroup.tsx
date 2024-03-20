@@ -28,19 +28,19 @@ export const graphInstanceSizes: GraphSize[] = [
     {
         key: "lg",
         name: "L",
-        label:"Velké grafy",
+        label: "Velké grafy",
         height: graphInstanceHeights["lg"]
     },
     {
         key: "xl",
         name: "XL",
-        label:"Extra velké grafy",
+        label: "Extra velké grafy",
         height: graphInstanceHeights["xl"]
     },
     {
         key: "2xl",
         name: "XXL",
-        label:"Obří grafy",
+        label: "Obří grafy",
         height: graphInstanceHeights["2xl"]
     },
 ]
@@ -65,8 +65,8 @@ export const GraphSizesButtonGroup: React.FC = () => {
                 <Button
                     isIconOnly
                     variant="solid"
-                    className={ size.key === activeScale ? "bg-background bg-opacity-90" : "bg-background bg-opacity-50" }
-                    onClick={() => dispatch( StackActions.setSharedScale( size.key ) )}
+                    className={size.key === activeScale ? "bg-background bg-opacity-90" : "bg-background bg-opacity-50"}
+                    onClick={() => dispatch(StackActions.setSharedScale(size.key))}
                 >
                     {size.name}
                 </Button>

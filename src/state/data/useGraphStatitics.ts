@@ -2,7 +2,7 @@ import { GoogleColumnStats, GoogleScope } from "@/graphql/google/google";
 import { useLazyQuery } from "@apollo/client";
 import gql from "graphql-tag";
 import { useCallback, useState } from "react";
-import { MeteoRequestType } from "../meteo/data/query";
+import { MeteoRequestType } from "./processors/query";
 import { GraphStatisticsDataType, StatisticsProcessing } from "./processors/statisticsProcessing";
 
 export const useGraphStatistics = (

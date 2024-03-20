@@ -4,9 +4,10 @@ import { WeatherSourceType } from "@/graphql/weather/definitions/source";
 import { StackActions } from "@/state/graph/reducerInternals/actions";
 import { GraphDomain, GraphInstanceScales, GraphInstanceState } from "@/state/graph/reducerInternals/storage";
 import { useGraphInternal } from "@/state/graph/useGraphInternal";
-import { BufferEntryType } from "@/state/meteo/data/responseProcessing";
+import { BufferEntryType } from "@/state/data/processors/responseProcessing";
 import { useMemo } from "react";
 import { useData } from "../useData";
+import { useGraphContext } from "@/state/graph/graphContext";
 
 export type GraphInstanceHeightSetter = (height: GraphInstanceScales) => void;
 
@@ -46,7 +47,7 @@ export const useDataContextInternal = (
 
     const data = useData( scope );
 
-    const graph = useGraphInternal();
+    const graph = useGraphContext();
 
     const instances = useMemo( (): GraphInstanceProps[] => {
 
@@ -122,8 +123,6 @@ export const useDataContextInternal = (
                     max
                 ) );
             }
-
-            console.log( "view statistics", viewStats );
 
             return {
                 graphData,

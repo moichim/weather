@@ -1,18 +1,16 @@
 "use client"
 
-import { useDisplayContext } from "@/state/graph/useBarInternal";
 import { Button } from "@nextui-org/react";
 import { useGraphContext } from "../../state/graph/graphContext";
-import { GraphStateFactory } from "../../state/graph/reducerInternals/storage";
 import { StackActions } from "../../state/graph/reducerInternals/actions";
 
 export const BarExpandButton: React.FC = () => {
 
-    const {graphState: state, graphDispatch: dispatch} = useGraphContext();
+    const { graphState: state, graphDispatch: dispatch } = useGraphContext();
 
 
     return <Button
-        onClick={() => dispatch(StackActions.barSetExpanded( !state.barExpanded) )}
+        onClick={() => dispatch(StackActions.barSetExpanded(!state.barExpanded))}
         isIconOnly
         aria-label={state.barExpanded ? "Sbalit" : "Rozbalit"}
         aria-expanded={state.barExpanded}

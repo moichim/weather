@@ -1,4 +1,4 @@
-import { MeteoRequestType } from "@/state/meteo/data/query";
+import { MeteoRequestType } from "@/state/data/processors/query";
 import { WeatherSerie, WeatherEntryType, WeatherProviderRequest, WeatherSerieIndexType, WeatherStatistics, WeatherStatistic } from "../weather";
 import { WeatherSourceType } from "../definitions/source";
 import { Properties } from "../definitions/properties";

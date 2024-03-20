@@ -1,23 +1,23 @@
 import { Navbar } from "@/components/navigation/utils/Navbar";
 import { googleSheetsProvider } from "@/graphql/google/googleProvider/googleProvider";
-import { GraphContextProvider } from "@/state/graph/graphContext";
-import { DisplayContextProvider } from "@/state/graph/useBarInternal";
-import { MeteoContextProvider } from "@/state/meteo/meteoContext";
 import { ScopeContextProvider } from "@/state/scope/scopeContext";
-import { notFound } from "next/navigation";
-import { PropsWithChildren } from "react";
-import { ScopePageProps } from "./page";
-import { TimeContextProvider } from "@/state/time/timeContext";
-import { PresetDropdown } from "@/state/time/components/presetDropdown";
-import { ReducerState } from "@/state/time/components/reducerState";
 import { FromControl } from "@/state/time/components/controls/fromControl";
 import { ToControl } from "@/state/time/components/controls/toControl";
+import { PresetDropdown } from "@/state/time/components/presetDropdown";
+import { TimeContextProvider } from "@/state/time/timeContext";
+import { notFound } from "next/navigation";
+import { PropsWithChildren } from "react";
 
 type ScopeLayoutProps = PropsWithChildren & ScopePageProps;
 
+export type ScopePageProps = {
+    params: {
+        slug: string
+    }
+};
 
 /** @todo Should not use the meteo context at all! */
-const ScopeLayout: React.FC<ScopeLayoutProps> = async ({ ...props }) => {
+const ScopeLayout = async ({ ...props }) => {
 
     const allScopes = await googleSheetsProvider.fetchAllScopesDefinitions();
     const scope = allScopes.find(s => s.slug === props.params.slug)!;
@@ -34,7 +34,7 @@ const ScopeLayout: React.FC<ScopeLayoutProps> = async ({ ...props }) => {
                 links={[
                     {
                         text: "Naměřená data",
-                        href: `/project/${scope.slug}`,
+                        href: `/project/${scope.slug}/data`,
                     },
                     {
                         text: "Informace o týmu",
@@ -61,7 +61,7 @@ const ScopeLayout: React.FC<ScopeLayoutProps> = async ({ ...props }) => {
                 <PresetDropdown />
             </Navbar>
 
-            <main className="w-full h-full min-h-screen bg-gray-200 pb-[10rem]">
+            <main className="w-full min-h-screen bg-gray-200 pb-[10rem]">
                 {props.children}
             </main>
 
