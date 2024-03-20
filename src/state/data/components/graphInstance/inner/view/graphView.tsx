@@ -1,14 +1,14 @@
 "use client";
 
-import { GraphInstanceProps } from "@/state/data/context/useDataContextInternal"
-import { useTimeContext } from "@/state/time/timeContext"
-import { Progress } from "@nextui-org/react"
-import { CartesianGrid, Line, LineChart, ReferenceArea, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
-import { useGraphViewDomain } from "./useGraphDomain"
-import { useGraphViewInteractions } from "./useGraphViewInteractions"
-import { useGraphViewTicks } from "./useGraphViewTicks"
-import { useCallback } from "react";
+import { GraphInstanceProps } from "@/state/data/context/useDataContextInternal";
+import { useTimeContext } from "@/state/time/timeContext";
 import { stringLabelFromTimestamp } from "@/utils/time";
+import { Progress } from "@nextui-org/react";
+import { useCallback, useMemo } from "react";
+import { CartesianGrid, Line, LineChart, ReferenceArea, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { useGraphViewDomain } from "./useGraphDomain";
+import { useGraphViewInteractions } from "./useGraphViewInteractions";
+import { useGraphViewTicks } from "./useGraphViewTicks";
 
 type GraphViewProps = GraphInstanceProps & {
     height: number
@@ -29,43 +29,35 @@ export const GraphView: React.FC<GraphViewProps> = props => {
         isSelectingLocal
     } = useGraphViewInteractions();
 
-
-
-    let CursorMarkerForAllGraphs: JSX.Element = <></>;
-
-    // If is selecting, return the cursor marker or the selection highlight
-    if (timeState.isSelecting) {
-
-        // If the selection is incomplete, show the marker
-        if (timeState.selectionCursor) {
-            CursorMarkerForAllGraphs = <ReferenceLine
-                x={timeState.selectionCursor}
-                stroke="black"
-            />
-        }
-        // If the selection is complete, return the reference area
-        if (timeState.selectionFrom !== undefined && timeState.selectionTo !== undefined) {
-            <ReferenceArea
-                x1={timeState.selectionFrom}
-                x2={timeState.selectionTo}
-            />
-        }
-    }
-
-    let CursorMarkerForCurrentlySelectingGraph: JSX.Element = <></>;
-
-    if (isSelectingLocal && timeState.selectionCursor) {
-        CursorMarkerForCurrentlySelectingGraph = <ReferenceArea
-            x1={timeState.selectionCursor}
-            x2={cursor}
-        />
-    }
-
-    console.log(timeState.selectionFrom, timeState.selectionTo);
+    console.log(timeState.hasSelection, timeState.selectionFrom, timeState.selectionTo);
 
     const formatLabel = useCallback((value: number) => stringLabelFromTimestamp(value), []);
 
     const formatTooltip = useCallback((value: number, property: any) => value.toFixed(3), []);
+
+
+    const selectingCursor = useMemo(() => {
+
+        if (timeState.isSelecting) {
+            if (timeState.selectionCursor) {
+                return <ReferenceLine
+                    x={timeState.selectionCursor}
+                    stroke="black"
+                />
+            }
+        }
+
+        if (timeState.selectionFrom !== undefined && timeState.selectionTo !== undefined) {
+            return <ReferenceArea
+                x1={timeState.selectionFrom}
+                x2={timeState.selectionTo}
+                fill="red"
+            />
+        }
+
+        return <></>
+
+    }, [timeState.isSelecting, timeState.selectionCursor, timeState.selectionFrom, timeState.selectionTo]);
 
 
     if (props.graphData === undefined) {
@@ -96,17 +88,17 @@ export const GraphView: React.FC<GraphViewProps> = props => {
 
             >
 
-                {CursorMarkerForAllGraphs}
-
-                {CursorMarkerForCurrentlySelectingGraph}
-
-                {(timeState.selectionFrom !== undefined && timeState.selectionTo) && <ReferenceArea
-                    x1={timeState.selectionFrom}
-                    x2={timeState.selectionTo}
-                />}
-
-
                 <CartesianGrid strokeDasharray={"2 2"} />
+
+                {(timeState.selectionFrom !== undefined && timeState.selectionTo !== undefined)
+                    && <ReferenceArea
+                        x1={timeState.selectionFrom}
+                        x2={timeState.selectionTo + 1}
+                        fill="white"
+                        opacity={1}
+                    />
+                }
+
 
                 {props.graphData && props.graphData.lines.map(source => {
 
@@ -152,7 +144,21 @@ export const GraphView: React.FC<GraphViewProps> = props => {
 
                     isAnimationActive={false}
                     coordinate={{ x: cursor, y: 0 }}
+                    cursor={{
+                        stroke: timeState.isSelecting ? "rgb(0, 112, 240)" : "black"
+                    }}
                 />
+
+                {isSelectingLocal &&
+                    timeState.selectionCursor !== undefined
+                    && <ReferenceArea
+                        x1={timeState.selectionCursor}
+                        x2={cursor}
+                        fill="white"
+                    />
+                }
+
+                {timeState.selectionCursor && <ReferenceLine x={timeState.selectionCursor} stroke="rgb(0, 112, 240)" />}
 
             </LineChart>
         </ResponsiveContainer>

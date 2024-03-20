@@ -255,13 +255,20 @@ export const getDefaultsFromScope = (
     scope: GoogleScope
 ): TimeStorageType => {
 
-    const initialFrom = subMonths(new Date, 3).getTime();
+    const fromTmp = new Date;
+    fromTmp.setUTCMonth( 10 );
+    fromTmp.setUTCDate(30);
+    fromTmp.setUTCFullYear( 2023 );
+    fromTmp.setUTCMinutes( 0 );
+    fromTmp.setUTCMilliseconds( 0 );
+    fromTmp.setUTCSeconds(0);
+
+    const initialFrom = fromTmp.getTime();
     const initialTo = addDays(TimeRound.up(new Date, TimePeriod.DAY), 0).getTime();
 
     const presets = calculatePresets(initialFrom, initialTo);
 
     const currentPreset = presets.WHOLE;
-
 
     return correct({
 

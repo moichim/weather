@@ -122,48 +122,13 @@ export const useGraphViewInteractions = () => {
 
     }, [graphState.activeTool, timeState.selectionCursor, isSelectingLocal, timeDispatch, graphDispatch]);
 
-    /**
-     * The cursor reference line
-     */
-    let CursorMarkerForAllGraphs: JSX.Element = <></>;
-
-    // If is selecting, return the cursor marker or the selection highlight
-    if (timeState.isSelecting) {
-
-        // If the selection is incomplete, show the marker
-        if (timeState.selectionCursor) {
-            CursorMarkerForAllGraphs = <ReferenceLine
-                x={timeState.selectionCursor}
-                stroke="black"
-            />
-        }
-        // If the selection is complete, return the reference area
-        else if (timeState.selectionFrom !== undefined && timeState.selectionTo !== undefined) {
-            <ReferenceArea
-                x1={timeState.selectionFrom}
-                x2={timeState.selectionTo}
-            />
-        }
-    }
-
-    let CursorMarkerForCurrentlySelectingGraph: JSX.Element = <></>;
-
-    if (isSelectingLocal && timeState.selectionCursor) {
-        CursorMarkerForCurrentlySelectingGraph = <ReferenceArea
-            x1={timeState.selectionCursor}
-            x2={cursor}
-        />
-    }
-
 
     return {
         isHovering,
         isSelectingLocal,
         cursor,
         onMouseMove,
-        onClick,
-        CursorMarkerForAllGraphs,
-        CursorMarkerForCurrentlySelectingGraph
+        onClick
     }
 
 }

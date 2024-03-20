@@ -214,17 +214,23 @@ const setSelection = (
     const selectionFrom = Math.max(TimeRound.down(f, action.payload.roundTo).getTime(), storage.defaultFrom);
     const selectionTo = Math.min(TimeRound.up(t, action.payload.roundTo).getTime(), storage.defaultTo);
 
+    const newSelections = clampSelectionWithinRange(
+        storage.from,
+        storage.to,
+        selectionFrom,
+        selectionTo
+    )
+
     return correct({
 
         ...storage,
 
         selectionCursor: undefined,
-        ...clampSelectionWithinRange(
-            storage.from,
-            storage.to,
-            selectionFrom,
-            selectionTo
-        ),
+        selectionFrom: newSelections.selectionFrom,
+        selectionTo: newSelections.selectionTo !== undefined
+            ? TimeRound.up( newSelections.selectionTo, TimePeriod.HOUR ).getTime()
+            : undefined,
+        hasSelection: true,
 
         currentPreset: undefined
 
@@ -313,7 +319,10 @@ const startSelecting = (
     return correct({
         ...storage,
         selectionCursor: action.payload.value,
-        isSelecting: true
+        isSelecting: true,
+        selectionFrom: undefined,
+        selectionTo: undefined,
+        hasSelection: false
     });
 }
 
@@ -340,14 +349,17 @@ const endSelecting = (
         const result = {
             ...storage,
             selectionFrom,
-            selectionTo,
+            selectionTo: selectionTo !== undefined
+                ? TimeRound.up( selectionTo, TimePeriod.HOUR ).getTime()
+                : undefined,
+            hasSelection: true,
             selectionCursor: undefined,
             isSelecting: false
         };
 
         console.log( result );
 
-        return result;
+        // return result;
 
         return correct(result);
 

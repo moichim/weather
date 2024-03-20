@@ -25,6 +25,9 @@ export type GraphInstanceProps = {
 
     viewStats?: GoogleColumnStats[],
     viewStatsLoading: boolean,
+
+    selectionStats?: GoogleColumnStats[],
+    selectionStatsLoading: boolean,
     
     state: GraphInstanceState,
     
@@ -57,12 +60,12 @@ export const useDataContextInternal = (
                 ? data.graphData.data[ instance.property.slug ]
                 : undefined;
 
-            // const viewStatsData: 
-            let viewStats: GoogleColumnStats[] | undefined = undefined;
-
-            let viewStatsLoading = data.viewStats.loading;
 
             // View Statistics
+            
+            let viewStats: GoogleColumnStats[] | undefined = undefined;
+            let viewStatsLoading = data.viewStats.loading;
+
             if ( data.viewStats.data ) {
                 
                 // Google Statistics
@@ -79,6 +82,26 @@ export const useDataContextInternal = (
             }
 
 
+
+            // Selection Statistics
+            let selectionStats: GoogleColumnStats[] | undefined = undefined;
+            let selectionStatsLoading = data.selectionStats.loading;
+
+            if ( data.selectionStats.data ) {
+                // Google Statistics
+                const statistics = Object.values( data.selectionStats.data.dots ).filter( dot => dot.in.slug === instance.property.slug ).filter( dot => dot.count > 0 );
+
+                // MeteoStatistics
+                const lines = Object.values( data.selectionStats.data.lines ).filter( line => line.in.slug === instance.property.slug ).filter( line => line.count > 0 );
+
+                selectionStats = [
+                    ...statistics,
+                    ...lines
+                ]
+            }
+
+
+            // Properties to which this instance may switch
             const availableProperties = graph.graphState.availableGraphs.filter( property => {
 
                 if ( property.slug === instance.property.slug ) {
@@ -134,7 +157,9 @@ export const useDataContextInternal = (
                 loadingData: data.loading,
                 loadingAnything: false,
                 viewStats,
-                viewStatsLoading
+                viewStatsLoading,
+                selectionStats,
+                selectionStatsLoading
             }
 
         } );

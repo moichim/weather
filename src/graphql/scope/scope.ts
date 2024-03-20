@@ -22,6 +22,7 @@ type GoogleScope {
     team: String!
     locality: String!
     description: String!
+    start: String
 }
 
 `;

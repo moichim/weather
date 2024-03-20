@@ -16,6 +16,7 @@ export type GoogleScope = {
     team: string,
     locality: string,
     description: string,
+    start?: string
 }
 
 export type GoogleDataColumnDefinition = {

@@ -9,12 +9,13 @@ import { Statistics } from "./inner/statistics";
 import { GraphView } from "./inner/view/graphView";
 import { TimeFormat } from "@/state/time/reducerInternals/timeUtils/formatting";
 import { useTimeContext } from "@/state/time/timeContext";
+import { TimeEventsFactory } from "@/state/time/reducerInternals/actions";
 
 export const GraphInstance: React.FC<GraphInstanceProps> = props => {
 
     const height = useMemo(() => graphInstanceHeights[props.state.scale], [props.state.scale]);
 
-    const { timeState } = useTimeContext();
+    const { timeState, timeDispatch } = useTimeContext();
 
     return <div
         className="w-full pb-4"
@@ -24,18 +25,18 @@ export const GraphInstance: React.FC<GraphInstanceProps> = props => {
 
             <div className="w-full md:w-1/3 lg:w-1/6 flex flex-wrap flex-col gap-4 justify-cener items-center md:items-end md:pr-4">
 
-                    <GraphinstanceSelector
-                        setter={props.setProperty}
-                        property={props.state.property}
-                        availableProperties={props.availableProperties}
-                        loading={props.loadingData}
-                    />
+                <GraphinstanceSelector
+                    setter={props.setProperty}
+                    property={props.state.property}
+                    availableProperties={props.availableProperties}
+                    loading={props.loadingData}
+                />
 
-                    <GraphInstanceSizes
-                        setter={props.setHeight}
-                        height={props.state.scale}
-                        loading={props.loadingData}
-                    />
+                <GraphInstanceSizes
+                    setter={props.setHeight}
+                    height={props.state.scale}
+                    loading={props.loadingData}
+                />
 
             </div>
 
@@ -47,11 +48,22 @@ export const GraphInstance: React.FC<GraphInstanceProps> = props => {
             </div>
 
             <div className="w-full lg:w-1/3 md:pl-4">
-                <Statistics 
-                    data={props.viewStats}
-                    label={ `${props.state.property.name} v oddobí ${TimeFormat.humanRangeDates( timeState.from, timeState.to )}` }
-                    loading={props.viewStatsLoading}
-                />
+                {timeState.hasSelection === true
+                    ? <Statistics
+                        data={props.selectionStats}
+                        label={`${props.state.property.name} v oddobí ${TimeFormat.humanRangeDates(timeState.selectionFrom!, timeState.selectionTo!)}`}
+                        loading={props.selectionStatsLoading}
+                        onClose={() => {
+                            timeDispatch( TimeEventsFactory.clearSelection() );
+                        }}
+                    />
+                    : <Statistics
+                        data={props.viewStats}
+                        label={`${props.state.property.name} v oddobí ${TimeFormat.humanRangeDates(timeState.from, timeState.to)}`}
+                        loading={props.viewStatsLoading}
+                    />
+                }
+
             </div>
 
         </div>

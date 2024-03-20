@@ -27,6 +27,8 @@ export const useGraphData = (
     ssr: false,
     // nextFetchPolicy: "no-cache",
 
+    onError: console.error
+
   });
 
   // The public fetch method
