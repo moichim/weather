@@ -4,6 +4,7 @@ import { Toolbar } from "@/components/toolbar/toolbar";
 import { GoogleScope } from "@/graphql/google/google";
 import { useDataContextInternal } from "../context/useDataContextInternal";
 import { GraphInstance } from "./graphInstance/graphInstance";
+import { SelectionBar } from "@/state/time/components/selectionBar";
 
 export const GraphGrid: React.FC<GoogleScope> = props => {
 
@@ -24,6 +25,8 @@ export const GraphGrid: React.FC<GoogleScope> = props => {
                     />
                 })}
         </div>
+
+        <SelectionBar />
 
     </div>
 }

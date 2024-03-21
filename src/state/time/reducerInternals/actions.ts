@@ -20,7 +20,6 @@ export enum TimeEvents {
     MODIFY_RANGE_FROM = 14,
     MODIFY_RANGE_TO = 15,
 
-    SET_MODIFICATION_MODE = 16,
 
 }
 
@@ -241,7 +240,8 @@ const pickRange = (
 // Modification
 
 type ModificationPayload = TimePayloadBase & {
-    amount: number
+    amount: number,
+    period: TimePeriod
 }
 
 export type RangeFromModificationAction = TimeEventBase<ModificationPayload> & {
@@ -268,35 +268,19 @@ type ModificationEvents = RangeFromModificationAction
 type ModificationEventsKeys = TimeEvents.MODIFY_RANGE_FROM | TimeEvents.MODIFY_RANGE_TO | TimeEvents.MODIFY_SELECTION_FROM | TimeEvents.MODIFY_SELECTION_TO;
 
 
-// Set modification mode
-
-type SetModificationModePayload = TimePayloadBase & {
-    mode: TimePeriod
-}
-export type SetModificationModeAction = TimeEventBase<SetModificationModePayload> & {
-    type: TimeEvents.SET_MODIFICATION_MODE
-}
 
 
 
 const modificationActionFactory = <T extends ModificationEvents>(
     eventType: ModificationEventsKeys
 ) => {
-    return (value: number) => ({
+    return (value: number, period: TimePeriod) => ({
         type: eventType as ModificationEventsKeys,
         payload: {
-            amount: value
+            amount: value,
+            period: period
         }
     } as T)
-}
-
-const setModificationMode = (mode: TimePeriod): SetModificationModeAction => {
-    return {
-        type: TimeEvents.SET_MODIFICATION_MODE,
-        payload: {
-            mode
-        }
-    }
 }
 
 
@@ -324,8 +308,6 @@ export class TimeEventsFactory {
 
     public static modifySelectionTo = modificationActionFactory<SelectionToModificationAction>(TimeEvents.MODIFY_RANGE_TO);
 
-    public static setModificationMode = setModificationMode;
-
 
 
 }
@@ -344,5 +326,4 @@ export type TimeEventsType = ResetAction
     | RangeFromModificationAction
     | RangeToModificationAction
     | SelectionFromModificationAction
-    | SelectionToModificationAction
-    | SetModificationModeAction;
+    | SelectionToModificationAction;

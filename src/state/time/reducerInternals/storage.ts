@@ -18,10 +18,12 @@ export type TimeStorageType = TimeType & {
     defaultTo: number,
     modificationMode: TimePeriod,
     currentPreset?: TimeStoragePresetType,
-    mayLowerFrom: boolean,
-    mayRiseFrom: boolean,
-    mayLowerTo: boolean,
-    mayRiseTo: boolean,
+
+    fromLowerHours: number,
+    fromRiseHours: number,
+    toLowerHours: number,
+    toRiseHours: number,
+
     presets: {
         [index: string]: TimeStoragePresetType
     },
@@ -40,10 +42,10 @@ export const timeStorageDefaults: TimeStorageType = {
     presets: {},
     from: 0,
     to: 0,
-    mayLowerFrom: false,
-    mayLowerTo: false,
-    mayRiseFrom: false,
-    mayRiseTo: false,
+    fromLowerHours: 0,
+    fromRiseHours: 0,
+    toLowerHours: 0,
+    toRiseHours: 0,
     hasSelection: false,
     isSelecting: false
 }
@@ -259,6 +261,7 @@ export const getDefaultsFromScope = (
     fromTmp.setUTCMonth( 9 );
     fromTmp.setUTCDate(30);
     fromTmp.setUTCFullYear( 2023 );
+    fromTmp.setUTCHours( 0 );
     fromTmp.setUTCMinutes( 0 );
     fromTmp.setUTCMilliseconds( 0 );
     fromTmp.setUTCSeconds(0);

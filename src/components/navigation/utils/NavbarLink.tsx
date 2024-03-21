@@ -1,6 +1,7 @@
 "use client";
 
-import { Link, LinkProps, ThemeColors, LinkVariantProps } from "@nextui-org/react"
+import { Link } from "@/utils/link";
+import { LinkProps, ThemeColors, LinkVariantProps } from "@nextui-org/react"
 import { usePathname } from "next/navigation";
 
 

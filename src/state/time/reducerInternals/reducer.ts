@@ -1,48 +1,17 @@
 import { differenceInDays, differenceInHours, differenceInMonths, differenceInYears } from "date-fns";
 import { Reducer } from "react";
-import { ActivatePresetAction, EndSelectionAction, RangeFromModificationAction, RangePickAction, RangeToModificationAction, SelectionFromModificationAction, SelectionPickAction, SelectionToModificationAction, SetModificationModeAction, SetRangeAction, SetSelectionAction, StartSelectionAction, TimeEvents, TimeEventsType, TimePeriod } from "./actions";
+import { ActivatePresetAction, EndSelectionAction, RangeFromModificationAction, RangePickAction, RangeToModificationAction, SelectionFromModificationAction, SelectionPickAction, SelectionToModificationAction, SetRangeAction, SetSelectionAction, StartSelectionAction, TimeEvents, TimeEventsType, TimePeriod } from "./actions";
 import { TimeStorageType } from "./storage";
 import { TimeRound } from "./timeUtils/rounding";
+import { TimeFormat } from "./timeUtils/formatting";
 
-const mayLowerValue = (value: number, min: number, mode: TimePeriod) => {
 
-    switch (mode) {
-
-        case TimePeriod.HOUR:
-            return differenceInHours(value, min) > 0;
-        case TimePeriod.DAY:
-            return differenceInDays(value, min) > 0;
-        case TimePeriod.WEEK:
-            return differenceInDays(value, min) > 7;
-        case TimePeriod.MONTH:
-            return differenceInMonths(value, min) > 0;
-        case TimePeriod.YEAR:
-            return differenceInYears(value, min) > 0;
-
-    }
-
+const difference = (
+    a: number,
+    b: number
+) => {
+    return differenceInHours( a, b );
 }
-
-const mayRiseValue = (value: number, min: number, mode: TimePeriod) => {
-
-
-    switch (mode) {
-
-        case TimePeriod.HOUR:
-            return differenceInHours(value, min) < 0;
-        case TimePeriod.DAY:
-            return differenceInDays(value, min) < 0;
-        case TimePeriod.WEEK:
-            return differenceInDays(value, min) < -7;
-        case TimePeriod.MONTH:
-            return differenceInMonths(value, min) < 0;
-        case TimePeriod.YEAR:
-            return differenceInYears(value, min) < 0;
-
-    }
-
-}
-
 
 
 export const correct = (storage: TimeStorageType) => {
@@ -88,12 +57,11 @@ export const correct = (storage: TimeStorageType) => {
         }
     }
 
-    // Calculate available modifications
-
-    storage.mayLowerFrom = mayLowerValue(storage.from, storage.defaultFrom, storage.modificationMode);
-    storage.mayRiseFrom = mayRiseValue(storage.from, storage.to, storage.modificationMode);
-    storage.mayLowerTo = mayLowerValue(storage.to, storage.from, storage.modificationMode);
-    storage.mayRiseTo = mayRiseValue(storage.to, storage.defaultTo, storage.modificationMode);
+    // Calculate the lower & rise distances
+    storage.fromLowerHours = difference( storage.from, storage.defaultFrom );
+    storage.fromRiseHours = difference( storage.to, storage.from );
+    storage.toLowerHours = difference( storage.to, storage.from );
+    storage.toRiseHours = difference( storage.defaultTo, storage.to );
 
     return storage;
 
@@ -368,7 +336,9 @@ const modifyRangeFrom = (
 ): TimeStorageType => {
 
 
-    const modifiedDate = TimeRound.modify(storage.from, action.payload.amount, storage.modificationMode);
+    const modifiedDate = TimeRound.modify(storage.from, action.payload.amount, action.payload.period);
+
+    console.log( TimeFormat.humanDate( modifiedDate ) + " " + TimeFormat.humanTime( modifiedDate ) );
 
     const from = Math.max(modifiedDate.getTime(), storage.defaultFrom);
 
@@ -392,7 +362,9 @@ const modifyRangeTo = (
 ): TimeStorageType => {
 
 
-    const modifiedDate = TimeRound.modify(storage.to, action.payload.amount, storage.modificationMode);
+    const modifiedDate = TimeRound.modify(storage.to, action.payload.amount, action.payload.period);
+
+    console.log( TimeFormat.humanDate( modifiedDate ) + " " + TimeFormat.humanTime( modifiedDate ) );
 
     const to = Math.min(modifiedDate.getTime(), storage.defaultTo);
 
@@ -420,7 +392,7 @@ const modifySelectionFrom = (
         return storage;
     } else {
 
-        const modifiedDate = TimeRound.modify(storage.selectionFrom, action.payload.amount, storage.modificationMode);
+        const modifiedDate = TimeRound.modify(storage.selectionFrom, action.payload.amount, action.payload.period);
 
         const modifiedSelectionFrom = Math.max(modifiedDate.getTime(), storage.defaultFrom);
 
@@ -447,7 +419,7 @@ const modifySelectionTo = (
         return storage;
     } else {
 
-        const modifiedDate = TimeRound.modify(storage.selectionTo, action.payload.amount, storage.modificationMode);
+        const modifiedDate = TimeRound.modify(storage.selectionTo, action.payload.amount, action.payload.period);
 
         const modifiedSelectionTo = Math.min(modifiedDate.getTime(), storage.defaultTo);
 
@@ -463,21 +435,6 @@ const modifySelectionTo = (
 
     }
 
-}
-
-const setModificationMode = (
-    storage: TimeStorageType,
-    action: SetModificationModeAction
-): TimeStorageType => {
-
-    if (action.payload.mode === storage.modificationMode) {
-        return storage;
-    }
-
-    return correct({
-        ...storage,
-        modificationMode: action.payload.mode
-    });
 }
 
 
@@ -526,9 +483,6 @@ export const timeReducer: Reducer<TimeStorageType, TimeEventsType> = (
 
         case TimeEvents.MODIFY_SELECTION_TO:
             return modifySelectionTo(state, action);
-
-        case TimeEvents.SET_MODIFICATION_MODE:
-            return setModificationMode(state, action);
 
         default:
             return state;
