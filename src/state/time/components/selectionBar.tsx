@@ -16,11 +16,17 @@ export const SelectionBar: React.FC = () => {
     }
 
     return <div className="fixed w-0 left-1/2 bottom-4 h-40">
-        <div className="w-80 mx-auto absolute bottom-0 -left-40 rounded-2xl p-4 border-2 border-gray-400 border-solid bg-foreground text-background backdrop-opacity-80">
+        <div className="w-[30rem] mx-auto absolute bottom-0 -left-[15rem] rounded-2xl p-4 border-2 border-gray-400 border-solid bg-foreground text-background backdrop-opacity-80">
             <div className="flex w-full gap-2">
                 <div className="flex-grow">
-                    <h2 className="text-sm opacity-70">Vyznačená oblast</h2>
-                    <p>{TimeFormat.humanRangeDates(state.selectionFrom!, state.selectionTo!)}</p>
+                    <h2 className="text-sm opacity-50 pb-2">Vyznačené rozmezí</h2>
+                    <div className="flex gap-3 pb-1">
+                        
+                        <span>{TimeFormat.humanDate( state.selectionFrom! )} <sup className="opacity-90">{TimeFormat.humanTime( state.selectionFrom! )}</sup></span>
+                        <span>—</span>
+                        <span>{TimeFormat.humanDate( state.selectionTo! )} <sup className="opacity-80">{TimeFormat.humanTime( state.selectionTo! )}</sup></span>
+
+                    </div>
                 </div>
 
                 <Tooltip
@@ -47,7 +53,7 @@ export const SelectionBar: React.FC = () => {
 
             </div>
 
-            <p className="text-sm opacity-70">{formatDuration(
+            <p className="text-sm opacity-50">{formatDuration(
                 intervalToDuration({ start: state.selectionFrom!, end: state.selectionTo! })
             )}</p>
 

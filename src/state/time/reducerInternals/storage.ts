@@ -3,6 +3,7 @@ import { addDays, differenceInDays, subDays, subMonths } from "date-fns"
 import { TimePeriod } from "./actions"
 import { correct } from "./reducer"
 import { TimeRound } from "./timeUtils/rounding"
+import { TimeFormat } from "./timeUtils/formatting"
 
 type TimeType = {
     from: number,
@@ -119,6 +120,15 @@ const calculatePresets = (from: number, to: number): {
 
                 let calculatedFrom = f;
 
+                let name = [
+                    MONTHS[ month as keyof typeof MONTHS ],
+                    year
+                ];
+
+                if ( month === minMonth ) {
+                    name.push( `(od ${TimeFormat.humanDate(f)})` );
+                }
+
                 if (month !== minMonth) {
                     const frm = new Date();
                     frm.setUTCDate(5);
@@ -139,10 +149,7 @@ const calculatePresets = (from: number, to: number): {
 
 
                 months[getPresetID(year, month)] = {
-                    name: [
-                        MONTHS[month as keyof typeof MONTHS],
-                        year
-                    ].join(" "),
+                    name: name.join(" "),
                     from: calculatedFrom.getTime(),
                     to: calculatedTo.getTime()
                 }
@@ -154,6 +161,19 @@ const calculatePresets = (from: number, to: number): {
             for (let month = minMonth; month <= 12; month++) {
 
                 let calculatedFrom = f;
+
+                let name = [
+                    MONTHS[ month as keyof typeof MONTHS ],
+                    year
+                ];
+
+                if ( month === minMonth ) {
+                    name.push( `(od ${TimeFormat.humanDate(f)})` );
+                }
+
+                if ( month === maxMonth ) {
+                    name.push( `(do ${TimeFormat.humanDate(t)})` );
+                }
 
                 if (month !== minMonth) {
                     const frm = new Date();
@@ -171,10 +191,7 @@ const calculatePresets = (from: number, to: number): {
 
 
                 months[getPresetID(year, month)] = {
-                    name: [
-                        MONTHS[month as keyof typeof MONTHS],
-                        year
-                    ].join(" "),
+                    name: name.join(" "),
                     from: calculatedFrom.getTime(),
                     to: calculatedTo.getTime()
                 }
@@ -184,6 +201,15 @@ const calculatePresets = (from: number, to: number): {
         } else if (year === maxYear) {
 
             for (let month = 1; month <= maxMonth; month++) {
+
+                let name = [
+                    MONTHS[ month as keyof typeof MONTHS ],
+                    year
+                ];
+
+                if ( month === maxMonth ) {
+                    name.push( `(do ${TimeFormat.humanDate(t)})` );
+                }
 
                 let calculatedFrom = new Date();
                 calculatedFrom.setUTCDate(5);
@@ -202,10 +228,7 @@ const calculatePresets = (from: number, to: number): {
                 }
 
                 months[getPresetID(year, month)] = {
-                    name: [
-                        MONTHS[month as keyof typeof MONTHS],
-                        year
-                    ].join(" "),
+                    name: name.join(" "),
                     from: calculatedFrom.getTime(),
                     to: calculatedTo.getTime()
                 }

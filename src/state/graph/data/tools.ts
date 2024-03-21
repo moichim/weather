@@ -21,13 +21,13 @@ export const graphTools: {
 } = {
     [GraphTools.INSPECT]: {
         name: "Inspekce",
-        tooltip: "Prohlížejte jednotlivé hodnoty",
+        tooltip: "Prohlížet hodnoty",
         slug: GraphTools.INSPECT,
         icon: InfoIcon
     },
     [GraphTools.SELECT]: {
         name: "Vyznačení",
-        tooltip: "Vyznačte oblast pro zobrazení statistik",
+        tooltip: "Vyznačit časové rozmezí",
         slug: GraphTools.SELECT,
         icon: SelectIcon,
         onActivate: undefined,
@@ -35,7 +35,7 @@ export const graphTools: {
     },
     [GraphTools.ZOOM]: {
         name: "Přiblížení",
-        tooltip: "Přibližte oblast",
+        tooltip: "Přiblížit na časové rozmezí",
         slug: GraphTools.ZOOM,
         icon: ZoomInIcon,
         onActivate: undefined,

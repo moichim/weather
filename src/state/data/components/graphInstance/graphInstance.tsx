@@ -51,7 +51,7 @@ export const GraphInstance: React.FC<GraphInstanceProps> = props => {
                 {timeState.hasSelection === true
                     ? <Statistics
                         data={props.selectionStats}
-                        label={`${props.state.property.name} v oddobí ${TimeFormat.humanRangeDates(timeState.selectionFrom!, timeState.selectionTo!)}`}
+                        label={`${props.state.property.name} ve vyznačeném rozmezí`}
                         loading={props.selectionStatsLoading}
                         onClose={() => {
                             timeDispatch( TimeEventsFactory.clearSelection() );
