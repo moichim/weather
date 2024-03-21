@@ -8,7 +8,7 @@ export const PresetDropdown: React.FC = () => {
 
     const { timeState, timeDispatch } = useTimeContext();
 
-    let buttonLabel = "Období";
+    let buttonLabel = "Zvolte období";
 
     if (timeState.currentPreset !== undefined) {
         buttonLabel = timeState.currentPreset.name;
