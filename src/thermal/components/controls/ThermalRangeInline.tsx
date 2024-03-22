@@ -4,12 +4,15 @@ import { ThermalFileInstance } from "@/thermal/file/ThermalFileInstance";
 import { useThermalMinmax } from "@/thermal/hooks/propertyListeners/useThermalMinmax";
 import { useThermalRange } from "@/thermal/hooks/propertyListeners/useThermalRange";
 import { ThermalGroup } from "@/thermal/registry/ThermalGroup";
-import { ThermalRegistry } from "@/thermal/registry/ThermalRegistry";
+import { ThermalRegistry, ThermalStatistics } from "@/thermal/registry/ThermalRegistry";
 import { ThermalRangeType } from "@/thermal/registry/interfaces";
-import { Skeleton, SliderValue, Tooltip, cn } from "@nextui-org/react";
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Skeleton, SliderValue, Tooltip, cn } from "@nextui-org/react";
 import { useEffect, useMemo, useState } from "react";
 import { ThermalRangeSlider } from "./ThermalRangeSlider";
 import { TemperatureControl } from "./textInputs/TemperatureControl";
+import { useThermalPalette } from "@/thermal/hooks/propertyListeners/useThermalPalette";
+import { SettingIcon } from "@/components/ui/icons";
+import { useThermalRegistry } from "@/thermal/hooks/retrieval/useThermalRegistry";
 
 type ThermalRangeProps = {
     object: ThermalRegistry | ThermalGroup | ThermalFileInstance,
@@ -33,6 +36,7 @@ export const ThermalRangeInline: React.FC<ThermalRangeProps> = ({
 
     const { range, imposeRange } = useThermalRange(object);
     const { minmax } = useThermalMinmax(object);
+    const palette = useThermalPalette();
 
     const initialValue = useMemo(() => {
 
@@ -120,6 +124,7 @@ export const ThermalRangeInline: React.FC<ThermalRangeProps> = ({
 
 
 
+
     // Conditional rendering
 
 
@@ -158,11 +163,12 @@ export const ThermalRangeInline: React.FC<ThermalRangeProps> = ({
                     base: "px-1 min-w-screen",
                     mark: "bg-black",
                     track: "bg-gray-400 h-6 cursor-pointer",
-                    filler: "thermal-scale-gradient cursor-pointer",
+                    filler: `thermal-scale-${palette.thermalPaletteSlug} cursor-pointer`,
                     label: "text-xl"
                 }}
 
             />
+
             <TemperatureControl
                 step={step}
                 range={range}

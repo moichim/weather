@@ -62,8 +62,6 @@ export const ButtonArrow: React.FC<ButtonArrowProps> = ({
         <DropdownMenu
             onAction={value => {
 
-                console.log(value);
-
                 switch (value) {
 
                     case TimePeriod.HOUR:

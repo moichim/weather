@@ -2,6 +2,7 @@
 
 import { ThermalFileInstance } from "../file/ThermalFileInstance";
 import { ThermalFileSource } from "../file/ThermalFileSource";
+import { ThermalPalette, ThermalPalettes } from "../file/palettes";
 import { ThermalGroup } from "./ThermalGroup";
 import { ThermalRegistry } from "./ThermalRegistry";
 import { ThermalCursorPositionOrundefined, ThermalMinmaxOrUndefined, ThermalMinmaxType, ThermalRangeOrUndefined } from "./interfaces";
@@ -30,6 +31,8 @@ export enum ThermalEvents {
     INSTANCE_DETAIL_EMITTED = "instancedetailemitted",
 
     READY = "ready",
+
+    PALETTE_CHANGED = "palettechanged"
 
 }
 
@@ -82,6 +85,15 @@ export type InstanceDetailEmittedDetail = {
     filename: string
 }
 export type InstanceDetailEmitted = CustomEvent<InstanceDetailEmittedDetail>
+
+
+// Palette event
+type PaletteChanges = {
+    palette: ThermalPalette,
+    slug: keyof typeof ThermalPalettes
+}
+
+export type PaletteEvent = CustomEvent<PaletteChanges>;
 
 /** All thermal events need to be created through this factory */
 export class ThermalEventsFactory {
@@ -241,6 +253,17 @@ export class ThermalEventsFactory {
                 }
             }
         );
+    }
+
+    public static paletteChanged(
+        activePalette: keyof typeof ThermalPalettes
+    ) {
+        return new CustomEvent<PaletteChanges>( ThermalEvents.PALETTE_CHANGED, {
+            detail: {
+                slug: activePalette,
+                palette: ThermalPalettes[ activePalette ]
+            }
+        } );
     }
 
 }

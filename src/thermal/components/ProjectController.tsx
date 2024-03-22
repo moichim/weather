@@ -1,12 +1,13 @@
 "use client";
 
 import { Navbar } from "@/components/navigation/utils/Navbar";
-import { Spinner } from "@nextui-org/react";
+import { ScrollShadow, Spinner } from "@nextui-org/react";
 import { useProjectLoader } from "../context/useProjectLoader";
 import { useRegistryListener } from "../context/useRegistryListener";
 import { ThermalGroup } from "./ThermalGroup";
 import { ThermalRangeInline } from "./controls/ThermalRangeInline";
 import { OpacityScale } from "./registry/OpacityScale";
+import { PaletteControl } from "./controls/paletteControl";
 
 type ProjectControllerProps = {
     scope: string
@@ -27,16 +28,19 @@ export const ProjectController: React.FC<ProjectControllerProps> = props => {
 
         <Navbar
             className="bg-slate-200"
+            height="6rem"
             innerContent={listener.registry.range === undefined
-                ? <div className="flex items-center gap-4 text-primary"><Spinner size="sm"/><span>Načítám a zpracovávám soubory</span></div>
+                ? <div className="flex items-center gap-4 text-primary"><Spinner size="sm"/><span>Načítám teplotní škálu</span></div>
 
-                : <><ThermalRangeInline
+                : <>
+                    <ThermalRangeInline
                     object={listener.registry}
                     imposeInitialRange={listener.registry.range}
                     description="Klikněte na posuvník a změňte rozsah zobrazených teplot!" />
                     <div className="w-30 md:w-40 lg:w-60">
                         <OpacityScale />
                     </div>
+                    <PaletteControl />
                 </>
                 }
         />

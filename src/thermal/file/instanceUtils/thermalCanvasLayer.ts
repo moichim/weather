@@ -1,4 +1,4 @@
-import { PALETTE } from "@/thermal/file/palettes";
+import { GRAYSCALE, PALETTE } from "@/thermal/file/palettes";
 import { ThermalFileInstance } from "../ThermalFileInstance";
 import { AbstractLayer } from "./AbstractLayer";
 import ThermalDomFactory from "./domFactories";
@@ -56,7 +56,7 @@ export class ThermalCanvasLayer extends AbstractLayer {
 
     /** Returns an array of 255 RGB colors */
     protected getPalette(): string[] {
-        return PALETTE;
+        return this.instance.group.registry.activePalette;
     }
 
     public draw(): void {

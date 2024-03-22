@@ -92,8 +92,6 @@ export class ThermalFileInstance extends ThermalObjectBase {
     // The listener layer
     protected listenerLayer: ThermalListenerLayer | null = null;
 
-    protected palette = ThermalPalettes.IRON;
-
 
 
 

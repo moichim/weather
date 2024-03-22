@@ -1,10 +1,12 @@
 "use client";
 
+import { NumberDomain } from "recharts/types/util/types";
 import { ThermalFileSource } from "../file/ThermalFileSource";
 import { ThermalGroup } from "./ThermalGroup";
 import { ThermalObjectContainer } from "./abstractions/ThermalObjectContainer";
 import { ThermalEvents, ThermalEventsFactory } from "./events";
 import { ThermalRangeOrUndefined } from "./interfaces";
+import { GRAYSCALE, PALETTE, ThermalPalettes } from "../file/palettes";
 
 /**
  * The global thermal registry
@@ -20,12 +22,12 @@ import { ThermalRangeOrUndefined } from "./interfaces";
  * - ThermalEvents.READY
  */
 export class ThermalRegistry extends ThermalObjectContainer {
-    
+
 
     public readonly hash = Math.random();
 
     protected onDestroySelf(): void {
-        this.getGroupsArray().forEach( group => group.destroySelf() );
+        this.getGroupsArray().forEach(group => group.destroySelf());
     }
 
 
@@ -38,11 +40,11 @@ export class ThermalRegistry extends ThermalObjectContainer {
 
 
     protected onRecieveActivationStatus(status: boolean): void {
-        this.getGroupsArray().forEach( group => group.recieveActivationStatus( status ) );
+        this.getGroupsArray().forEach(group => group.recieveActivationStatus(status));
     }
 
     protected onImposeActivationStatus(status: boolean): void {
-        this.onRecieveActivationStatus( status );
+        this.onRecieveActivationStatus(status);
     }
 
 
@@ -76,21 +78,21 @@ export class ThermalRegistry extends ThermalObjectContainer {
                 ThermalEventsFactory.groupInit(group)
             );
 
-            group.addEventListener( ThermalEvents.GROUP_LOADING_FINISH, () => {
+            group.addEventListener(ThermalEvents.GROUP_LOADING_FINISH, () => {
 
-                const all = this.getGroupsArray().reduce( ( state, current ) => {
-                    if ( current.isLoading )
+                const all = this.getGroupsArray().reduce((state, current) => {
+                    if (current.isLoading)
                         return false;
                     return state
-                }, true );
+                }, true);
 
-                if ( all ) {
+                if (all) {
 
-                    this.dispatchEvent( ThermalEventsFactory.ready() );
+                    this.dispatchEvent(ThermalEventsFactory.ready());
 
                 }
 
-            } );
+            });
 
             return group;
         }
@@ -98,15 +100,15 @@ export class ThermalRegistry extends ThermalObjectContainer {
         return this.groups[id];
     }
 
-    public removeGroup( id: string ) {
+    public removeGroup(id: string) {
 
-        const group = this.groups[ id ];
+        const group = this.groups[id];
 
-        if ( group ) {
+        if (group) {
 
             group.destroySelf();
 
-            delete this.groups[ id ];
+            delete this.groups[id];
 
             this.recalculateMinmax();
         }
@@ -236,4 +238,134 @@ export class ThermalRegistry extends ThermalObjectContainer {
 
 
 
+    /**
+     * Statistics processing
+     */
+
+    public async getStatistics() {
+
+        if (this.minmax === undefined || this.getGroupsArray().length === 0) {
+            return await [];
+        } else {
+
+            // Get all pixels
+            const allPixels = this.getGroupsArray().reduce((
+                state,
+                current
+            ) => {
+
+                const pixels = current.getInstancesArray().reduce((buf, instance) => {
+
+                    buf = [...buf, ...instance.pixels];
+
+                    return buf;
+
+                }, [] as number[]);
+
+                return [...state, ...pixels]
+
+            }, [] as number[]);
+
+
+            // Calculate the ten segments
+            const segments: [number, number][] = [];
+
+            const numSegments = 100;
+            const difference = this.minmax.max - this.minmax.min;
+            const segment = difference / numSegments;
+
+            for (let i = 0; i < numSegments; i++) {
+
+                const from = (segment * i) + this.minmax.min;
+                const to = from + segment;
+
+                segments.push([from, to]);
+
+            }
+
+            const results: {
+                from: number,
+                to: number,
+                count: number
+            }[] = [];
+
+            let sum = allPixels.length;
+
+            for ( let i of segments ) {
+
+                const count = await allPixels.filter( pixel => {
+                    return pixel >= i[0] && pixel < i[1]; 
+                }).length;
+
+                sum = sum + count;
+
+                results.push( {
+                    from: i[0],
+                    to: i[1],
+                    count: count
+                } );
+
+            }
+
+            
+
+            const recalculated = results.map( i => {
+                return {
+                    ...i,
+                    percentage: i.count / sum * 100,
+                }
+            } );
+
+            const max = Math.max( ...recalculated.map( item => item.percentage ) );
+
+            return recalculated.map( item => {
+                return {
+                    ...item,
+                    height: item.percentage / max * 100
+                }
+            } ) as ThermalStatistics[];
+
+        }
+
+
+    }
+
+    public readonly palettes = {
+        iron: PALETTE
+    }
+
+    public readonly _availablePalettes = ThermalPalettes;
+
+    public get availablePalettes() {
+        return this._availablePalettes;
+    }
+
+    protected _activePalette: keyof typeof ThermalPalettes = "iron";
+    public set palette( value: keyof typeof ThermalPalettes ) {
+        this._activePalette = value;
+        this.getGroupsArray().forEach( group => group.getInstancesArray().forEach( instance => instance.draw() ) );
+        this.dispatchEvent( ThermalEventsFactory.paletteChanged( value ) );
+    }
+    public get palette() {
+        return this._activePalette;
+    }
+
+    public get currentPalette() {
+        return this._availablePalettes[ this._activePalette ];
+    }
+
+    public get activePalette() {
+        return this._availablePalettes[ this._activePalette ].pixels;    
+    }
+
+
+
+}
+
+export type ThermalStatistics = {
+    from: number,
+    to: number,
+    percentage: number,
+    count: number,
+    height: number
 }
