@@ -9,6 +9,7 @@ import ThermalDomFactory from "./instanceUtils/domFactories";
 import { ThermalCanvasLayer } from "./instanceUtils/thermalCanvasLayer";
 import ThermalCursorLayer from "./instanceUtils/thermalCursorLayer";
 import { ThermalListenerLayer } from "./instanceUtils/thermalListenerLayer";
+import { ThermalDateLayer } from "./instanceUtils/thermalDateLayer";
 
 /**
  * Instance of a thermal file takes care of its display and user interactions
@@ -58,7 +59,6 @@ export class ThermalFileInstance extends ThermalObjectBase {
     protected readonly horizontalLimit: number;
     protected readonly verticalLimit: number;
 
-
     public constructor(
         protected readonly source: ThermalFileSource,
         public readonly group: ThermalGroup
@@ -89,6 +89,9 @@ export class ThermalFileInstance extends ThermalObjectBase {
     /// The cursor layer
     protected cursorLayer: ThermalCursorLayer | null = null;
 
+    // The date popup layer
+    protected datelayer: ThermalDateLayer | null = null;
+
     // The listener layer
     protected listenerLayer: ThermalListenerLayer | null = null;
 
@@ -114,6 +117,11 @@ export class ThermalFileInstance extends ThermalObjectBase {
         }
 
         this.root = container;
+        this.root.style.borderWidth = "2px";
+        this.root.style.borderStyle = "solid";
+        this.root.style.borderColor = "transparent";
+        this.root.style.margin = "-1px";
+        this.root.style.transition = "border-color .1s ease-in-out";
 
         // Create the visible layer if necessary
         if (this.visibleUrl) {
@@ -125,6 +133,9 @@ export class ThermalFileInstance extends ThermalObjectBase {
 
         // Create the cursor layer
         this.cursorLayer = new ThermalCursorLayer(this);
+
+        // 
+        this.datelayer = new ThermalDateLayer( this );
 
         // Create the listener layer
         this.listenerLayer = new ThermalListenerLayer( this );
@@ -167,6 +178,8 @@ export class ThermalFileInstance extends ThermalObjectBase {
                 this.canvasLayer.mount();
             if (this.cursorLayer)
                 this.cursorLayer.mount();
+            if (this.datelayer)
+                this.datelayer.mount();
             if (this.listenerLayer)
                 this.listenerLayer.mount();
 
@@ -188,7 +201,8 @@ export class ThermalFileInstance extends ThermalObjectBase {
                 // Show the cursor
                 this.cursorLayer!.show = true;
         
-                this._isHover = true;
+                this.isHover = true;
+                this.group.registry.highlight = this.timestamp;
         
                 const client = this.width;
                 const parent = this.root!.clientWidth;
@@ -206,7 +220,8 @@ export class ThermalFileInstance extends ThermalObjectBase {
 
                 this.cursorLayer!.show = false;
         
-                this._isHover = false;
+                this.isHover = false;
+                this.group.registry.highlight = undefined;
         
                 this.imposeCursorPosition(undefined);
         
@@ -316,6 +331,19 @@ export class ThermalFileInstance extends ThermalObjectBase {
 
     protected _isHover: boolean = false;
     public get isHover() { return this._isHover }
+    protected set isHover( value: boolean ) {
+        this._isHover = value;
+
+        if ( value ) {
+            //this.datelayer?.show()
+            if ( this.root )
+                this.root.style.borderColor = "black";
+        } else {
+            this.datelayer?.hide();
+            if ( this.root )
+                this.root.style.borderColor = "transparent";
+        }
+    }
 
     protected _cursorValue: number | undefined;
     public get cursorValue() { return this._cursorValue; }
@@ -400,6 +428,21 @@ export class ThermalFileInstance extends ThermalObjectBase {
         if (this.visibleLayer && this.canvasLayer) {
             this.canvasLayer.opacity = value;
         }
+    }
+
+    // hightlighting
+    public highlight( value: boolean ) {
+
+        if ( value ) {
+            if (this.root )
+                this.root.style.borderColor = "black";
+            this.datelayer?.show()
+        } else {
+            if ( this.root )
+                this.root.style.borderColor = "transparent";
+            this.datelayer?.hide()
+        }
+
     }
 
 }

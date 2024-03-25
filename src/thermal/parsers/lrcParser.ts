@@ -1,5 +1,7 @@
+import { format } from 'date-fns';
 import { ThermalFileSource } from '../file/ThermalFileSource';
 import AbstractParser from './AbstractParser';
+import { TimeFormat } from '@/state/time/reducerInternals/timeUtils/formatting';
 
 
 /**
@@ -88,37 +90,59 @@ export default class LrcParser extends AbstractParser {
         return this.read16bNumber(19);
     }
 
+    protected convertDotNetTicksToJsTimestamp(dotNetTicks: bigint): number {
+        // Počet tiků v 1 milisekundě v .NET
+        const dotNetTicksPerMillisecond = BigInt( 10000 );
+        // Počet milisekund mezi epochálními body .NET a JavaScriptu
+        const epochOffset = BigInt( 62135596800000 );
+    
+        // Převést počet tiků na počet milisekund od epochy .NET
+        const millisecondsFromDotNetEpoch = Number(dotNetTicks / dotNetTicksPerMillisecond);
+        // Přidat počet milisekund mezi epochálními body
+        const millisecondsFromJsEpoch = millisecondsFromDotNetEpoch + Number(epochOffset);
+    
+        return millisecondsFromJsEpoch;
+    }
+
     // Timestamp
     protected getTimestamp(): number {
 
-        const big = this.data.getBigInt64(25, true);
+        const t = this.data.getBigUint64( 24, true );
 
-        const UnixEpoch = BigInt.asUintN(64,BigInt( 62135596800000 ));
-        const TicksPerMillisecond = BigInt(10000);
-        const TicksPerDay = BigInt(24 * 60 * 60 * 1000) * TicksPerMillisecond;
-        const TicksCeiling = BigInt(0x4000000000000000);
-        const LocalMask = BigInt(0x8000000000000000);
-        const TicksMask = BigInt(0x3FFFFFFFFFFFFFFF);
+        const result = this.convertDotNetTicksToJsTimestamp( t );
 
-
-        let ticks = big & TicksMask;
-
-        const localTime = big & LocalMask;
-
-        if (localTime) {
-
-            if (ticks > TicksCeiling - TicksPerDay) {
-                ticks -= TicksCeiling;
+        function extractJsTimestampFromDateString(inputString: string): number | null {
+            // Regulární výraz pro vyhledání časového razítka ve formátu YYYY-MM-DD HH-mm-ss
+            const regex = /(\d{4})-(\d{2})-(\d{2}) (\d{2})-(\d{2})-(\d{2})/;
+        
+            // Vyhledat shodu v řetězci
+            const match = inputString.match(regex);
+        
+            if (match) {
+                // Získat části datumu a času ze shody
+                const year = parseInt(match[1], 10);
+                const month = parseInt(match[2], 10) - 1; // Měsíce jsou indexované od 0
+                const day = parseInt(match[3], 10);
+                const hour = parseInt(match[4], 10);
+                const minute = parseInt(match[5], 10);
+                const second = parseInt(match[6], 10);
+        
+                // Vytvořit objekt datumu
+                const date = new Date(year, month, day, hour, minute, second);
+        
+                // Převést datum na JavaScript timestamp
+                const jsTimestamp = date.getTime();
+                return jsTimestamp;
+            } else {
+                // Pokud shoda není nalezena, vrátit null
+                return null;
             }
-            if (ticks < 0) {
-                ticks += TicksPerDay;
-            }
-
         }
+        
 
-        const result = ticks / TicksPerMillisecond - UnixEpoch;
+        const ts = extractJsTimestampFromDateString( this.url );
 
-        return Number(BigInt.asUintN( 64, result ));
+        return ts ?? (new Date).getTime();
 
     }
 

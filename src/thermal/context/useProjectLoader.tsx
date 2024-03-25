@@ -84,6 +84,8 @@ export const useProjectLoader = (
         variables: {
             scope: scopeId
         },
+        ssr: false,
+        nextFetchPolicy: "no-cache",
         onCompleted: (result) => {
 
             result.scopeFiles.forEach(folder => {

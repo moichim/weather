@@ -1,3 +1,5 @@
+import { TimeFormat } from "@/state/time/reducerInternals/timeUtils/formatting";
+
 export default class ThermalDomFactory {
 
     public static createCanvasContainer(): HTMLDivElement {
@@ -20,6 +22,40 @@ export default class ThermalDomFactory {
         // canvas.style.cursor = "crosshair";
         //canvas.style.transition = "opacity 300ms ease-in-out";
         return canvas;
+    }
+
+
+    public static createDateLayer(): HTMLDivElement {
+        const layer = document.createElement( "div" );
+        layer.classList.add( "dateLayer" );
+        layer.style.margin = "0px";
+        layer.style.padding = "0px";
+        layer.style.position = "absolute";
+        layer.style.top = "0px";
+        layer.style.left = "0%";
+        layer.style.width = "100%";
+        layer.style.fontSize = "small";
+        // layer.style.transition = "opacity 300ms ease-in-out";
+        return layer;
+    }
+
+    public static createDateLayerInner(): HTMLDivElement {
+        const inner = document.createElement( "div" );
+        inner.classList.add("dateLayerInner" );
+        inner.style.margin = "0px";
+        inner.style.padding = ".3rem 0rem";
+        inner.style.backgroundColor = "black";
+        inner.style.color = "white";
+        inner.style.borderRadius = ".5rem .5rem 0 0";
+        inner.style.width = "calc(100% + 4px )";
+        inner.style.position = "absolute";
+        inner.style.top = "0rem";
+        inner.style.left = "-2px";
+        // inner.style.transform = "scale(.5)";
+        inner.style.opacity = "0";
+        inner.style.transition = "all .1s ease-in-out";
+        inner.style.textAlign = "center";
+        return inner;
     }
 
     public static createVisibleLayer(): HTMLDivElement {

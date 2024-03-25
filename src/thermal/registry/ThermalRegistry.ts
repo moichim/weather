@@ -7,6 +7,7 @@ import { ThermalObjectContainer } from "./abstractions/ThermalObjectContainer";
 import { ThermalEvents, ThermalEventsFactory } from "./events";
 import { ThermalRangeOrUndefined } from "./interfaces";
 import { GRAYSCALE, PALETTE, ThermalPalettes } from "../file/palettes";
+import { addHours } from "date-fns";
 
 /**
  * The global thermal registry
@@ -340,7 +341,7 @@ export class ThermalRegistry extends ThermalObjectContainer {
         return this._availablePalettes;
     }
 
-    protected _activePalette: keyof typeof ThermalPalettes = "iron";
+    protected _activePalette: keyof typeof ThermalPalettes = "jet";
     public set palette( value: keyof typeof ThermalPalettes ) {
         this._activePalette = value;
         this.getGroupsArray().forEach( group => group.getInstancesArray().forEach( instance => instance.draw() ) );
@@ -356,6 +357,52 @@ export class ThermalRegistry extends ThermalObjectContainer {
 
     public get activePalette() {
         return this._availablePalettes[ this._activePalette ].pixels;    
+    }
+
+
+
+    protected _highlight?: number;
+    public get highlight() {
+        return this._highlight;
+    }
+    public set highlight(
+        value: number | undefined
+    ) {
+        this._highlight = value;
+        if ( value !== undefined ) {
+            const min = this.getHourDown( value );
+            const max = this.getHourUp( value );
+            this.getGroupsArray().forEach( group => {
+                group.getInstancesArray().forEach( instance => {
+                    if ( instance.timestamp >= min && instance.timestamp <= max ) {
+                        instance.highlight( true );
+                    } else {
+                        instance.highlight( false );
+                    }
+                } );
+            } );
+        }
+        else {
+            this.getGroupsArray().forEach( group => group.getInstancesArray().forEach( instance => {
+                instance.highlight(false)
+            } ) )
+        }
+    }
+
+    protected getHourDown(
+        timestamp: number
+    ): number {
+        const d = new Date();
+        d.setTime( timestamp );
+        return addHours(d, -1).getTime();
+    }
+
+    protected getHourUp(
+        timestamp: number
+    ): number {
+        const d = new Date();
+        d.setTime( timestamp );
+        return addHours(d, 1).getTime();
     }
 
 

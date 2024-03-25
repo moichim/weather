@@ -48,7 +48,7 @@ export const ThermalGroup: React.FC<ThermalGroupProps> = props => {
             </div>
 
             {loader.instances.length > 0 && <>
-                <div className="relative flex flex-wrap">
+                <div className="relative flex flex-wrap -ms-[1px] -me-[3px] md:-me-[3px] lg:-me-[7px]">
                     {loader.instances.map(instance => {
                         return <ThermalInstance instance={instance} key={instance.id} />
                     })}

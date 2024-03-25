@@ -4,13 +4,14 @@ import { ThermalFileInstance } from "@/thermal/file/ThermalFileInstance"
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ThermalCanvasContainer } from "./ThermalContainer";
 import { InstanceDetailEmitted, InstanceDetailEmittedDetail, ThermalEvents, ThermalEventsFactory } from "@/thermal/registry/events";
-import { Button, Code, Link, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, SliderValue, Tab, Tabs, cn } from "@nextui-org/react";
+import { Button, Code, Link, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, SliderValue, Tab, Tabs, Tooltip, cn } from "@nextui-org/react";
 import { useGroupInstance } from "@/thermal/context/useGroupInstance";
 import { useRegistryContext } from "@/thermal/context/RegistryContext";
 import { ThermalScale } from "../registry/ThermalScale";
 import { ThermalScaleGlobal } from "../registry/ThermalScaleGlobal";
 import { useRegistryListener } from "@/thermal/context/useRegistryListener";
 import { ThermalRange } from "../controls/ThermalRange";
+import { TimeFormat } from "@/state/time/reducerInternals/timeUtils/formatting";
 
 type ThermalInstanceProps = {
     instance: ThermalFileInstance,
@@ -101,6 +102,7 @@ export const ThermalInstance: React.FC<ThermalInstanceProps> = ({
             ref={ref}
             className={cn(className, "relative p-0 m-0")}
         ></div>
+
         <Modal
             isOpen={content !== undefined}
             onOpenChange={() => {
@@ -118,13 +120,15 @@ export const ThermalInstance: React.FC<ThermalInstanceProps> = ({
                             </ModalHeader>
                             <ModalBody>
 
+                                <div>{TimeFormat.humanDate(content.time)} {TimeFormat.humanTime(content.time)}</div>
+
                                 <div className="text-sm text-gray-500">
                                     <div>Minimální teplota: {content.min} °C</div>
                                     <div>Maximální teplota: {content.max} °C</div>
                                 </div>
 
                                 {detail && <>
-                                    <ThermalRange object={ detail } />
+                                    <ThermalRange object={detail} />
                                     <ThermalInstance
                                         instance={detail}
                                         className="w-full"
