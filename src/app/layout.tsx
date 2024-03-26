@@ -28,7 +28,7 @@ export default function RootLayout({
           "h-[100vh]"
         ])}>
           <Providers>
-            <RegistryContextProvider>
+            
               <Navbar
                 brandContent={<Link href="/" color="foreground" className="font-bold hover:text-primary">LabIR Edu Mikroklima</Link>}
                 endContent={<>
@@ -58,7 +58,6 @@ export default function RootLayout({
               />
               {children}
               <NotificationListing />
-            </RegistryContextProvider>
           </Providers>
         </div>
       </body>

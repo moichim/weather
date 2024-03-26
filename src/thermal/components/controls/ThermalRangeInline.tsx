@@ -7,7 +7,7 @@ import { useThermalRange } from "@/thermal/hooks/propertyListeners/useThermalRan
 import { ThermalGroup } from "@/thermal/registry/ThermalGroup";
 import { ThermalRegistry } from "@/thermal/registry/ThermalRegistry";
 import { ThermalRangeType } from "@/thermal/registry/interfaces";
-import { Skeleton, SliderValue, Tooltip, cn } from "@nextui-org/react";
+import { Skeleton, SliderValue, Spinner, Tooltip, cn } from "@nextui-org/react";
 import { useEffect, useMemo, useState } from "react";
 import { ThermalRangeSlider } from "./ThermalRangeSlider";
 import { TemperatureControl } from "./textInputs/TemperatureControl";
@@ -129,14 +129,23 @@ export const ThermalRangeInline: React.FC<ThermalRangeProps> = ({
 
 
     if (minmax === undefined) {
-        return <Skeleton className="flex-grow bg-red-500"/>
+        return <div className="flex-grow flex gap-4 items-center text-primary h-full">
+            <Spinner size="sm" />
+            <span>Zpracovávám teplotní škálu minmax</span>
+        </div>
     }
 
     if (range === undefined)
-        return <Skeleton className="flex-grow bg-green-500"/>
+        return <div className="flex-grow flex gap-4 items-center text-primary h-full">
+            <Spinner size="sm" />
+            <span>Zpracovávám teplotní škálu range</span>
+        </div>
 
     if (props.loaded === false)
-    return <Skeleton className="flex-grow bg-primary-500"/>
+        return <div className="flex-grow flex gap-4 items-center text-primary h-full">
+            <Spinner size="sm" />
+            <span>Zpracovávám teplotní škálu loaded</span>
+        </div>
 
     return <div className={cn(className, "flex gap-4 w-full items-center thermal-scale-inline")}>
         <ThermalRangeSlider

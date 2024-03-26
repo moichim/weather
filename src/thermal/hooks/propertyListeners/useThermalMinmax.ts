@@ -26,6 +26,8 @@ export const useThermalMinmax = (
 
     }, [ target, minmax, setMinmax ] );
 
+    console.log( minmax, target );
+
     return {
         minmax,
         target

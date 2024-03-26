@@ -7,6 +7,7 @@ import { FromControl } from "@/state/time/components/controls/fromControl";
 import { ToControl } from "@/state/time/components/controls/toControl";
 import { PresetDropdown } from "@/state/time/components/presetDropdown";
 import { TimeContextProvider } from "@/state/time/timeContext";
+import { RegistryContextProvider } from "@/thermal/context/RegistryContext";
 import { Dropdown, DropdownTrigger } from "@nextui-org/react";
 import { notFound } from "next/navigation";
 import { PropsWithChildren } from "react";
@@ -50,6 +51,7 @@ const ScopeLayout = async ({ ...props }) => {
     return <ScopeContextProvider activeScope={scope} allScopes={allScopes}>
 
         <TimeContextProvider scope={scope}>
+        <RegistryContextProvider>
 
             <Navbar
                 brandContent={<Dropdown
@@ -86,6 +88,7 @@ const ScopeLayout = async ({ ...props }) => {
                 {props.children}
             </main>
 
+</RegistryContextProvider>
         </TimeContextProvider>
     </ScopeContextProvider>
 }
