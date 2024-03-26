@@ -130,20 +130,20 @@ export const ThermalRangeInline: React.FC<ThermalRangeProps> = ({
     if (minmax === undefined) {
         return <div className="flex-grow flex gap-4 items-center text-primary h-full">
             <Spinner size="sm" />
-            <span>Zpracovávám teplotní škálu minmax</span>
+            <span>Zpracovávám teplotní škálu</span>
         </div>
     }
 
     if (range === undefined)
         return <div className="flex-grow flex gap-4 items-center text-primary h-full">
             <Spinner size="sm" />
-            <span>Zpracovávám teplotní škálu range</span>
+            <span>Zpracovávám teplotní škálu</span>
         </div>
 
     if (props.loaded === false)
         return <div className="flex-grow flex gap-4 items-center text-primary h-full">
             <Spinner size="sm" />
-            <span>Zpracovávám teplotní škálu loaded</span>
+            <span>Zpracovávám teplotní škálu</span>
         </div>
 
     return <div className={cn(className, "flex gap-4 w-full items-center thermal-scale-inline")}>
