@@ -127,7 +127,6 @@ export const ThermalRangeInline: React.FC<ThermalRangeProps> = ({
     // Conditional rendering
 
 
-
     if (minmax === undefined) {
         return <div className="flex-grow flex gap-4 items-center text-primary h-full">
             <Spinner size="sm" />

@@ -32,7 +32,7 @@ export const ProjectController: React.FC<ProjectControllerProps> = props => {
         <Navbar
             className="bg-slate-200"
             height="6rem"
-            innerContent={(listener.registry.range === undefined || listener.ready === false )
+            innerContent={(listener.registry.range === undefined )
                 ? <div className="flex items-center gap-4 text-primary"><Spinner size="sm" /><span>Načítám teplotní škálu</span></div>
 
                 : <>

@@ -38,10 +38,10 @@ const ScopeLayout = async ({ ...props }) => {
             text: "Informace o týmu",
             href: `/project/${scope.slug}/info`
         },
-        
+
     ];
 
-    if ( scope.count > 0 ) {
+    if (scope.count > 0) {
         links.push({
             text: "Termogramy",
             href: `/project/${scope.slug}/thermo`
@@ -51,44 +51,44 @@ const ScopeLayout = async ({ ...props }) => {
     return <ScopeContextProvider activeScope={scope} allScopes={allScopes}>
 
         <TimeContextProvider scope={scope}>
-        <RegistryContextProvider>
+            <RegistryContextProvider>
 
-            <Navbar
-                brandContent={<Dropdown
-                    backdrop="blur"
+                <Navbar
+                    brandContent={<Dropdown
+                        backdrop="blur"
+                    >
+                        <DropdownTrigger>
+                            <div className="flex gap-2 hover:text-primary cursor-pointer">
+                                <strong>{scope.name}</strong>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 15 12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+                                </svg>
+                            </div>
+                        </DropdownTrigger>
+                        <ScopeDropdownMenu {...scope} />
+                    </Dropdown>}
+                    links={links}
+
+                    closeLink="/"
+                    closeLinkHint={`Zavřít projekt ${scope.name}`}
+                    className="bg-slate-100"
+                    classNames={{
+                        // menu: "top-32 bg-red-300"
+                    }}
                 >
-                    <DropdownTrigger>
-                        <div className="flex gap-2 hover:text-primary cursor-pointer">
-                            <strong>{scope.name}</strong>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 15 12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
-                            </svg>
-                        </div>
-                    </DropdownTrigger>
-                    <ScopeDropdownMenu {...scope} />
-                </Dropdown>}
-                links={links}
+                    <div className="flex gap-0 items-center group">
+                        <FromControl />
+                        <div className="h-[2px] bg-gray-300 w-3 group-hover:bg-primary-300"></div>
+                        <ToControl />
+                    </div>
+                    <PresetDropdown />
+                </Navbar>
 
-                closeLink="/"
-                closeLinkHint={`Zavřít projekt ${scope.name}`}
-                className="bg-slate-100"
-                classNames={{
-                    // menu: "top-32 bg-red-300"
-                }}
-            >
-                <div className="flex gap-0 items-center group">
-                    <FromControl />
-                    <div className="h-[2px] bg-gray-300 w-3 group-hover:bg-primary-300"></div>
-                    <ToControl />
-                </div>
-                <PresetDropdown />
-            </Navbar>
+                <main className="w-full min-h-screen bg-gray-200 pb-[10rem]">
+                    {props.children}
+                </main>
 
-            <main className="w-full min-h-screen bg-gray-200 pb-[10rem]">
-                {props.children}
-            </main>
-
-</RegistryContextProvider>
+            </RegistryContextProvider>
         </TimeContextProvider>
     </ScopeContextProvider>
 }
