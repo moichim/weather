@@ -16,7 +16,7 @@ export const ThermalRangeSlider: React.FC<ThermalRangeProps> = props => {
 
     const registry = useThermalRegistry();
 
-    const { range, imposeRange } = useThermalRange(registry);
+    const { imposeRange } = useThermalRange(registry);
     const { minmax } = useThermalMinmax(registry);
 
     const renderThumb = useCallback((

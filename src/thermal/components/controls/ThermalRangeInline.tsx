@@ -129,104 +129,101 @@ export const ThermalRangeInline: React.FC<ThermalRangeProps> = ({
 
 
     if (minmax === undefined) {
-        return <Skeleton />
+        return <Skeleton className="flex-grow"/>
     }
 
     if (range === undefined)
         return <Skeleton />
 
-    return <Tooltip
-        content={props.tooltip}
-        placement="bottom"
-        isDisabled={props.tooltip === undefined}
-    >
-        <div className={cn(className, "flex gap-4 w-full items-center")}>
-            <ThermalRangeSlider
+    if (props.loaded === false)
+        return <Skeleton />
 
-                loaded={props.loaded}
+    return <div className={cn(className, "flex gap-4 w-full items-center thermal-scale-inline")}>
+        <ThermalRangeSlider
 
-                step={step}
-                showSteps={step !== -Infinity}
+            loaded={props.loaded}
 
-                // Values
-                minValue={Math.floor(minmax.min - rangeOffset)}
-                maxValue={Math.ceil(minmax.max + rangeOffset)}
-                value={value}
+            step={step}
+            showSteps={step !== -Infinity}
 
-                // Events
-                onChange={onUserSlide}
-                onChangeEnd={onUserSlideEnd}
+            // Values
+            minValue={Math.floor(minmax.min - rangeOffset)}
+            maxValue={Math.ceil(minmax.max + rangeOffset)}
+            value={value}
+
+            // Events
+            onChange={onUserSlide}
+            onChangeEnd={onUserSlideEnd}
 
 
-                // Appearance
-                color="foreground"
-                classNames={{
-                    base: "px-1 min-w-screen",
-                    mark: "bg-black",
-                    track: "bg-gray-400 h-6 cursor-pointer",
-                    filler: `thermal-scale-${palette.thermalPaletteSlug} cursor-pointer`,
-                    label: "text-xl"
-                }}
+            // Appearance
+            color="foreground"
+            classNames={{
+                base: "px-1 min-w-screen",
+                mark: "bg-black",
+                track: "bg-gray-400 h-6 cursor-pointer",
+                filler: `thermal-scale-${palette.thermalPaletteSlug} cursor-pointer`,
+                label: "text-xl"
+            }}
 
-            />
+        />
 
-            <TemperatureControl
-                step={step}
-                range={range}
-                minmax={minmax}
-                label="od"
-                className="md:hidden"
-                currentValue={range.from}
-                doValidateFinalValue={value => {
+        <TemperatureControl
+            step={step}
+            range={range}
+            minmax={minmax}
+            label="od"
+            className="md:hidden"
+            currentValue={range.from}
+            doValidateFinalValue={value => {
 
-                    const parsedValue = parseFloat(value);
+                const parsedValue = parseFloat(value);
 
-                    if (isNaN(parsedValue)) {
-                        return false;
-                    }
+                if (isNaN(parsedValue)) {
+                    return false;
+                }
 
-                    if (parsedValue < minmax.min) {
-                        return false
-                    }
+                if (parsedValue < minmax.min) {
+                    return false
+                }
 
-                    return parsedValue;
-                }}
-                onSetValid={value => {
-                    imposeRange({ from: value, to: range.to });
-                }}
+                return parsedValue;
+            }}
+            onSetValid={value => {
+                imposeRange({ from: value, to: range.to });
+            }}
 
-            />
+        />
 
-            <TemperatureControl
-                step={step}
-                range={range}
-                minmax={minmax}
-                label="do"
-                currentValue={range.to}
-                className="md:hidden"
-                doValidateFinalValue={value => {
+        <TemperatureControl
+            step={step}
+            range={range}
+            minmax={minmax}
+            label="do"
+            currentValue={range.to}
+            className="md:hidden"
+            doValidateFinalValue={value => {
 
-                    const parsedValue = parseFloat(value);
+                const parsedValue = parseFloat(value);
 
-                    if (isNaN(parsedValue)) {
-                        return false;
-                    }
+                if (isNaN(parsedValue)) {
+                    return false;
+                }
 
-                    if (parsedValue > minmax.max) {
-                        return false
-                    }
+                if (parsedValue > minmax.max) {
+                    return false
+                }
 
-                    return parsedValue;
-                }}
-                onSetValid={value => {
-                    imposeRange({ from: range.from, to: value });
-                }}
+                return parsedValue;
+            }}
+            onSetValid={value => {
+                imposeRange({ from: range.from, to: value });
+            }}
 
-            />
+        />
 
 
-        </div>
-    </Tooltip>
+    </div>
 
 
 
