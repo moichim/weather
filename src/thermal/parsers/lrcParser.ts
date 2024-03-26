@@ -195,7 +195,7 @@ export default class LrcParser extends AbstractParser {
 
     getThermalFile() {
         if (!this.isValid()) {
-            console.log( this.getErrors() );
+            console.error( this.getErrors() );
             return null;
         }
         return new ThermalFileSource(

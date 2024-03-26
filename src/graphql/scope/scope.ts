@@ -23,6 +23,7 @@ type GoogleScope {
     locality: String!
     description: String!
     start: String
+    count: Int
 }
 
 `;

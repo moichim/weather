@@ -85,7 +85,7 @@ export const useRegistryListener = () => {
 
     useEffect( () => {
 
-        console.log( "registr změnil stav ready na", ready );
+        // console.log( "registr změnil stav ready na", ready );
 
         if (ready === false) {
             registry

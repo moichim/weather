@@ -7,7 +7,7 @@ import { ResolvingMetadata, Metadata } from "next";
 export const generateStaticParams = async () => {
 
   const scopes = await googleSheetsProvider.fetchAllScopesDefinitions();
-  return scopes;
+  return scopes.filter( scope => scope.count > 0 );
 
 }
 

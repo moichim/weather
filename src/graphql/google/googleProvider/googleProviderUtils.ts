@@ -85,22 +85,6 @@ export default class GoogleProviderUtils {
 
     }
 
-    public static parseScopeDefinition(row: any[]): GoogleScope {
-        return {
-            name: row[0],
-            slug: row[1],
-            sheetId: row[2],
-            sheetTab: row[3],
-            lat: GoogleProviderUtils.sanitizeNumericalValueRequired(row[4]),
-            lon: GoogleProviderUtils.sanitizeNumericalValueRequired(row[5]),
-            hasNtc: row[6] === "1",
-            isDefault: row[7] === "1",
-            team: row[8],
-            locality: row[9],
-            description: row[10]
-        }
-    }
-
 
     // Meteo data
 

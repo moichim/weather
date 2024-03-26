@@ -1,6 +1,7 @@
 import { Navbar } from "@/components/navigation/utils/Navbar";
 import { ScopeDropdownMenu } from "@/components/scope/scopeDropdownMenu";
 import { googleSheetsProvider } from "@/graphql/google/googleProvider/googleProvider";
+import { scopeProvider } from "@/graphql/scope/ScopeProvider";
 import { ScopeContextProvider } from "@/state/scope/scopeContext";
 import { FromControl } from "@/state/time/components/controls/fromControl";
 import { ToControl } from "@/state/time/components/controls/toControl";
@@ -21,11 +22,30 @@ export type ScopePageProps = {
 /** @todo Should not use the meteo context at all! */
 const ScopeLayout = async ({ ...props }) => {
 
-    const allScopes = await googleSheetsProvider.fetchAllScopesDefinitions();
+    const allScopes = await scopeProvider.fetchAllScopesDefinitions();
     const scope = allScopes.find(s => s.slug === props.params.slug)!;
 
     if (scope === undefined)
         notFound();
+
+    const links = [
+        {
+            text: "Naměřená data",
+            href: `/project/${scope.slug}/data`,
+        },
+        {
+            text: "Informace o týmu",
+            href: `/project/${scope.slug}/info`
+        },
+        
+    ];
+
+    if ( scope.count > 0 ) {
+        links.push({
+            text: "Termogramy",
+            href: `/project/${scope.slug}/thermo`
+        });
+    }
 
     return <ScopeContextProvider activeScope={scope} allScopes={allScopes}>
 
@@ -45,20 +65,7 @@ const ScopeLayout = async ({ ...props }) => {
                     </DropdownTrigger>
                     <ScopeDropdownMenu {...scope} />
                 </Dropdown>}
-                links={[
-                    {
-                        text: "Naměřená data",
-                        href: `/project/${scope.slug}/data`,
-                    },
-                    {
-                        text: "Informace o týmu",
-                        href: `/project/${scope.slug}/info`
-                    },
-                    {
-                        text: "Termogramy",
-                        href: `/project/${scope.slug}/thermo`
-                    },
-                ]}
+                links={links}
 
                 closeLink="/"
                 closeLinkHint={`Zavřít projekt ${scope.name}`}

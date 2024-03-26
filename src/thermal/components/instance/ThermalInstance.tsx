@@ -1,17 +1,12 @@
 "use client";
 
-import { ThermalFileInstance } from "@/thermal/file/ThermalFileInstance"
-import { useCallback, useEffect, useRef, useState } from "react";
-import { ThermalCanvasContainer } from "./ThermalContainer";
-import { InstanceDetailEmitted, InstanceDetailEmittedDetail, ThermalEvents, ThermalEventsFactory } from "@/thermal/registry/events";
-import { Button, Code, Link, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, SliderValue, Tab, Tabs, Tooltip, cn } from "@nextui-org/react";
-import { useGroupInstance } from "@/thermal/context/useGroupInstance";
-import { useRegistryContext } from "@/thermal/context/RegistryContext";
-import { ThermalScale } from "../registry/ThermalScale";
-import { ThermalScaleGlobal } from "../registry/ThermalScaleGlobal";
-import { useRegistryListener } from "@/thermal/context/useRegistryListener";
-import { ThermalRange } from "../controls/ThermalRange";
 import { TimeFormat } from "@/state/time/reducerInternals/timeUtils/formatting";
+import { useRegistryContext } from "@/thermal/context/RegistryContext";
+import { useGroupInstance } from "@/thermal/context/useGroupInstance";
+import { ThermalFileInstance } from "@/thermal/file/ThermalFileInstance";
+import { InstanceDetailEmitted, InstanceDetailEmittedDetail, ThermalEvents } from "@/thermal/registry/events";
+import { Button, Link, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, cn } from "@nextui-org/react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 type ThermalInstanceProps = {
     instance: ThermalFileInstance,
@@ -128,7 +123,6 @@ export const ThermalInstance: React.FC<ThermalInstanceProps> = ({
                                 </div>
 
                                 {detail && <>
-                                    <ThermalRange object={detail} />
                                     <ThermalInstance
                                         instance={detail}
                                         className="w-full"

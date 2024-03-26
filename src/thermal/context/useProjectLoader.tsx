@@ -110,14 +110,13 @@ export const useProjectLoader = (
 
     useEffect(() => {
         if (query.loading === false) {
-            console.log( "Začínám poptávat soubory" );
             fetchQuery({
                 variables: {
                     from: from,
                     to: to,
                     scope: scopeId
                 },
-                onError: console.log,
+                onError: console.error,
                 fetchPolicy: "network-only"
             });
         }

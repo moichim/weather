@@ -24,10 +24,6 @@ describe( "ThermalLoader", () => {
         // no errors should be in the parser
         expect( parser.getErrors().length ).toEqual(0);
 
-        if ( parser.getErrors().length ) {
-            console.log( parser.getErrors() );
-        }
-
         // the parser should be valid
         expect(parser.isValid()).toEqual( true );
 

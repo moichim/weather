@@ -31,7 +31,9 @@ export const MapMultipleInternal: React.FC<MapMultipleInternalProps> = props => 
                 <p className="text-xs text-foreground-500">{item.locality}</p>
                 <ButtonGroup variant="flat">
                     <Button size="sm" as={Link} href={`/project/${item.slug}/data`}>Data</Button>
-                    <Button size="sm" as={Link} href={`/project/${item.slug}/thermo`} color="primary">Snímky</Button>
+                    {item.count > 0
+                        && <Button size="sm" as={Link} href={`/project/${item.slug}/thermo`} color="primary">Snímky</Button>
+                    }
                 </ButtonGroup>
             </MapMarker>)}
         </MapMultipleWrapperElement>

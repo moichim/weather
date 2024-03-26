@@ -36,13 +36,13 @@ export const ScopeCard: React.FC<ScopeCardProps> = props => {
                     >
                         Data
                     </Button>
-                    <Button
+                    {props.count > 0 && <Button
                         color="primary"
                         as={Link}
                         href={`/project/${props.slug}/thermo`}
                     >
                         Smínky
-                    </Button>
+                    </Button>}
                 </ButtonGroup>
             </CardFooter>
         </Card>

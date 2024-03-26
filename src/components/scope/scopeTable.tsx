@@ -45,12 +45,14 @@ export const ScopeTable: React.FC<ScopeTableProps> = props => {
                 href={`/project/${item.slug}/info`}
                 size="sm"
             >Informace</Button>
-            <Button
-                as={Link}
-                href={`/project/${item.slug}/thermo`}
-                size="sm"
-                color="primary"
-            >Smínky</Button>
+            {item.count > 0
+                && <Button
+                    as={Link}
+                    href={`/project/${item.slug}/thermo`}
+                    size="sm"
+                    color="primary"
+                >Smínky</Button>
+            }
         </div>
     }));
 

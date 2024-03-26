@@ -1,11 +1,9 @@
 "use client";
 
 import { useManualLoader } from "@/thermal/context/useManualLoader";
-import { useRegistryListener } from "@/thermal/context/useRegistryListener";
 import { ThermalFileRequest } from "@/thermal/registry/ThermalRequest";
 import { Skeleton, cn } from "@nextui-org/react";
 import { useEffect } from "react";
-import { ThermalRange } from "../controls/ThermalRange";
 import { ThermalInstance } from "../instance/ThermalInstance";
 
 export type CustomisedThermalFileRequest = ThermalFileRequest & {
@@ -26,8 +24,6 @@ export const ManualGroup: React.FC<ManualGroupProps> = props => {
     }
 
     const loader = useManualLoader(props.id, props.files);
-
-    const listener = useRegistryListener();
 
     useEffect(() => {
         loader.load();
@@ -52,8 +48,6 @@ export const ManualGroup: React.FC<ManualGroupProps> = props => {
                 />)
             }
         </div>
-
-        <ThermalRange object={ loader.group } imposeInitialRange={{from:-17, to: 13}} rangeOffset={5}/>
     </>
 
 }

@@ -22,6 +22,7 @@ export const GOOGLE_SCOPES_QUERY = gql`
             team
             locality
             description
+            count
         }
     }
 

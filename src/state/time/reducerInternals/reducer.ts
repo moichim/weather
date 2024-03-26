@@ -338,8 +338,6 @@ const modifyRangeFrom = (
 
     const modifiedDate = TimeRound.modify(storage.from, action.payload.amount, action.payload.period);
 
-    console.log( TimeFormat.humanDate( modifiedDate ) + " " + TimeFormat.humanTime( modifiedDate ) );
-
     const from = Math.max(modifiedDate.getTime(), storage.defaultFrom);
 
     return correct({
@@ -363,8 +361,6 @@ const modifyRangeTo = (
 
 
     const modifiedDate = TimeRound.modify(storage.to, action.payload.amount, action.payload.period);
-
-    console.log( TimeFormat.humanDate( modifiedDate ) + " " + TimeFormat.humanTime( modifiedDate ) );
 
     const to = Math.min(modifiedDate.getTime(), storage.defaultTo);
 
