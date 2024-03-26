@@ -14,6 +14,7 @@ export const useRegistryListener = () => {
     const [range, setRange] = useState<ThermalRangeOrUndefined>(undefined);
     const [minmax, setMinmax] = useState<ThermalMinmaxOrUndefined>(undefined);
     const [ready, setReady] = useState<boolean>(false);
+    const [count, setCount] = useState<number>(0);
 
     const registry = useRegistryContext();
 
@@ -50,37 +51,58 @@ export const useRegistryListener = () => {
 
         // Initialiser
         const initialiser = (evt: Event) => {
-            setReady( true );
+            console.info( "Vše je ready" );
+            setReady( prev => {
+                return true
+            } );
+            setCount( prev => {
+                return prev + 1;
+            } );
         }
         registry.addEventListener( ThermalEvents.READY, initialiser );
+
+        const loaderStartListener = ( evt: Event ) => {
+            setReady( prev => {
+                return false
+             } );
+            setCount( prev => {
+                return prev + 1; 
+            });
+        }
+
+        registry.addEventListener( ThermalEvents.GROUP_LOADING_START, loaderStartListener );
 
         return () => {
             registry.removeEventListener(ThermalEvents.OPACITY_UPDATED, opacityListener);
             registry.removeEventListener(ThermalEvents.RANGE_UPDATED, rangeListener);
             registry.removeEventListener(ThermalEvents.MINMAX_UPDATED, minmaxListener);
             registry.removeEventListener( ThermalEvents.READY, initialiser );
+            registry.removeEventListener( ThermalEvents.GROUP_LOADING_START, loaderStartListener );
         }
 
 
-    }, [registry, setRange, setOpacity, setMinmax]);
+    }, [registry, setRange, setOpacity, setMinmax, count, setReady, setCount, ready]);
 
     useEffect( () => {
 
         console.log( "registr změnil stav ready na", ready );
 
         if (ready === false) {
+            registry
             return;
         }
 
         const timeout = setTimeout( () => {
             Object.values( registry.groups ).forEach( group => {
-                group.getInstancesArray().forEach( instance => instance.recieveActivationStatus( true ) );
+                group.getInstancesArray().forEach( instance => {
+                    instance.recieveActivationStatus( true )
+                } );
             } );
         }, 20 );
 
         return () => clearTimeout( timeout );
 
-    }, [ready] );
+    }, [ready, setReady, registry, count] );
 
     useEffect(() => {
 

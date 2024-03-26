@@ -4,7 +4,7 @@ import { NumberDomain } from "recharts/types/util/types";
 import { ThermalFileSource } from "../file/ThermalFileSource";
 import { ThermalGroup } from "./ThermalGroup";
 import { ThermalObjectContainer } from "./abstractions/ThermalObjectContainer";
-import { ThermalEvents, ThermalEventsFactory } from "./events";
+import { GroupLoadingEvent, ThermalEvents, ThermalEventsFactory } from "./events";
 import { ThermalRangeOrUndefined } from "./interfaces";
 import { GRAYSCALE, PALETTE, ThermalPalettes } from "../file/palettes";
 import { addHours } from "date-fns";
@@ -79,6 +79,11 @@ export class ThermalRegistry extends ThermalObjectContainer {
                 ThermalEventsFactory.groupInit(group)
             );
 
+            group.addEventListener( ThermalEvents.GROUP_LOADING_START, (event: Event) => {
+                const e = event as GroupLoadingEvent;
+                this.dispatchEvent( ThermalEventsFactory.groupLoadingStart( e.detail.group ) );
+            } );
+
             group.addEventListener(ThermalEvents.GROUP_LOADING_FINISH, () => {
 
                 const all = this.getGroupsArray().reduce((state, current) => {
@@ -86,6 +91,7 @@ export class ThermalRegistry extends ThermalObjectContainer {
                         return false;
                     return state
                 }, true);
+
 
                 if (all) {
 

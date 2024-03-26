@@ -9,7 +9,7 @@ import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Slider, 
 import { DOMAttributes, useCallback, useEffect, useState } from "react";
 
 type ThermalRangeProps = SliderProps & {
-
+    loaded: boolean
 }
 
 export const ThermalRangeSlider: React.FC<ThermalRangeProps> = props => {
@@ -41,7 +41,7 @@ export const ThermalRangeSlider: React.FC<ThermalRangeProps> = props => {
 
         registry.getStatistics().then(result => setRanges(result));
 
-    }, []);
+    }, [minmax]);
 
     return <div className="flex-grow">
 
@@ -63,11 +63,11 @@ export const ThermalRangeSlider: React.FC<ThermalRangeProps> = props => {
                     <div className="border-1 border-solid border-gray-300 relative w-full h-full">
 
 
-                        {ranges === undefined && <div className="flex gap-4 items-center text-primary justify-center h-full">
+                        {(ranges === undefined || props.loaded === false ) && <div className="flex gap-4 items-center text-primary justify-center h-full">
                             <Spinner size="sm" />
-                            <span>Zpracovávám rozložení teplot</span>
+                            <span>Zpracovávám histogram</span>
                         </div>}
-                        {ranges && ranges.map((item, index) => {
+                        {(ranges && props.loaded === true ) && ranges.map((item, index) => {
 
                             return <Tooltip
                                 content={`${item.percentage.toFixed(4)}% teplot je v rozmezí ${item.from.toFixed(2)} °C až ${item.to.toFixed(2)} °C`}

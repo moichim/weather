@@ -17,7 +17,7 @@ export type ThermoFileScope = {
 export const fileTypeDefs = gql`
 
     extend type Query {
-        scopeFiles( scope: String ): [ThermalFolderRepsonse]
+        scopeFiles( scope: String, from: Float, to: Float ): [ThermalFolderRepsonse]
     }
 
     type ThermalFolderRepsonse {
@@ -48,10 +48,20 @@ export const fileResolvers = {
         scopeFiles: async (
             parents: any,
             args: {
-                scope: string
+                scope: string,
+                from?: number,
+                to?: number
             }
         ) => {
-            return await filesProvider.fetchScopeContent( args.scope );
+
+            const normalize = (number?: number) => {
+                if ( number === undefined ) return undefined;
+                return parseInt((number / 1000).toFixed(0))
+            }
+
+            return  await filesProvider.fetchScopeContent( args.scope, normalize( args.from ), normalize( args.to ) )
+
+            
         },
 
 

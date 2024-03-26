@@ -2,17 +2,15 @@
 
 import { ThermalFileInstance } from "@/thermal/file/ThermalFileInstance";
 import { useThermalMinmax } from "@/thermal/hooks/propertyListeners/useThermalMinmax";
+import { useThermalPalette } from "@/thermal/hooks/propertyListeners/useThermalPalette";
 import { useThermalRange } from "@/thermal/hooks/propertyListeners/useThermalRange";
 import { ThermalGroup } from "@/thermal/registry/ThermalGroup";
-import { ThermalRegistry, ThermalStatistics } from "@/thermal/registry/ThermalRegistry";
+import { ThermalRegistry } from "@/thermal/registry/ThermalRegistry";
 import { ThermalRangeType } from "@/thermal/registry/interfaces";
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Skeleton, SliderValue, Tooltip, cn } from "@nextui-org/react";
+import { Skeleton, SliderValue, Tooltip, cn } from "@nextui-org/react";
 import { useEffect, useMemo, useState } from "react";
 import { ThermalRangeSlider } from "./ThermalRangeSlider";
 import { TemperatureControl } from "./textInputs/TemperatureControl";
-import { useThermalPalette } from "@/thermal/hooks/propertyListeners/useThermalPalette";
-import { SettingIcon } from "@/components/ui/icons";
-import { useThermalRegistry } from "@/thermal/hooks/retrieval/useThermalRegistry";
 
 type ThermalRangeProps = {
     object: ThermalRegistry | ThermalGroup | ThermalFileInstance,
@@ -21,7 +19,8 @@ type ThermalRangeProps = {
     description?: React.ReactNode,
     className?: string,
     rangeOffset?: number,
-    tooltip?: React.ReactNode
+    tooltip?: React.ReactNode,
+    loaded: boolean
 }
 
 export const ThermalRangeInline: React.FC<ThermalRangeProps> = ({
@@ -143,6 +142,8 @@ export const ThermalRangeInline: React.FC<ThermalRangeProps> = ({
     >
         <div className={cn(className, "flex gap-4 w-full items-center")}>
             <ThermalRangeSlider
+
+                loaded={props.loaded}
 
                 step={step}
                 showSteps={step !== -Infinity}

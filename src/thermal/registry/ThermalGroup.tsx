@@ -70,8 +70,6 @@ export class ThermalGroup extends ThermalObjectContainer {
 
         if (value !== this._isLoading) {
             this._isLoading = value;
-
-            console.log( "změna načítání", this.id, value );
             
             value
                 ? this.dispatchEvent(ThermalEventsFactory.groupLoadingStart(this))
@@ -93,6 +91,11 @@ export class ThermalGroup extends ThermalObjectContainer {
     }
     public requestFiles(requests: ThermalFileRequest[]) {
 
+        this.getInstancesArray().forEach( instance => instance.destroySelf() );
+        this._instancesByUrl = {};
+        this.recalculateParameters();
+
+
         if (this.isLoading === false)
             this.isLoading = true;
 
@@ -100,6 +103,8 @@ export class ThermalGroup extends ThermalObjectContainer {
 
     }
     public async resolveQuery() {
+
+        this.dispatchEvent( ThermalEventsFactory.groupLoadingStart( this ) );
 
         // Perform the fetches
         const result = await Promise.all(

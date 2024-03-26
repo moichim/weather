@@ -1,15 +1,15 @@
 "use client";
 
-import { useQuery } from "@apollo/client";
+import { useLazyQuery, useQuery } from "@apollo/client";
 import gql from "graphql-tag";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ThermoFileDefinition, ThermoFileScope } from "../graphql/files";
 import { ThermalFileRequest } from "../registry/ThermalRequest";
 
 export const PROJECT_FILES_QUERY = gql`
 
-query Scopes($scope: String!) {
-    scopeFiles(scope: $scope) {
+query Scopes($scope: String!, $from: Float, $to: Float) {
+    scopeFiles(scope: $scope, from: $from, to: $to) {
       files {
         filename
         timestamp
@@ -48,7 +48,9 @@ type ProjectFilesQueryResponse = {
  * Requests information about the scope's files
  */
 export const useProjectLoader = (
-    scopeId: string
+    scopeId: string,
+    from: number,
+    to: number
 ) => {
 
     const [groups, setGroups] = useState<ProjectDescription>({});
@@ -62,7 +64,7 @@ export const useProjectLoader = (
 
         setGroups(prev => {
 
-            if (!Object.keys(prev).includes(id)) {
+            // if (!Object.keys(prev).includes(id)) {
                 return {
                     ...prev,
                     [id]: {
@@ -72,7 +74,7 @@ export const useProjectLoader = (
                         files
                     }
                 }
-            }
+            //} 
 
             return prev;
 
@@ -80,12 +82,14 @@ export const useProjectLoader = (
 
     }, [setGroups]);
 
-    const query = useQuery<ProjectFilesQueryResponse>(PROJECT_FILES_QUERY, {
+    const [fetchQuery, query] = useLazyQuery<ProjectFilesQueryResponse>(PROJECT_FILES_QUERY, {
         variables: {
-            scope: scopeId
+            scope: scopeId,
+            from: from,
+            to: to
         },
         ssr: false,
-        nextFetchPolicy: "no-cache",
+        fetchPolicy: "network-only",
         onCompleted: (result) => {
 
             result.scopeFiles.forEach(folder => {
@@ -103,6 +107,24 @@ export const useProjectLoader = (
 
         }
     });
+
+    useEffect(() => {
+        if (query.loading === false) {
+            console.log( "Začínám poptávat soubory" );
+            fetchQuery({
+                variables: {
+                    from: from,
+                    to: to,
+                    scope: scopeId
+                },
+                onError: console.log,
+                fetchPolicy: "network-only"
+            });
+        }
+            
+    }, [from, to]);
+
+
 
     return {
         loading: query.loading,

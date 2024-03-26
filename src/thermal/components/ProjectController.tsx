@@ -1,13 +1,14 @@
 "use client";
 
 import { Navbar } from "@/components/navigation/utils/Navbar";
-import { ScrollShadow, Spinner } from "@nextui-org/react";
+import { useTimeContext } from "@/state/time/timeContext";
+import { Spinner } from "@nextui-org/react";
 import { useProjectLoader } from "../context/useProjectLoader";
 import { useRegistryListener } from "../context/useRegistryListener";
 import { ThermalGroup } from "./ThermalGroup";
 import { ThermalRangeInline } from "./controls/ThermalRangeInline";
-import { OpacityScale } from "./registry/OpacityScale";
 import { PaletteControl } from "./controls/paletteControl";
+import { OpacityScale } from "./registry/OpacityScale";
 
 type ProjectControllerProps = {
     scope: string
@@ -20,7 +21,9 @@ type ProjectControllerProps = {
  */
 export const ProjectController: React.FC<ProjectControllerProps> = props => {
 
-    const { groups, loading } = useProjectLoader(props.scope);
+    const { timeState } = useTimeContext();
+
+    const { groups, loading } = useProjectLoader(props.scope, timeState.from, timeState.to);
 
     const listener = useRegistryListener();
 
@@ -29,20 +32,21 @@ export const ProjectController: React.FC<ProjectControllerProps> = props => {
         <Navbar
             className="bg-slate-200"
             height="6rem"
-            innerContent={listener.registry.range === undefined
-                ? <div className="flex items-center gap-4 text-primary"><Spinner size="sm"/><span>Načítám teplotní škálu</span></div>
+            innerContent={(listener.registry.range === undefined || listener.ready === false )
+                ? <div className="flex items-center gap-4 text-primary"><Spinner size="sm" /><span>Načítám teplotní škálu</span></div>
 
                 : <>
                     <ThermalRangeInline
-                    object={listener.registry}
-                    imposeInitialRange={listener.registry.range}
-                    description="Klikněte na posuvník a změňte rozsah zobrazených teplot!" />
+                        loaded={listener.ready}
+                        object={listener.registry}
+                        imposeInitialRange={listener.registry.range}
+                        description="Klikněte na posuvník a změňte rozsah zobrazených teplot!" />
                     <div className="w-30 md:w-40 lg:w-60">
                         <OpacityScale />
                     </div>
                     <PaletteControl />
                 </>
-                }
+            }
         />
 
         {(loading === true || listener.ready === false) &&

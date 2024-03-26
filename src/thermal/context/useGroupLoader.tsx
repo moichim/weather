@@ -60,9 +60,11 @@ export const useGroupLoader = (
 
             const target = event.target as ThermalGroup;
 
-            const instances = target.getInstancesArray();
+            const i = target.getInstancesArray();
 
-            setInstances(instances);
+            setInstances(i);
+
+            // i.forEach( instance => instance.recieveActivationStatus( true ) );
 
         };
 

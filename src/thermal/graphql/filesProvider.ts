@@ -9,9 +9,30 @@ export class FilesProvider {
     }
 
     public async fetchScopeContent(
-        scope: string
+        scope: string,
+        from?: number,
+        to?: number
     ) {
-        const response = await fetch( ScopeProvider.baseUrl + scope + "/content" );
+
+        let url = ScopeProvider.baseUrl + scope + "/content";
+
+        const append: string[] = [];
+
+        if ( from !== undefined ) {
+            append.push( `from=${from}` );
+        }
+
+        if ( to !== undefined ) {
+            append.push( `to=${to}` );
+        }
+
+        if ( append.length > 0 ) {
+            url += `?${append.join( "&" )}`;
+        }
+
+        console.log( url );
+
+        const response = await fetch( url );
 
         const json = await response.json();
 
