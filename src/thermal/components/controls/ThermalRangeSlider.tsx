@@ -63,11 +63,11 @@ export const ThermalRangeSlider: React.FC<ThermalRangeProps> = props => {
                     <div className="border-1 border-solid border-gray-300 relative w-full h-full">
 
 
-                        {(ranges === undefined || props.loaded === false ) && <div className="flex gap-4 items-center text-primary justify-center h-full">
+                        {(ranges === undefined ) && <div className="flex gap-4 items-center text-primary justify-center h-full">
                             <Spinner size="sm" />
                             <span>Zpracovávám histogram</span>
                         </div>}
-                        {(ranges && props.loaded === true ) && ranges.map((item, index) => {
+                        {(ranges ) && ranges.map((item, index) => {
 
                             return <Tooltip
                                 content={`${item.percentage.toFixed(4)}% teplot je v rozmezí ${item.from.toFixed(2)} °C až ${item.to.toFixed(2)} °C`}

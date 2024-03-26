@@ -129,14 +129,14 @@ export const ThermalRangeInline: React.FC<ThermalRangeProps> = ({
 
 
     if (minmax === undefined) {
-        return <Skeleton className="flex-grow"/>
+        return <Skeleton className="flex-grow bg-red-500"/>
     }
 
     if (range === undefined)
-        return <Skeleton />
+        return <Skeleton className="flex-grow bg-green-500"/>
 
     if (props.loaded === false)
-        return <Skeleton />
+    return <Skeleton className="flex-grow bg-primary-500"/>
 
     return <div className={cn(className, "flex gap-4 w-full items-center thermal-scale-inline")}>
         <ThermalRangeSlider
