@@ -5,7 +5,7 @@ import { ThermalFileInstance } from "../file/ThermalFileInstance";
 import { ThermalFileSource } from "../file/ThermalFileSource";
 import { ThermalRegistry } from "./ThermalRegistry";
 import { ThermalFileRequest, ThermalRequest } from "./ThermalRequest";
-import { ThermalContainerStates, ThermalObjectContainer } from "./abstractions/ThermalObjectContainer";
+import { ThermalContainerStates } from "./abstractions/ThermalObjectContainer";
 import { ThermalEventsFactory } from "./events";
 import { ThermalCursorPositionOrundefined, ThermalMinmaxOrUndefined, ThermalMinmaxType, ThermalRangeOrUndefined } from "./interfaces";
 
@@ -30,7 +30,7 @@ import { ThermalCursorPositionOrundefined, ThermalMinmaxOrUndefined, ThermalMinm
  * - ThermalEvents.GROUP_LOADING_START
  * - ThermalEvents.GROUP_LOADING_FINISH
  */
-export class ThermalGroup extends ThermalObjectContainer {
+export class ThermalGroup {
 
 
     public readonly hash = Math.random();
@@ -41,7 +41,6 @@ export class ThermalGroup extends ThermalObjectContainer {
         public readonly registry: ThermalRegistry,
         public readonly id: string
     ) {
-        super();
     }
 
 
@@ -143,7 +142,7 @@ export class ThermalGroup extends ThermalObjectContainer {
                 if (file !== null) {
 
                     // This makes sure that there are no duplicite sources
-                    file = this.registry.registerSource(file);
+                    file = this.registry.manager.registerSource(file);
 
                     // Add the request in the group in a unified way
                     this.instantiateSource(file);

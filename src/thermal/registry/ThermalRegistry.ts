@@ -8,6 +8,17 @@ import { GroupLoadingEvent, ThermalEvents, ThermalEventsFactory } from "./events
 import { ThermalMinmaxOrUndefined, ThermalRangeOrUndefined } from "./interfaces";
 import { GRAYSCALE, PALETTE, ThermalPalettes } from "../file/palettes";
 import { addHours } from "date-fns";
+import { ThermalManager } from "./ThermalManager";
+import { ThermalFileRequest, ThermalRequest } from "./ThermalRequest";
+import { ThermalRegistryLoader } from "./utilities/ThermalRegistryLoader";
+import { IWithOpacity, OpacityDrive } from "./properties/OpacityDrive";
+import { ProjectDescription } from "../context/useProjectLoader";
+import { LoadingProperty } from "./properties/LoadingProperty";
+import { GroupsProperty } from "./properties/GroupProperty";
+import { IThermalContainer, IThermalRegistry } from "./interfaces/interfaces";
+import { MinmaxRegistryProperty } from "./properties/MinmaxRegistryProperty";
+import { RangeDriver } from "./properties/RangeDriver";
+import { HistogramProperty } from "./properties/HistogramProperty";
 
 /**
  * The global thermal registry
@@ -22,107 +33,161 @@ import { addHours } from "date-fns";
  * - ThermalEvents.RANGE_UPDATED
  * - ThermalEvents.READY
  */
-export class ThermalRegistry extends ThermalObjectContainer {
-
-
-    /** 
-     * Loading states 
-     */
-
-    protected onSetStateEmpty(): void {
-        this.removeAllChildren();
-    }
-    protected onSetStateLoading(): void {
-        // this.getGroupsArray().forEach( group => group.recieveActivationStatus( false ) );
-    }
-    protected onSetStateLoaded(): void {
-        this.recalculateAllParameters();
-    }
-
-    /** Internal buffer holding IDs of all currently loading groups */
-    protected _groupsLoading: string[] = [];
-    
-    /** Indicate one group as loading and set the global state */
-    public groupStartedLoading(
-        groupId: string
-    ) {
-
-        if ( ! this._groupsLoading.includes( groupId ) ) {
-            this._groupsLoading.push( groupId );
-            this.setStateLoading();
-        }
-    }
-
-    /** Indicate one group as loaded and set the global state */
-    public groupFinisledLoading( 
-        groupId: string 
-    ) {
-
-        if ( this._groupsLoading.includes( groupId ) ) {
-            this._groupsLoading = this._groupsLoading.filter( g => g !== groupId );
-            if ( this._groupsLoading.length === 0 ) {
-                console.log( "Nyní by měl stav registru skočit na načtený" );
-                this.setStateLoaded();
-            }
-        }
-    }
-
-    /** Resolve requests for all groups having any requests and return the affected groups */
-    public async resolveAllGroups() {
-
-        const result = await Promise.all(
-            this.getGroupsArray()
-                .filter( group => group.requests.length > 0 )
-                .map( group => group.resolveQuery() )
-        );
-
-        return result;
-
-    }
-
+export class ThermalRegistry implements IThermalRegistry {
 
     public readonly hash = Math.random();
 
+    public constructor(
+        public readonly id: string,
+        public readonly manager: ThermalManager
+    ) {
+        // super();
+    }
+
+    /** Takes care of the entire loading */
+    protected readonly loader: ThermalRegistryLoader = new ThermalRegistryLoader( this );
+    
+    
+
+    /** Groups are stored in an observable property */
+    public readonly groups: GroupsProperty = new GroupsProperty( this, [] );
+
+
+
     /**
-     * Destruction
+     * 
+     * 1. resets everything
+     * 2. set as loading (T)
+     * 3. create the groups and register their filed
+     * 4. fetch all requests (this will register and instantiate the sources)
+     * 5. mark as loaded
+     * 6. return the groups
+     */
+    public async loadProject(
+        description: ProjectDescription
+    ): Promise<ThermalGroup[]> {
+
+        this.loading.markAsLoading();
+
+        // Reset everything at first
+        this.reset();
+
+        // Create the groups from the definition
+        for ( const groupId in description ) {
+
+            const group = this.groups.addOrGetGroup( groupId );
+
+            // Request the files
+            this.loader.requestFiles( group, description[groupId].files );
+
+        }
+
+        // Resolve the query and create the instances where they should be
+        await this.loader.resolveQuery();
+
+        // Recalculate the minmax
+        this.minmax.recalculateFromGroups();
+
+        // If there is minmax, impose it down
+        if ( this.minmax.value )
+            this.range.imposeRange( {from: this.minmax.value.min, to: this.minmax.value.max} );
+
+        // Recalculate the histogram
+        this.histogram.recalculate();
+
+        this.loading.markAsLoaded();
+
+        return this.groups.value;
+
+    }
+
+    public async loadOneFile( file: ThermalFileRequest, groupId: string ): Promise<ThermalGroup> {
+
+        this.loading.markAsLoading();
+
+        this.reset();
+
+        const group = this.groups.addOrGetGroup( groupId );
+
+        this.loader.requestFile( group, file.thermalUrl, file.visibleUrl );
+
+        // Resolve the entire query
+        await this.loader.resolveQuery();
+
+        // Recalculate the minmax
+        this.minmax.recalculateFromGroups();
+
+        // If there is minmax, impose it down
+        if ( this.minmax.value )
+            this.range.imposeRange( {from: this.minmax.value.min, to: this.minmax.value.max} );
+
+        // Recalculate the histogram
+        this.histogram.recalculate();
+
+        this.loading.markAsLoaded();
+
+        return this.groups.map.get( groupId ) as ThermalGroup
+
+    }
+
+
+
+    public reset() {
+        this.removeAllChildren();
+        this.opacity.reset();
+        this.minmax.reset();
+    }
+
+    public removeAllChildren() {
+        this.groups.removeAllGroups();
+    };
+
+    public destroySelfAndBelow() {}
+
+
+
+
+    /**
+     * Properties
      */
 
-    protected onDestroySelf(): void {
-        this.removeAllChildren();
-        this.minmax = undefined;
-        this.range = undefined;
-        this.histogram = [];
+
+    /** 
+     * Opacity property 
+     */
+    public readonly opacity: OpacityDrive = new OpacityDrive( this, 1 );
+
+    /** 
+     * Minmax property 
+     */
+    public readonly minmax: MinmaxRegistryProperty = new MinmaxRegistryProperty( this, undefined );
+
+    /**
+     * Loading
+     */
+    public readonly loading: LoadingProperty = new LoadingProperty( this, false );
+
+    /**
+     * Range
+     */
+    public readonly range: RangeDriver = new RangeDriver( this, undefined );
+
+    /**
+     * Histogram
+     */
+    public readonly histogram: HistogramProperty = new HistogramProperty( this, [] );
+
+
+
+
+    protected test() {
+        this.opacity.addListener( "test", value => {console.log( value );} );
     }
 
-    protected removeAllChildren() {
-        for ( let group of this.getGroupsArray() ) {
-            group.destroySelf();
-            delete this.groups[group.id];
-        }
-    }
 
-    /** Remove a single group and recalculate the parameters work
-    */
-    public removeGroup(id: string) {
 
-        const group = this.groups[id];
-
-        if (group) {
-
-            group.destroySelf();
-
-            delete this.groups[id];
-
-            // If there are no groups left, mark the state as empty
-            if ( this.getGroupsArray().length === 0 ) {
-                this.setStateEmpty();
-            } 
-            // If there are some groups, recalculate the parameters
-            else {
-                this.recalculateAllParameters();
-            }
-        }
-
+    protected clearListeners() {
+        this.opacity.clearAllListeners();
     }
 
 
@@ -135,7 +200,7 @@ export class ThermalRegistry extends ThermalObjectContainer {
 
 
     protected onRecieveActivationStatus(status: boolean): void {
-        this.getGroupsArray().forEach(group => group.recieveActivationStatus(status));
+        this.groups.value.forEach(group => group.recieveActivationStatus(status));
     }
 
     protected onImposeActivationStatus(status: boolean): void {
@@ -151,73 +216,13 @@ export class ThermalRegistry extends ThermalObjectContainer {
     /**
      * Groups creation
      */
-
-    protected _groups: {
-        [index: string]: ThermalGroup
-    } = {}
-    protected get groups() { return this._groups }
-    public getGroupsArray = () => Object.values(this.groups);
-    public getGroupsById = () => this._groups;
-    protected _isGroupRegistered = (id: string) => this.groups[id] !== undefined;
     /** Create a group or get an existing instance */
     public addOrGetGroup(
         id: string
     ) {
-        if (!this._isGroupRegistered(id)) {
-
-            const group = new ThermalGroup(this, id);
-            this.groups[id] = group;
-            this.dispatchEvent(
-                ThermalEventsFactory.groupInit(group)
-            );
-
-            return group;
-        }
-
-        return this.groups[id];
+        return this.groups.addOrGetGroup(id);
     }
 
-    
-
-    
-
-    
-
-
-
-    /**
-     * Sources handling
-     */
-
-
-    protected _sourcesByUrl: {
-        [index: string]: ThermalFileSource
-    } = {}
-    public get sourcesByUrl() { return this._sourcesByUrl; }
-    protected getSourcesArray() {
-        return Object.values(this.sourcesByUrl);
-    }
-    protected getRegisteredUrls() {
-        return Object.keys(this.sourcesByUrl);
-    }
-    public registerSource(
-        source: ThermalFileSource
-    ) {
-        if (!this.getRegisteredUrls().includes(source.url)) {
-
-            // Assign the source
-            this.sourcesByUrl[source.url] = source;
-
-            // Emit the loaded event
-            this.dispatchEvent(ThermalEventsFactory.sourceRegistered(source));
-
-            return source;
-
-        }
-
-        return this.sourcesByUrl[source.url];
-    }
-    public isUrlRegistered = (url: string) => Object.keys(this.sourcesByUrl).includes(url);
 
 
 
@@ -233,134 +238,12 @@ export class ThermalRegistry extends ThermalObjectContainer {
         // this.histogram = this._getHistorgramFromAllGroups();
     }
 
-    /** 
-     * The current histogram should be calculated everytime when:
-     * - the groups are loaded
-     * - the group is added
-     * 
-    */
-    public histogram: ThermalStatistics[] = [];
-
-
-    /** Calculate a histogram of all groups */
-    public _getHistorgramFromAllGroups() {
-
-        if (this.minmax === undefined || this.getGroupsArray().length === 0) {
-            return [];
-        } else {
-
-            // Get all pixels
-            const allPixels = this.getGroupsArray().reduce((
-                state,
-                current
-            ) => {
-
-                const pixels = current.getInstancesArray().reduce((buf, instance) => {
-
-                    buf = [...buf, ...instance.pixels];
-
-                    return buf;
-
-                }, [] as number[]);
-
-                return [...state, ...pixels]
-
-            }, [] as number[]);
-
-
-            // Calculate the ten segments
-            const segments: [number, number][] = [];
-
-            const numSegments = 50;
-            const difference = this.minmax.max - this.minmax.min;
-            const segment = difference / numSegments;
-
-            for (let i = 0; i < numSegments; i++) {
-
-                const from = (segment * i) + this.minmax.min;
-                const to = from + segment;
-
-                segments.push([from, to]);
-
-            }
-
-            const results: {
-                from: number,
-                to: number,
-                count: number
-            }[] = [];
-
-            let sum = allPixels.length;
-
-            for ( let i of segments ) {
-
-                const count = allPixels.filter( pixel => {
-                    return pixel >= i[0] && pixel < i[1]; 
-                }).length;
-
-                sum = sum + count;
-
-                results.push( {
-                    from: i[0],
-                    to: i[1],
-                    count: count
-                } );
-
-            }
-
-            const recalculated = results.map( i => {
-                return {
-                    ...i,
-                    percentage: i.count / sum * 100,
-                }
-            } );
-
-            const max = Math.max( ...recalculated.map( item => item.percentage ) );
-
-            return recalculated.map( item => {
-                return {
-                    ...item,
-                    height: item.percentage / max * 100
-                }
-            } ) as ThermalStatistics[];
-
-        }
-
-
-    }
-
     /** Completely calculate the minmax and set it also as the range */
     protected recalculateMinmaxAndRange() {
         this.minmax = this._getMinmaxFromAllGroups();
         if (this.minmax) {
             this.range = { from: this.minmax.min, to: this.minmax.max };
         }
-    }
-
-    /** Internal method for calculation of minmax from current groups  */
-    protected _getMinmaxFromAllGroups(): ThermalMinmaxOrUndefined {
-
-        const groups = this.getGroupsArray();
-
-        if (groups.length === 0) {
-            return undefined;
-        }
-
-        const minmax = groups.reduce((state, current) => {
-
-            if (current.minmax === undefined) {
-                return state;
-            }
-
-            return {
-                min: current.minmax.min < state.min ? current.minmax.min : state.min,
-                max: current.minmax.max > state.max ? current.minmax.max : state.max
-            }
-
-        }, { min: Infinity, max: -Infinity });
-
-        return minmax;
-
     }
 
 
@@ -405,99 +288,6 @@ export class ThermalRegistry extends ThermalObjectContainer {
 
     protected onOpacityUpdated(value: number): void {
         this.getGroupsArray().forEach(group => group.recieveOpacity(value));
-    }
-
-
-
-    /**
-     * Statistics processing
-     * @deprecated Should not be used at all! Instead, read the histogram from the variable!
-     */
-
-    public async getStatistics() {
-
-        if (this.minmax === undefined || this.getGroupsArray().length === 0) {
-            return await [];
-        } else {
-
-            // Get all pixels
-            const allPixels = this.getGroupsArray().reduce((
-                state,
-                current
-            ) => {
-
-                const pixels = current.getInstancesArray().reduce((buf, instance) => {
-
-                    buf = [...buf, ...instance.pixels];
-
-                    return buf;
-
-                }, [] as number[]);
-
-                return [...state, ...pixels]
-
-            }, [] as number[]);
-
-
-            // Calculate the ten segments
-            const segments: [number, number][] = [];
-
-            const numSegments = 100;
-            const difference = this.minmax.max - this.minmax.min;
-            const segment = difference / numSegments;
-
-            for (let i = 0; i < numSegments; i++) {
-
-                const from = (segment * i) + this.minmax.min;
-                const to = from + segment;
-
-                segments.push([from, to]);
-
-            }
-
-            const results: {
-                from: number,
-                to: number,
-                count: number
-            }[] = [];
-
-            let sum = allPixels.length;
-
-            for ( let i of segments ) {
-
-                const count = await allPixels.filter( pixel => {
-                    return pixel >= i[0] && pixel < i[1]; 
-                }).length;
-
-                sum = sum + count;
-
-                results.push( {
-                    from: i[0],
-                    to: i[1],
-                    count: count
-                } );
-
-            }
-
-            const recalculated = results.map( i => {
-                return {
-                    ...i,
-                    percentage: i.count / sum * 100,
-                }
-            } );
-
-            const max = Math.max( ...recalculated.map( item => item.percentage ) );
-
-            return recalculated.map( item => {
-                return {
-                    ...item,
-                    height: item.percentage / max * 100
-                }
-            } ) as ThermalStatistics[];
-
-        }
-
-
     }
 
 

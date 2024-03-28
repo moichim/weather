@@ -40,7 +40,7 @@ export const ThermalInstance: React.FC<ThermalInstanceProps> = ({
 
         setContent(payload);
 
-        const instance = group.instantiateSource(registry.sourcesByUrl[payload.url]);
+        const instance = group.instantiateSource(registry.manager.sourcesByUrl[payload.url]);
         if (registry.range)
             instance.recieveRange(registry.range);
 

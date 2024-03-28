@@ -10,6 +10,7 @@ import { ThermalPalettes } from "../file/palettes";
 import { useThermalLoadingState } from "../hooks/propertyListeners/useThermalLoadingState";
 import { ThermalContainerStates } from "../registry/abstractions/ThermalObjectContainer";
 import { useThermalHistogram } from "../hooks/propertyListeners/useThermalHistogram";
+import { ThermalManager } from "../registry/ThermalManager";
 
 /**
  * Creates and stores the global instance of the `ThermalRegistry` 
@@ -22,9 +23,16 @@ import { useThermalHistogram } from "../hooks/propertyListeners/useThermalHistog
  */
 export const useRegistryContextInternal = () => {
 
+
+    const manager = useMemo( () => {
+        return new ThermalManager;
+    }, [] );
+
+
+
     const registry = useMemo(() => {
 
-        return new ThermalRegistry;
+        return new ThermalRegistry(manager);
 
     }, []);
 

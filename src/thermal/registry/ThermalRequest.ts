@@ -44,8 +44,11 @@ export class ThermalRequest extends EventTarget {
 
     public async fetch() {
 
-        if ( this.group.registry.isUrlRegistered( this.url ) ) {
-            return this.group.registry.sourcesByUrl[ this.url ];
+        if ( this.group.registry.manager.isUrlRegistered( this.url ) ) {
+            return {
+                file: this.group.registry.manager.sourcesByUrl[ this.url ],
+                request: this
+            };
         }
 
         const file = await ThermalFileSource.fromUrl( this.url, this.visibleUrl ) as unknown as ThermalFileSource;
@@ -53,8 +56,10 @@ export class ThermalRequest extends EventTarget {
         if ( !file ) {
             return null;
         } else if ( file !== null ) {
-            this.dispatchEvent( new CustomEvent<{file: ThermalFileSource}>( "loaded", { detail: { file: file as unknown as ThermalFileSource }} ) );
-            return file;
+            return {
+                file,
+                request: this
+            };
         }
 
         return null;
