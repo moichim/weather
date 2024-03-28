@@ -1,9 +1,9 @@
-import { useThermalPalette } from "@/thermal/hooks/propertyListeners/useThermalPalette";
+import { useRegistryContext } from "@/thermal/context/RegistryContext";
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, cn } from "@nextui-org/react";
 
 export const PaletteControl: React.FC = () => {
 
-    const palette = useThermalPalette();
+    const {thermalPaletteSlug, thermalPalette, setThermalPalette, availableThermalPalettes} = useRegistryContext();
 
     return <Dropdown>
         <DropdownTrigger>
@@ -11,10 +11,10 @@ export const PaletteControl: React.FC = () => {
                 <div className="flex gap-2 items-center w-60">
 
                     <div className={cn(
-                        `thermal-scale-${palette.thermalPaletteSlug}`,
+                        `thermal-scale-${thermalPaletteSlug}`,
                         "w-10 h-4 rounded-xl"
                     )}></div>
-                    <div className="text-sm flex-grow">{palette.thermalPalette.name}</div>
+                    <div className="text-sm flex-grow">{thermalPalette.name}</div>
 
 
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
@@ -26,11 +26,11 @@ export const PaletteControl: React.FC = () => {
         <DropdownMenu
             onAction={key => {
 
-                palette.setThermalPalette(key)
+                setThermalPalette(key)
 
             }}
         >
-            {Object.entries(palette.availableThermalPalettes).map(([key, palette]) => {
+            {Object.entries(availableThermalPalettes).map(([key, palette]) => {
                 return <DropdownItem
                     key={key}
                 >

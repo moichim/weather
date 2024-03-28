@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
-import { useGroupListener } from "../context/useGroupListener";
-import { useGroupLoader } from "../context/useGroupLoader";
+import { useThermalGroupInstance } from "../hooks/retrieval/useThermalGroupinstance";
 import { ThermalFileRequest } from "../registry/ThermalRequest";
 import { ThermalInstance } from "./instance/ThermalInstance";
+import { ThermalContainerStates } from "../registry/abstractions/ThermalObjectContainer";
+import { Spinner } from "@nextui-org/react";
 
 type ThermalGroupProps = {
     groupId: string,
@@ -17,18 +18,18 @@ type ThermalGroupProps = {
  * Handles a single troup of images. 
  * 
  * Instantiated once the folder is loaded in `Project Controller`. Initialises the loading of files.
+ * @deprecated
  */
 export const ThermalGroup: React.FC<ThermalGroupProps> = props => {
 
-    const loader = useGroupLoader(props.groupId);
+
+    const { instances, loadingState, minmax, group } = useThermalGroupInstance(props.groupId);
 
     useEffect(() => {
-
-        loader.loadFiles(props.files);
-
-    }, [props.files]);
-
-    const listener = useGroupListener(props.groupId);
+        if (loadingState === ThermalContainerStates.LOADED) {
+            group.recieveActivationStatus(true);
+        }
+    }, []);
 
 
 
@@ -40,16 +41,24 @@ export const ThermalGroup: React.FC<ThermalGroupProps> = props => {
 
                 {props.description && <p className="py-2">{props.description}</p>}
 
-                {listener.minmax && <div className="text-small text-gray-500">
-                    <p>Minimum: {listener.minmax.min.toFixed(3)} °C</p>
-                    <p>Maximum: {listener.minmax.max.toFixed(3)} °C</p>
-                </div>}
+                {(loadingState !== ThermalContainerStates.LOADED) && <div className="w-full flex gap-4 items-center text-primary-500">
+                        <Spinner /> Zpracovávám data
+                </div>
+                }
+
+                {(loadingState === ThermalContainerStates.LOADED && minmax) && <div className="text-small text-gray-500">
+                    <p>Minimum: {minmax.min.toFixed(3)} °C</p>
+                    <p>Maximum: {minmax.max.toFixed(3)} °C</p>
+                </div>
+
+
+                }
 
             </div>
 
-            {loader.instances.length > 0 && <>
+            {(instances.length > 0 && loadingState === ThermalContainerStates.LOADED ) && <>
                 <div className="relative flex flex-wrap -ms-[1px] -me-[3px] md:-me-[3px] lg:-me-[7px]">
-                    {loader.instances.map(instance => {
+                    {instances.map(instance => {
                         return <ThermalInstance instance={instance} key={instance.id} />
                     })}
                 </div>

@@ -2,8 +2,9 @@
 
 import { TimeFormat } from "@/state/time/reducerInternals/timeUtils/formatting";
 import { useRegistryContext } from "@/thermal/context/RegistryContext";
-import { useGroupInstance } from "@/thermal/context/useGroupInstance";
 import { ThermalFileInstance } from "@/thermal/file/ThermalFileInstance";
+import { useThermalRegistry } from "@/thermal/hooks/retrieval/useThermalRegistry";
+import { useThermalGroup } from "@/thermal/hooks/retrieval/useThernalGroup";
 import { InstanceDetailEmitted, InstanceDetailEmittedDetail, ThermalEvents } from "@/thermal/registry/events";
 import { Button, Link, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, cn } from "@nextui-org/react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -27,9 +28,9 @@ export const ThermalInstance: React.FC<ThermalInstanceProps> = ({
 
     const [content, setContent] = useState<InstanceDetailEmittedDetail | undefined>(undefined);
 
-    const group = useGroupInstance("detail");
+    const group = useThermalGroup("detail");
 
-    const registry = useRegistryContext();
+    const registry = useThermalRegistry();
 
     const [detail, setDetail] = useState<ThermalFileInstance | undefined>(undefined);
 
@@ -59,11 +60,11 @@ export const ThermalInstance: React.FC<ThermalInstanceProps> = ({
 
         if (ref !== null) {
             if (ref.current) {
-                if (!props.instance.binded) {
+                // if (!props.instance.binded) {
 
                     props.instance.buildDom(ref.current);
 
-                }
+                // }
 
             }
         }

@@ -5,7 +5,7 @@ import { ThermalFileSource } from "../file/ThermalFileSource";
 import { ThermalGroup } from "./ThermalGroup";
 import { ThermalObjectContainer } from "./abstractions/ThermalObjectContainer";
 import { GroupLoadingEvent, ThermalEvents, ThermalEventsFactory } from "./events";
-import { ThermalRangeOrUndefined } from "./interfaces";
+import { ThermalMinmaxOrUndefined, ThermalRangeOrUndefined } from "./interfaces";
 import { GRAYSCALE, PALETTE, ThermalPalettes } from "../file/palettes";
 import { addHours } from "date-fns";
 
@@ -25,10 +25,104 @@ import { addHours } from "date-fns";
 export class ThermalRegistry extends ThermalObjectContainer {
 
 
+    /** 
+     * Loading states 
+     */
+
+    protected onSetStateEmpty(): void {
+        this.removeAllChildren();
+    }
+    protected onSetStateLoading(): void {
+        // this.getGroupsArray().forEach( group => group.recieveActivationStatus( false ) );
+    }
+    protected onSetStateLoaded(): void {
+        this.recalculateAllParameters();
+    }
+
+    /** Internal buffer holding IDs of all currently loading groups */
+    protected _groupsLoading: string[] = [];
+    
+    /** Indicate one group as loading and set the global state */
+    public groupStartedLoading(
+        groupId: string
+    ) {
+
+        if ( ! this._groupsLoading.includes( groupId ) ) {
+            this._groupsLoading.push( groupId );
+            this.setStateLoading();
+        }
+    }
+
+    /** Indicate one group as loaded and set the global state */
+    public groupFinisledLoading( 
+        groupId: string 
+    ) {
+
+        if ( this._groupsLoading.includes( groupId ) ) {
+            this._groupsLoading = this._groupsLoading.filter( g => g !== groupId );
+            if ( this._groupsLoading.length === 0 ) {
+                console.log( "Nyní by měl stav registru skočit na načtený" );
+                this.setStateLoaded();
+            }
+        }
+    }
+
+    /** Resolve requests for all groups having any requests and return the affected groups */
+    public async resolveAllGroups() {
+
+        const result = await Promise.all(
+            this.getGroupsArray()
+                .filter( group => group.requests.length > 0 )
+                .map( group => group.resolveQuery() )
+        );
+
+        return result;
+
+    }
+
+
     public readonly hash = Math.random();
 
+    /**
+     * Destruction
+     */
+
     protected onDestroySelf(): void {
-        this.getGroupsArray().forEach(group => group.destroySelf());
+        this.removeAllChildren();
+        this.minmax = undefined;
+        this.range = undefined;
+        this.histogram = [];
+    }
+
+    protected removeAllChildren() {
+        for ( let group of this.getGroupsArray() ) {
+            group.destroySelf();
+            delete this.groups[group.id];
+        }
+    }
+
+    /** Remove a single group and recalculate the parameters work
+    */
+    public removeGroup(id: string) {
+
+        const group = this.groups[id];
+
+        if (group) {
+
+            group.destroySelf();
+
+            delete this.groups[id];
+
+            // If there are no groups left, mark the state as empty
+            if ( this.getGroupsArray().length === 0 ) {
+                this.setStateEmpty();
+            } 
+            // If there are some groups, recalculate the parameters
+            else {
+                this.recalculateAllParameters();
+            }
+        }
+
     }
 
 
@@ -55,23 +149,21 @@ export class ThermalRegistry extends ThermalObjectContainer {
 
 
     /**
-     * Groups
+     * Groups creation
      */
 
     protected _groups: {
         [index: string]: ThermalGroup
     } = {}
-    public get groups() { return this._groups }
-    protected getGroupsArray() {
-        return Object.values(this.groups);
-    }
-    protected isGroupRegistered(id: string) {
-        return this.groups[id] !== undefined;
-    }
+    protected get groups() { return this._groups }
+    public getGroupsArray = () => Object.values(this.groups);
+    public getGroupsById = () => this._groups;
+    protected _isGroupRegistered = (id: string) => this.groups[id] !== undefined;
+    /** Create a group or get an existing instance */
     public addOrGetGroup(
         id: string
     ) {
-        if (!this.isGroupRegistered(id)) {
+        if (!this._isGroupRegistered(id)) {
 
             const group = new ThermalGroup(this, id);
             this.groups[id] = group;
@@ -79,48 +171,17 @@ export class ThermalRegistry extends ThermalObjectContainer {
                 ThermalEventsFactory.groupInit(group)
             );
 
-            group.addEventListener( ThermalEvents.GROUP_LOADING_START, (event: Event) => {
-                const e = event as GroupLoadingEvent;
-                this.dispatchEvent( ThermalEventsFactory.groupLoadingStart( e.detail.group ) );
-            } );
-
-            group.addEventListener(ThermalEvents.GROUP_LOADING_FINISH, () => {
-
-                const all = this.getGroupsArray().reduce((state, current) => {
-                    if (current.isLoading)
-                        return false;
-                    return state
-                }, true);
-
-
-                if (all) {
-
-                    this.dispatchEvent(ThermalEventsFactory.ready());
-
-                }
-
-            });
-
             return group;
         }
 
         return this.groups[id];
     }
 
-    public removeGroup(id: string) {
+    
 
-        const group = this.groups[id];
+    
 
-        if (group) {
-
-            group.destroySelf();
-
-            delete this.groups[id];
-
-            this.recalculateMinmax();
-        }
-
-    }
+    
 
 
 
@@ -156,53 +217,128 @@ export class ThermalRegistry extends ThermalObjectContainer {
 
         return this.sourcesByUrl[source.url];
     }
-    public isUrlRegistered(url: string) {
-        return Object.keys(this.sourcesByUrl).includes(url);
-    }
+    public isUrlRegistered = (url: string) => Object.keys(this.sourcesByUrl).includes(url);
 
 
 
     /**
      * Parameters recalculation
+     * - minmax
+     * - range
+     * - histogram
      */
 
-    public recalculateParameters(): void {
-        this.recalculateMinmax();
+    public recalculateAllParameters(): void {
+        this.recalculateMinmaxAndRange();
+        // this.histogram = this._getHistorgramFromAllGroups();
     }
 
+    /** 
+     * The current histogram should be calculated everytime when:
+     * - the groups are loaded
+     * - the group is added
+     * 
+    */
+    public histogram: ThermalStatistics[] = [];
 
 
+    /** Calculate a histogram of all groups */
+    public _getHistorgramFromAllGroups() {
+
+        if (this.minmax === undefined || this.getGroupsArray().length === 0) {
+            return [];
+        } else {
+
+            // Get all pixels
+            const allPixels = this.getGroupsArray().reduce((
+                state,
+                current
+            ) => {
+
+                const pixels = current.getInstancesArray().reduce((buf, instance) => {
+
+                    buf = [...buf, ...instance.pixels];
+
+                    return buf;
+
+                }, [] as number[]);
+
+                return [...state, ...pixels]
+
+            }, [] as number[]);
 
 
+            // Calculate the ten segments
+            const segments: [number, number][] = [];
 
-    /**
-     * Range
-     */
+            const numSegments = 50;
+            const difference = this.minmax.max - this.minmax.min;
+            const segment = difference / numSegments;
 
-    public imposeRange(value: ThermalRangeOrUndefined) {
-        this.range = value;
+            for (let i = 0; i < numSegments; i++) {
+
+                const from = (segment * i) + this.minmax.min;
+                const to = from + segment;
+
+                segments.push([from, to]);
+
+            }
+
+            const results: {
+                from: number,
+                to: number,
+                count: number
+            }[] = [];
+
+            let sum = allPixels.length;
+
+            for ( let i of segments ) {
+
+                const count = allPixels.filter( pixel => {
+                    return pixel >= i[0] && pixel < i[1]; 
+                }).length;
+
+                sum = sum + count;
+
+                results.push( {
+                    from: i[0],
+                    to: i[1],
+                    count: count
+                } );
+
+            }
+
+            const recalculated = results.map( i => {
+                return {
+                    ...i,
+                    percentage: i.count / sum * 100,
+                }
+            } );
+
+            const max = Math.max( ...recalculated.map( item => item.percentage ) );
+
+            return recalculated.map( item => {
+                return {
+                    ...item,
+                    height: item.percentage / max * 100
+                }
+            } ) as ThermalStatistics[];
+
+        }
+
+
     }
 
-    protected onRangeUpdated(value: ThermalRangeOrUndefined): void {
-        this.getGroupsArray().forEach(group => group.recieveRange(value));
-    }
-
-
-
-
-
-
-    /**
-     * Minmax
-     */
-    public recalculateMinmax() {
-        this.minmax = this.calculateMinmaxFromGroups();
+    /** Completely calculate the minmax and set it also as the range */
+    protected recalculateMinmaxAndRange() {
+        this.minmax = this._getMinmaxFromAllGroups();
         if (this.minmax) {
             this.range = { from: this.minmax.min, to: this.minmax.max };
         }
     }
 
-    protected calculateMinmaxFromGroups() {
+    /** Internal method for calculation of minmax from current groups  */
+    protected _getMinmaxFromAllGroups(): ThermalMinmaxOrUndefined {
 
         const groups = this.getGroupsArray();
 
@@ -231,6 +367,34 @@ export class ThermalRegistry extends ThermalObjectContainer {
 
 
 
+    /**
+     * Global parameters
+     */
+
+
+
+
+
+
+
+
+
+    /**
+     * Range
+     */
+
+    public imposeRange(value: ThermalRangeOrUndefined) {
+        this.range = value;
+    }
+
+    protected onRangeUpdated(value: ThermalRangeOrUndefined): void {
+        this.getGroupsArray().forEach(group => group.recieveRange(value));
+    }
+
+
+
+
+
 
     /**
      * Opacity
@@ -247,6 +411,7 @@ export class ThermalRegistry extends ThermalObjectContainer {
 
     /**
      * Statistics processing
+     * @deprecated Should not be used at all! Instead, read the histogram from the variable!
      */
 
     public async getStatistics() {
@@ -314,8 +479,6 @@ export class ThermalRegistry extends ThermalObjectContainer {
 
             }
 
-            
-
             const recalculated = results.map( i => {
                 return {
                     ...i,
@@ -336,6 +499,11 @@ export class ThermalRegistry extends ThermalObjectContainer {
 
 
     }
+
+
+    /**
+     * Palette
+     */
 
     public readonly palettes = {
         iron: PALETTE
@@ -367,17 +535,17 @@ export class ThermalRegistry extends ThermalObjectContainer {
 
 
 
-    protected _highlight?: number;
-    public get highlight() {
-        return this._highlight;
+    protected _highlightTime?: number;
+    public get hightlightTime() {
+        return this._highlightTime;
     }
-    public set highlight(
+    public set hightlightTime(
         value: number | undefined
     ) {
-        this._highlight = value;
+        this._highlightTime = value;
         if ( value !== undefined ) {
-            const min = this.getHourDown( value );
-            const max = this.getHourUp( value );
+            const min = this._getHourDown( value );
+            const max = this._getHourUp( value );
             this.getGroupsArray().forEach( group => {
                 group.getInstancesArray().forEach( instance => {
                     if ( instance.timestamp >= min && instance.timestamp <= max ) {
@@ -395,7 +563,7 @@ export class ThermalRegistry extends ThermalObjectContainer {
         }
     }
 
-    protected getHourDown(
+    protected _getHourDown(
         timestamp: number
     ): number {
         const d = new Date();
@@ -403,7 +571,7 @@ export class ThermalRegistry extends ThermalObjectContainer {
         return addHours(d, -1).getTime();
     }
 
-    protected getHourUp(
+    protected _getHourUp(
         timestamp: number
     ): number {
         const d = new Date();

@@ -3,5 +3,6 @@
 import { useRegistryContext } from "@/thermal/context/RegistryContext"
 
 export const useThermalRegistry = () => {
-    return useRegistryContext();
+    const {registry} = useRegistryContext();
+    return registry;
 }

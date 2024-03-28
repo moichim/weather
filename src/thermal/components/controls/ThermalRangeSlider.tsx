@@ -1,12 +1,9 @@
 "use client";
 
 import { InfoIcon, SettingIcon } from "@/components/ui/icons";
-import { useThermalMinmax } from "@/thermal/hooks/propertyListeners/useThermalMinmax";
-import { useThermalRange } from "@/thermal/hooks/propertyListeners/useThermalRange";
-import { useThermalRegistry } from "@/thermal/hooks/retrieval/useThermalRegistry";
-import { ThermalStatistics } from "@/thermal/registry/ThermalRegistry";
+import { useRegistryContext } from "@/thermal/context/RegistryContext";
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Slider, SliderProps, Spinner, Tooltip, cn } from "@nextui-org/react";
-import { DOMAttributes, useCallback, useEffect, useState } from "react";
+import { DOMAttributes, useCallback } from "react";
 
 type ThermalRangeProps = SliderProps & {
     loaded: boolean
@@ -14,10 +11,7 @@ type ThermalRangeProps = SliderProps & {
 
 export const ThermalRangeSlider: React.FC<ThermalRangeProps> = props => {
 
-    const registry = useThermalRegistry();
-
-    const { imposeRange } = useThermalRange(registry);
-    const { minmax } = useThermalMinmax(registry);
+    const {registry, minmax, imposeGlobalRange, histogram} = useRegistryContext();
 
     const renderThumb = useCallback((
         props: DOMAttributes<HTMLDivElement> & { index?: number }
@@ -34,14 +28,6 @@ export const ThermalRangeSlider: React.FC<ThermalRangeProps> = props => {
             <span className={cn("transition-transform rounded-full w-6 h-6 block group-data-[dragging=true]:scale-80", bg)} />
         </div>)
     }, []);
-
-    const [ranges, setRanges] = useState<ThermalStatistics[]>();
-
-    useEffect(() => {
-
-        registry.getStatistics().then(result => setRanges(result));
-
-    }, [minmax]);
 
     return <div className="flex-grow">
 
@@ -63,11 +49,11 @@ export const ThermalRangeSlider: React.FC<ThermalRangeProps> = props => {
                     <div className="border-1 border-solid border-gray-300 relative w-full h-full">
 
 
-                        {(ranges === undefined ) && <div className="flex gap-4 items-center text-primary justify-center h-full">
+                        {(histogram === undefined ) && <div className="flex gap-4 items-center text-primary justify-center h-full">
                             <Spinner size="sm" />
                             <span>Zpracovávám histogram</span>
                         </div>}
-                        {(ranges ) && ranges.map((item, index) => {
+                        {(histogram ) && histogram.map((item, index) => {
 
                             return <Tooltip
                                 content={`${item.percentage.toFixed(4)}% teplot je v rozmezí ${item.from.toFixed(2)} °C až ${item.to.toFixed(2)} °C`}
@@ -77,8 +63,8 @@ export const ThermalRangeSlider: React.FC<ThermalRangeProps> = props => {
                             ><div
                                 className="absolute hover:bg-white bottom-0 h-full transition-all duration-300 ease-in-out border-s-1 border-gray-300 border-solid first:border-s-0"
                                 style={{
-                                    width: `${100 / ranges.length}%`,
-                                    left: `${index * (100 / ranges.length)}%`
+                                    width: `${100 / histogram.length}%`,
+                                    left: `${index * (100 / histogram.length)}%`
                                 }}
                             >
                                     <div
@@ -133,13 +119,13 @@ export const ThermalRangeSlider: React.FC<ThermalRangeProps> = props => {
 
                         if (key === "all") {
                             if (minmax)
-                                imposeRange({ from: minmax.min, to: minmax.max });
+                            imposeGlobalRange({ from: minmax.min, to: minmax.max });
                         } else if (key === "auto") {
 
-                            if (ranges && minmax)
-                                if (ranges.length > 0) {
+                            if (histogram && minmax)
+                                if (histogram.length > 0) {
 
-                                    const { min, max } = ranges.reduce((state, current) => {
+                                    const { min, max } = histogram.reduce((state, current) => {
 
                                         if (current.height > 3) {
 
@@ -156,7 +142,7 @@ export const ThermalRangeSlider: React.FC<ThermalRangeProps> = props => {
                                         return state;
                                     }, { min: minmax.max, max: minmax.min });
 
-                                    imposeRange({ from: min, to: max });
+                                    imposeGlobalRange({ from: min, to: max });
 
                                 }
 

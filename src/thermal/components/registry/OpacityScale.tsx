@@ -1,8 +1,8 @@
 "use client";
 
+import { useRegistryContext } from "@/thermal/context/RegistryContext";
 import { Slider } from "@nextui-org/react";
 import { useEffect, useState } from "react";
-import { useRegistryListener } from "../../context/useRegistryListener";
 
 
 /**
@@ -14,12 +14,12 @@ export const OpacityScale: React.FC = props => {
 
     const [ value, setValue ] = useState<number>( 1 );
 
-    const listener = useRegistryListener();
+    const { opacity, imposeGlobalOpacity } = useRegistryContext();
 
     useEffect(() => {
 
-        if ( value !== listener.opacity ) {
-            listener.setOpacity( value );
+        if ( value !== opacity ) {
+            imposeGlobalOpacity( value );
         }
 
     },[value]);

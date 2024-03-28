@@ -5,9 +5,9 @@ import { ThermalFileInstance } from "../file/ThermalFileInstance";
 import { ThermalFileSource } from "../file/ThermalFileSource";
 import { ThermalRegistry } from "./ThermalRegistry";
 import { ThermalFileRequest, ThermalRequest } from "./ThermalRequest";
-import { ThermalObjectContainer } from "./abstractions/ThermalObjectContainer";
+import { ThermalContainerStates, ThermalObjectContainer } from "./abstractions/ThermalObjectContainer";
 import { ThermalEventsFactory } from "./events";
-import { ThermalCursorPositionOrundefined, ThermalMinmaxType, ThermalRangeOrUndefined } from "./interfaces";
+import { ThermalCursorPositionOrundefined, ThermalMinmaxOrUndefined, ThermalMinmaxType, ThermalRangeOrUndefined } from "./interfaces";
 
 /**
  * Group of thermal images
@@ -45,191 +45,169 @@ export class ThermalGroup extends ThermalObjectContainer {
     }
 
 
-    protected onDestroySelf() {
 
-        this.getInstancesArray().forEach( instance => instance.destroySelf() );
 
+
+
+
+    /** Loading states */
+
+
+    protected onSetStateEmpty(): void {
+
+        // delete all instances
+        this.removeAllChildren();
+
+        // reset the minmax
+        this.minmax = undefined;
+
+        // reset the range
+        this.range = undefined;
     }
 
 
-
-
-    /**
-     * Loading of the files
-     */
-
-
-
-
-    // Requesting
-    protected _loading: ThermalRequest[] = []
-
-    protected _isLoading: boolean = false;
-    public get isLoading() { return this._isLoading; }
-    protected set isLoading(value: boolean) {
-
-        if (value !== this._isLoading) {
-            this._isLoading = value;
-            
-            value
-                ? this.dispatchEvent(ThermalEventsFactory.groupLoadingStart(this))
-                : this.dispatchEvent( ThermalEventsFactory.groupLoadingEnd( this ) );
-        }
-
+    protected onSetStateLoading(): void {
+        this.registry.groupStartedLoading(this.id);
     }
 
+    protected onSetStateLoaded(): void {
+        // After all instances are loaded, recalculate the parameters
+        this.recalculateAllParameters();
+        // Indicate the loading state above
+        this.registry.groupFinisledLoading(this.id);
+    }
+
+
+    /** Loading itself */
+
+
+
+    /** Buffer of all pending requests */
+    protected _requests: ThermalRequest[] = []
+    public get requests() { return this._requests; }
+
+    /** Request a single file. To fetch it, call ``resolveQuery` */
     public requestFile(
         thermalUrl: string,
         visibleUrl?: string
     ) {
 
-        if (this.isLoading === false)
-            this.isLoading = true;
+        // Can request files only when the group is not loading
+        if (this.loadingState === ThermalContainerStates.LOADING) {
+            console.error(`The group ${this.id} is already loading! Can not request  a single file!`);
+            return;
+        }
 
-        this._loading.push(ThermalRequest.single(this, thermalUrl, visibleUrl));
+        // Add a single request
+        this._requests.push(ThermalRequest.single(this, thermalUrl, visibleUrl));
 
     }
+
+    /** Request multiple files. To fetch them, call ``resolveQuery` */
     public requestFiles(requests: ThermalFileRequest[]) {
 
-        this.getInstancesArray().forEach( instance => instance.destroySelf() );
-        this._instancesByUrl = {};
-        this.recalculateParameters();
+        // Can request files only when the group is not loading
+        if (this.loadingState === ThermalContainerStates.LOADING) {
+            console.error(`The group ${this.id} is already loading! Can not request multiple files!`);
+            return;
+        }
 
-
-        if (this.isLoading === false)
-            this.isLoading = true;
-
-        this._loading = ThermalRequest.multiple(this, requests);
+        // Add multiple requests
+        this._requests = ThermalRequest.multiple(this, requests);
 
     }
     public async resolveQuery() {
 
-        this.dispatchEvent( ThermalEventsFactory.groupLoadingStart( this ) );
+        // If the group is already loading, do nothing
+        if (this.loadingState === ThermalContainerStates.LOADING) {
+            console.error(`The group ${this.id} is already loading! Can not resolve the query!`);
+            // return this;
+        }
+        // If the group is not loading yet, fire the requests
+        else {
 
-        // Perform the fetches
-        const result = await Promise.all(
-            this._loading.map(request => request.fetch())
-        );
+            if (this._requests.length === 0) {
+                console.error(`The group ${this.id} has no queried files!`);
+            }
 
-        // Process the requests
-        for (let file of result) {
+            this.setStateLoading();
 
-            if (file !== null) {
+            // Perform the fetches
+            const result = await Promise.all(
+                this._requests.map(request => request.fetch())
+            );
 
-                // This makes sure that there are no duplicite sources
-                file = this.registry.registerSource(file);
+            // Process the requests
+            for (let file of result) {
 
-                // Add the request in the group in a unified way
-                this.instantiateSource(file);
+                if (file !== null) {
+
+                    // This makes sure that there are no duplicite sources
+                    file = this.registry.registerSource(file);
+
+                    // Add the request in the group in a unified way
+                    this.instantiateSource(file);
+
+                }
 
             }
 
+            // Mark the state as loaded to perform all the postprocessing
+            this.setStateLoaded();
+
+            return this;
+
         }
 
-        // Calculate the minmax
+    }
 
-        this.recalculateParameters();
 
-        this.registry.recalculateParameters();
 
-        // Dispatch the event on the end
-        this.isLoading = false;
+
+
+
+    /**
+     * Destruction
+     */
+
+
+    protected onDestroySelf() {
+
+        console.log( "Grupa", this.id, "se ničí!", this.hash );
+
+        this.getInstancesArray().forEach(instance => instance.destroySelf());
+
+        this.minmax = undefined;
+        this.range = undefined;
 
     }
+
 
     public removeInstance(
         url: string
     ): void {
 
-        const instance = this.instancesByUrl[ url ];
+        const instance = this.instancesByUrl[url];
         instance.destroySelf();
-        delete this.instancesByUrl[ url ];
-        this.recalculateParameters();
+        delete this.instancesByUrl[url];
+        this.recalculateAllParameters();
 
     }
 
+
+    protected removeAllChildren() {
+        for (let instance of this.getInstancesArray()) {
+            instance.destroySelf();
+            delete this.instancesByUrl[instance.id];
+        }
+    }
 
 
 
 
     /**
-     * Recalculation of parameters
+     * Instances
      */
-    public recalculateParameters(): void {
-        this.minmax = this.calculateMinMax();
-    }
-
-
-    protected calculateMinMax() {
-
-        const instances = this.getInstancesArray();
-
-        if (instances.length === 0)
-            return undefined;
-        return instances.reduce((state, current) => {
-
-            if (current.min < state.min || current.max > state.max) {
-                return {
-                    min: current.min < state.min ? current.min : state.min,
-                    max: current.max > state.max ? current.max : state.max
-                }
-            }
-
-            return state;
-
-        }, { min: Infinity, max: -Infinity } as ThermalMinmaxType);
-    }
-
-    protected clampRangeWithinMinmax(): ThermalRangeOrUndefined {
-
-        // If there is no minmax, return undefined
-        if (this.minmax === undefined) {
-
-            return undefined;
-
-        }
-
-        // If there is a minmax but no range, create the range from minmax
-        else if (this.minmax !== undefined && this.range === undefined) {
-            return {
-                from: this.minmax.min,
-                to: this.minmax.max
-            }
-        }
-
-        // Otherwise make sure the range fits withnin the minmax
-
-        return this.range;
-
-    }
-
-
-
-
-
-
-
-    /**
-     * Activation
-     */
-
-    protected onRecieveActivationStatus(status: boolean): void {
-
-        this.getInstancesArray().forEach( instance => instance.recieveActivationStatus( status ) );
-
-    }
-
-
-    protected onImposeActivationStatus(status: boolean): void {
-        
-        this.onRecieveActivationStatus( status );
-
-        this.registry.recalculateParameters();
-
-    }
-
-
-
 
 
 
@@ -249,16 +227,80 @@ export class ThermalGroup extends ThermalObjectContainer {
         if (!this.getInstancesUrls().includes(source.url)) {
             const instance = source.createInstance(this);
             this._instancesByUrl[source.url] = instance;
-            this.dispatchEvent( ThermalEventsFactory.instanceCreated( instance, this ) );
+            this.dispatchEvent(ThermalEventsFactory.instanceCreated(instance, this));
             return instance;
         } else {
-            return this.instancesByUrl[ source.url ];
+            return this.instancesByUrl[source.url];
         }
     }
 
 
 
+
+
+
+    /**
+     * Recalculation of parameters
+     */
+    public recalculateAllParameters(): void {
+        this.minmax = this._getMinmaxFromInstances();
+    }
+
+
+    protected _getMinmaxFromInstances(): ThermalMinmaxOrUndefined {
+
+        const instances = this.getInstancesArray();
+
+        if (instances.length === 0)
+            return undefined;
+        return instances.reduce((state, current) => {
+
+            if (current.min < state.min || current.max > state.max) {
+                return {
+                    min: current.min < state.min ? current.min : state.min,
+                    max: current.max > state.max ? current.max : state.max
+                }
+            }
+
+            return state;
+
+        }, { min: Infinity, max: -Infinity } as ThermalMinmaxType);
+    }
+
+
+
+
+
+
+
+    /**
+     * Activation
+     */
+
+    protected onRecieveActivationStatus(status: boolean): void {
+
+        this.getInstancesArray().forEach(instance => instance.recieveActivationStatus(status));
+
+    }
+
+
+    protected onImposeActivationStatus(status: boolean): void {
+
+        this.onRecieveActivationStatus(status);
+
+        this.registry.recalculateAllParameters();
+
+    }
+
+
+
+
+
+
     
+
+
+
 
 
 
@@ -277,7 +319,7 @@ export class ThermalGroup extends ThermalObjectContainer {
 
     }
 
-    protected onRangeUpdated( value: ThermalRangeOrUndefined ) {
+    protected onRangeUpdated(value: ThermalRangeOrUndefined) {
 
         // Project in all instances
         if (value !== undefined) {
@@ -302,7 +344,7 @@ export class ThermalGroup extends ThermalObjectContainer {
         this.getInstancesArray().forEach(instance => {
             instance.recieveCursorPosition(value);
         });
-        this.dispatchEvent( ThermalEventsFactory.cursorUpdated( this._isHover, this.cursorPosition, undefined ) );
+        this.dispatchEvent(ThermalEventsFactory.cursorUpdated(this._isHover, this.cursorPosition, undefined));
 
     }
 
@@ -320,7 +362,7 @@ export class ThermalGroup extends ThermalObjectContainer {
     }
 
     protected onOpacityUpdated(value: number): void {
-        this.getInstancesArray().forEach( instance => instance.recieveOpacity( value ) );
+        this.getInstancesArray().forEach(instance => instance.recieveOpacity(value));
     }
 
 }

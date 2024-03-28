@@ -5,13 +5,20 @@ import { ThermalFileSource } from "../file/ThermalFileSource";
 import { ThermalPalette, ThermalPalettes } from "../file/palettes";
 import { ThermalGroup } from "./ThermalGroup";
 import { ThermalRegistry } from "./ThermalRegistry";
+import { ThermalContainerStates, ThermalObjectContainer } from "./abstractions/ThermalObjectContainer";
 import { ThermalCursorPositionOrundefined, ThermalMinmaxOrUndefined, ThermalMinmaxType, ThermalRangeOrUndefined } from "./interfaces";
 
 export enum ThermalEvents {
 
     GROUP_INIT = "groupinit",
 
+    CONTAINER_EMPTIED = "containeremptied",
+
+    CONTAINER_LOADING_STATE_CHANGED = "containerloadingstatechanged",
+
+    /** @deprecated */
     GROUP_LOADING_START = "grouprequeststart",
+    /** @deprecated */
     GROUP_LOADING_FINISH = "grouploadingfinish",
 
     SOURCE_REGISTERED = "sourceregistered",
@@ -41,6 +48,13 @@ export enum ThermalEvents {
 // Group initialised
 type GroupInitDetail = { group: ThermalGroup }
 export type GroupInitEvent = CustomEvent<GroupInitDetail>;
+
+
+type ContainerLoadingDetail = {
+    container: ThermalObjectContainer,
+    state: ThermalContainerStates
+}
+export type ContainerLoadingEvent = CustomEvent<ContainerLoadingDetail>;
 
 // Group loading
 type GroupLoadingDetail = { group: ThermalGroup, loading: boolean }
@@ -111,29 +125,16 @@ export class ThermalEventsFactory {
         );
     }
 
-    public static groupLoadingStart(
-        group: ThermalGroup
-    ) {
-        return new CustomEvent<GroupLoadingDetail>(
-            ThermalEvents.GROUP_LOADING_START,
+    public static containerLoadingStateChanged(
+        container: ThermalObjectContainer,
+        state: ThermalContainerStates
+    ): ContainerLoadingEvent {
+        return new CustomEvent<ContainerLoadingDetail>(
+            ThermalEvents.CONTAINER_LOADING_STATE_CHANGED,
             {
                 detail: {
-                    group,
-                    loading: true
-                }
-            }
-        );
-    }
-
-    public static groupLoadingEnd(
-        group: ThermalGroup
-    ) {
-        return new CustomEvent<GroupLoadingDetail>(
-            ThermalEvents.GROUP_LOADING_FINISH,
-            {
-                detail: {
-                    group,
-                    loading: false
+                    container,
+                    state
                 }
             }
         );

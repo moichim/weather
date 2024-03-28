@@ -3,6 +3,8 @@
 import { useMemo } from "react";
 import { useThermalRegistry } from "./useThermalRegistry";
 
+
+/** @deprecated */
 export const useThermalGroup = (
     groupId: string,
     forceActivation: boolean = false

@@ -44,7 +44,7 @@ export abstract class ThermalObjectBase extends EventTarget {
 
 
     /** Refresh parameters calculated from children */
-    public abstract recalculateParameters(): void;
+    protected abstract recalculateAllParameters(): void;
 
     // Range
 

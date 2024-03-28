@@ -1,13 +1,12 @@
 "use client";
 
+import { useRegistryContext } from "@/thermal/context/RegistryContext";
 import { ThermalFileInstance } from "@/thermal/file/ThermalFileInstance";
-import { useThermalMinmax } from "@/thermal/hooks/propertyListeners/useThermalMinmax";
-import { useThermalPalette } from "@/thermal/hooks/propertyListeners/useThermalPalette";
-import { useThermalRange } from "@/thermal/hooks/propertyListeners/useThermalRange";
 import { ThermalGroup } from "@/thermal/registry/ThermalGroup";
 import { ThermalRegistry } from "@/thermal/registry/ThermalRegistry";
+import { ThermalContainerStates } from "@/thermal/registry/abstractions/ThermalObjectContainer";
 import { ThermalRangeType } from "@/thermal/registry/interfaces";
-import { Skeleton, SliderValue, Spinner, Tooltip, cn } from "@nextui-org/react";
+import { SliderValue, Spinner, cn } from "@nextui-org/react";
 import { useEffect, useMemo, useState } from "react";
 import { ThermalRangeSlider } from "./ThermalRangeSlider";
 import { TemperatureControl } from "./textInputs/TemperatureControl";
@@ -32,10 +31,7 @@ export const ThermalRangeInline: React.FC<ThermalRangeProps> = ({
     ...props
 }) => {
 
-
-    const { range, imposeRange } = useThermalRange(object);
-    const { minmax } = useThermalMinmax(object);
-    const palette = useThermalPalette();
+    const {range, imposeGlobalRange, minmax, thermalPaletteSlug, loadingState } = useRegistryContext();
 
     const initialValue = useMemo(() => {
 
@@ -81,7 +77,7 @@ export const ThermalRangeInline: React.FC<ThermalRangeProps> = ({
 
         if (range !== undefined) {
             if (range.from !== final[0] || range.to !== final[1]) {
-                imposeRange({ from: final[0], to: final[1] });
+                imposeGlobalRange({ from: final[0], to: final[1] });
             }
             if (final[0] !== value[0] || final[1] !== value[1]) {
                 setValue(final);
@@ -121,6 +117,16 @@ export const ThermalRangeInline: React.FC<ThermalRangeProps> = ({
 
     }, [minmax]);
 
+    const fillerClass = useMemo( () => {
+
+        if ( loadingState === ThermalContainerStates.LOADED ) {
+            return `thermal-scale-${thermalPaletteSlug} cursor-pointer`;
+        }
+
+        return "cursor-disabled";
+
+    }, [loadingState] );
+
 
 
 
@@ -140,7 +146,7 @@ export const ThermalRangeInline: React.FC<ThermalRangeProps> = ({
             <span>Zpracovávám teplotní škálu</span>
         </div>
 
-    if (props.loaded === false)
+    if (loadingState !== ThermalContainerStates.LOADED)
         return <div className="flex-grow flex gap-4 items-center text-primary h-full">
             <Spinner size="sm" />
             <span>Zpracovávám teplotní škálu</span>
@@ -148,6 +154,8 @@ export const ThermalRangeInline: React.FC<ThermalRangeProps> = ({
 
     return <div className={cn(className, "flex gap-4 w-full items-center thermal-scale-inline")}>
         <ThermalRangeSlider
+
+        isDisabled={loadingState !== ThermalContainerStates.LOADED}
 
             loaded={props.loaded}
 
@@ -170,7 +178,7 @@ export const ThermalRangeInline: React.FC<ThermalRangeProps> = ({
                 base: "px-1 min-w-screen",
                 mark: "bg-black",
                 track: "bg-gray-400 h-6 cursor-pointer",
-                filler: `thermal-scale-${palette.thermalPaletteSlug} cursor-pointer`,
+                filler: fillerClass,
                 label: "text-xl"
             }}
 
@@ -198,7 +206,7 @@ export const ThermalRangeInline: React.FC<ThermalRangeProps> = ({
                 return parsedValue;
             }}
             onSetValid={value => {
-                imposeRange({ from: value, to: range.to });
+                imposeGlobalRange({ from: value, to: range.to });
             }}
 
         />
@@ -225,7 +233,7 @@ export const ThermalRangeInline: React.FC<ThermalRangeProps> = ({
                 return parsedValue;
             }}
             onSetValid={value => {
-                imposeRange({ from: range.from, to: value });
+                imposeGlobalRange({ from: range.from, to: value });
             }}
 
         />

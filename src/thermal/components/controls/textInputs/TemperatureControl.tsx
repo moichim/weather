@@ -1,17 +1,9 @@
 "use client";
 
 import { ArrowLeftIcon, ArrowRightIcon } from "@/components/ui/icons";
-import { ThermalFileInstance } from "@/thermal/file/ThermalFileInstance";
-import { useThermalMinmax } from "@/thermal/hooks/propertyListeners/useThermalMinmax";
-import { useThermalRange } from "@/thermal/hooks/propertyListeners/useThermalRange";
-import { useThermalRegistry } from "@/thermal/hooks/retrieval/useThermalRegistry";
-import { ThermalGroup } from "@/thermal/registry/ThermalGroup";
-import { ThermalRegistry } from "@/thermal/registry/ThermalRegistry";
-import { ThermalMinmaxOrUndefined, ThermalMinmaxType, ThermalRangeOrUndefined, ThermalRangeType } from "@/thermal/registry/interfaces";
-import { Button, Input, InputProps } from "@nextui-org/react";
-import { useState, useEffect } from "react";
-import { isUndefined } from "util";
-import { validate } from "uuid";
+import { ThermalMinmaxType, ThermalRangeType } from "@/thermal/registry/interfaces";
+import { Button, InputProps } from "@nextui-org/react";
+import { useEffect, useState } from "react";
 
 type FromControlProps = InputProps & {
     label: string,

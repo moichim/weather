@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useThermalRegistry } from "../retrieval/useThermalRegistry";
-import { PaletteEvent, ThermalEvents } from "@/thermal/registry/events";
 import { ThermalPalettes } from "@/thermal/file/palettes";
+import { ThermalRegistry } from "@/thermal/registry/ThermalRegistry";
+import { PaletteEvent, ThermalEvents } from "@/thermal/registry/events";
+import { useEffect, useState } from "react";
 
-export const useThermalPalette = () => {
-
-    const registry = useThermalRegistry();
+export const useThermalPalette = (
+    registry: ThermalRegistry
+) => {
 
     const [palette, setPalette] = useState(registry.currentPalette);
     const [slug, setSlug] = useState(registry.palette);

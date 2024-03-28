@@ -202,7 +202,7 @@ export class ThermalFileInstance extends ThermalObjectBase {
                 this.cursorLayer!.show = true;
         
                 this.isHover = true;
-                this.group.registry.highlight = this.timestamp;
+                this.group.registry.hightlightTime = this.timestamp;
         
                 const client = this.width;
                 const parent = this.root!.clientWidth;
@@ -221,7 +221,7 @@ export class ThermalFileInstance extends ThermalObjectBase {
                 this.cursorLayer!.show = false;
         
                 this.isHover = false;
-                this.group.registry.highlight = undefined;
+                this.group.registry.hightlightTime = undefined;
         
                 this.imposeCursorPosition(undefined);
         
@@ -247,16 +247,17 @@ export class ThermalFileInstance extends ThermalObjectBase {
     }
 
     protected onRecieveActivationStatus(status: boolean): void {
+        console.log( "Změna stavi zvenku na", status );
         if ( status ) this.onActivateInternal();
         else this.onDeactivateInternal();
     }
 
     protected onImposeActivationStatus(status: boolean): void {
         this.onRecieveActivationStatus( status );
-        this.group.recalculateParameters();
+        this.group.recalculateAllParameters();
     }
 
-    public recalculateParameters(): void {}
+    protected recalculateAllParameters(): void {}
 
 
 

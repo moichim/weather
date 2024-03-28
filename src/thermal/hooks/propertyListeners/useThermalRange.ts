@@ -42,7 +42,7 @@ export const useThermalRange = (
     return {
         target,
         range,
-        imposeRange: imposeGlobalRange
+        imposeGlobalRange
     }
 
 }

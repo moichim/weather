@@ -27,14 +27,14 @@ query Scopes($scope: String!, $from: Float, $to: Float) {
 
 `;
 
-type ProjectFolserDefinition = {
+type ProjectFolderDefinition = {
     id: string,
     name: string,
     description?: string
     files: ThermalFileRequest[]
 };
-type ProjectDescription = {
-    [index: string]: ProjectFolserDefinition
+export type ProjectDescription = {
+    [index: string]: ProjectFolderDefinition
 }
 
 type ProjectFilesQueryResponse = {
@@ -92,6 +92,8 @@ export const useProjectLoader = (
         fetchPolicy: "network-only",
         onCompleted: (result) => {
 
+            console.log( result );
+
             result.scopeFiles.forEach(folder => {
 
                 const files: ThermalFileRequest[] = folder.files.map(file => {
@@ -117,11 +119,14 @@ export const useProjectLoader = (
                     scope: scopeId
                 },
                 onError: console.error,
-                fetchPolicy: "network-only"
+                fetchPolicy: "network-only",
+                ssr: false
             });
         }
             
     }, [from, to]);
+
+    console.log( "skupiny", groups );
 
 
 
