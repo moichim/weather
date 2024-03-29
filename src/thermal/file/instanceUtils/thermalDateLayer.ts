@@ -1,8 +1,8 @@
 import { TimeFormat } from "@/state/time/reducerInternals/timeUtils/formatting";
+import { differenceInMinutes } from "date-fns";
 import { ThermalFileInstance } from "../ThermalFileInstance";
 import { AbstractLayer } from "./AbstractLayer";
 import ThermalDomFactory from "./domFactories";
-import { differenceInHours, differenceInMinutes } from "date-fns";
 
 export class ThermalDateLayer extends AbstractLayer {
 
@@ -27,8 +27,8 @@ export class ThermalDateLayer extends AbstractLayer {
         }
 
         
-        if ( this.instance.group.registry.hightlightTime ) {
-            const difference = differenceInMinutes(this.instance.timestamp, this.instance.group.registry.hightlightTime);
+        if ( this.instance.group.registry.highlight.value !== undefined ) {
+            const difference = differenceInMinutes(this.instance.timestamp, this.instance.group.registry.highlight.value);
             return `${difference < 0 ? "" : "+"}${difference} minut <span style="opacity:.7">${TimeFormat.humanTime(this.instance.timestamp)}</span>`;
         }
 

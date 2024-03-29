@@ -1,16 +1,36 @@
-import { ThermalStatistics, ThermalRegistry } from "../ThermalRegistry";
-import { AbstractProperty, IBaseProperty } from "./abstractProperty";
+import { ThermalStatistics, ThermalRegistry } from "../../ThermalRegistry";
+import { AbstractProperty, IBaseProperty } from "../abstractProperty";
 
 export interface IWithHistogram extends IBaseProperty {
     histogram: HistogramProperty
 }
 
+/** Handles the histogram creation and subscription.
+ * - should be used only in registries
+ */
 export class HistogramProperty extends AbstractProperty<ThermalStatistics[], ThermalRegistry> {
 
     protected resolution = 50;
 
+    /** Set the historgam resolution
+     * - does not recalculate the value!
+     * - to recalculate value, call `recalculateWithCurrentSetting`
+     * 
+     * @notice Higher the number, lower the resolution.
+    */
+    public setResolution( value: number ) {
+        this.resolution = Math.min( Math.max( value, 2 ), 200 );
+    }
+
+    /** If incorrect resolution is being set, set empty array */
     protected validate(value: ThermalStatistics[]): ThermalStatistics[] {
-        return value;    
+        if (value.length !== this.resolution) {
+            console.warn( `Tried to set incorrect resolution. 
+            Desired resolution: '${this.resolution}'. Incoming resolution ${value.length}. 
+            => No changes were made - using the old value instead the new.` );
+            return this.value;
+        }
+        return value;
     }
 
     protected afterSetEffect(value: ThermalStatistics[]) {
@@ -18,8 +38,10 @@ export class HistogramProperty extends AbstractProperty<ThermalStatistics[], The
     }
 
 
-    public recalculate() {
+    /** Recalculates the value using all current instances and with che current resolution */
+    public recalculateWithCurrentSetting() {
         this.value = this._getHistorgramFromAllGroups();
+        return this.value;
     }
 
 

@@ -1,8 +1,8 @@
-import { ThermalGroup } from "../ThermalGroup";
-import { ThermalRegistry } from "../ThermalRegistry";
-import { ThermalMinmaxOrUndefined } from "../interfaces";
-import { AbstractMinmaxProperty } from "./AbstractMinmaxProperty";
-import { IBaseProperty } from "./abstractProperty";
+import { ThermalGroup } from "../../ThermalGroup";
+import { ThermalRegistry } from "../../ThermalRegistry";
+import { ThermalMinmaxOrUndefined } from "../../interfaces";
+import { AbstractMinmaxProperty } from "../abstractMinmaxProperty";
+import { IBaseProperty } from "../abstractProperty";
 
 export interface IWithMinmaxRegistry extends IBaseProperty {
     minmax: MinmaxRegistryProperty
@@ -23,6 +23,8 @@ export class MinmaxRegistryProperty extends AbstractMinmaxProperty<ThermalRegist
         const groups = this.parent.groups.value;
 
         this.value = this._getMinmaxFromAllGroups( groups );
+
+        return this.value;
     }
 
     protected _getMinmaxFromAllGroups(
@@ -35,13 +37,13 @@ export class MinmaxRegistryProperty extends AbstractMinmaxProperty<ThermalRegist
 
         const minmax = groups.reduce((state, current) => {
 
-            if (current.minmax === undefined) {
+            if (current.minmax.value === undefined) {
                 return state;
             }
 
             return {
-                min: current.minmax.min < state.min ? current.minmax.min : state.min,
-                max: current.minmax.max > state.max ? current.minmax.max : state.max
+                min: current.minmax.value.min < state.min ? current.minmax.value.min : state.min,
+                max: current.minmax.value.max > state.max ? current.minmax.value.max : state.max
             }
 
         }, { min: Infinity, max: -Infinity });

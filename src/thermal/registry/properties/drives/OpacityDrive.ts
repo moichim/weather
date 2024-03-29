@@ -1,5 +1,5 @@
-import { ThermalRegistry } from "../ThermalRegistry";
-import { AbstractProperty, IBaseProperty } from "./abstractProperty";
+import { ThermalRegistry } from "../../ThermalRegistry";
+import { AbstractProperty, IBaseProperty } from "../abstractProperty";
 
 export interface IWithOpacity extends IBaseProperty {
     opacity: OpacityDrive
@@ -12,9 +12,12 @@ export class OpacityDrive extends AbstractProperty<number, ThermalRegistry> {
         return Math.min( Math.max( 0, value ), 1 );
     }
 
+    /** 
+     * Whenever the opacity changes, propagate the value to all instances
+     */
     protected afterSetEffect(value: number) {
 
-        this.parent.groups.value.forEach( group => group.getInstancesArray().forEach( instance => instance.recieveOpacity( value ) ) );
+        this.parent.forEveryInstance( instance => instance.recieveOpacity( value ) );
 
     }
 
@@ -23,6 +26,7 @@ export class OpacityDrive extends AbstractProperty<number, ThermalRegistry> {
         value: number
     ) {
         this.value = value;
+        return this.value;
     }
 
     

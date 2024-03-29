@@ -4,6 +4,7 @@ import { ThermalRangeOrUndefined, ThermalMinmaxOrUndefined } from "../interfaces
 
 type PropertyListenersTypes = boolean 
     | number 
+    | string
     | ThermalRangeOrUndefined 
     | ThermalMinmaxOrUndefined
     | ThermalGroup[]
@@ -13,6 +14,8 @@ type PropertyListenerFn<T extends PropertyListenersTypes> = ( value: T ) => any
 
 export interface IBaseProperty {}
 
+
+/** A common basis for all observable properties */
 export abstract class AbstractProperty<
     ValueType extends PropertyListenersTypes,
     ParentType extends IBaseProperty
@@ -35,7 +38,7 @@ export abstract class AbstractProperty<
 
     protected abstract afterSetEffect( value: ValueType ): any
 
-    /** Get the current value */
+    /** Get the current value @readonly */
     public get value() {
         return this._value;
     };

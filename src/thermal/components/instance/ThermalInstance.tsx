@@ -62,7 +62,7 @@ export const ThermalInstance: React.FC<ThermalInstanceProps> = ({
             if (ref.current) {
                 // if (!props.instance.binded) {
 
-                    props.instance.buildDom(ref.current);
+                    props.instance.mount(ref.current);
 
                 // }
 

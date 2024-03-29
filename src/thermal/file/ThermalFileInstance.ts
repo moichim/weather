@@ -1,42 +1,21 @@
-import { ThermalPalettes } from "./palettes";
 import { ThermalGroup } from "../registry/ThermalGroup";
-import { ThermalObjectBase } from "../registry/abstractions/ThermalObjectBase";
-import { ThermalEvents, ThermalEventsFactory } from "../registry/events";
-import { ThermalCursorPositionOrundefined, ThermalRangeDataType } from "../registry/interfaces";
+import { ThermalEventsFactory } from "../registry/events";
+import { ThermalCursorPositionOrundefined } from "../registry/interfaces";
+import { IThermalObjectBase } from "../registry/interfaces/interfaces";
 import { ThermalFileSource } from "./ThermalFileSource";
 import { VisibleLayer } from "./instanceUtils/VisibleLayer";
-import ThermalDomFactory from "./instanceUtils/domFactories";
 import { ThermalCanvasLayer } from "./instanceUtils/thermalCanvasLayer";
 import ThermalCursorLayer from "./instanceUtils/thermalCursorLayer";
-import { ThermalListenerLayer } from "./instanceUtils/thermalListenerLayer";
 import { ThermalDateLayer } from "./instanceUtils/thermalDateLayer";
+import { ThermalListenerLayer } from "./instanceUtils/thermalListenerLayer";
 
 /**
- * Instance of a thermal file takes care of its display and user interactions
- * 
- * Creation:
- * - instances are created in `ThermalFileSource.createInstance()`
- * - once the instance is created, it is necessary to do the following:
- *   - bind the instance to an empty `HTMLDivElement`
- *   - initialise the instance once it is binded
- * 
- * Initialisation
- * - binds the instance's inner DOM to the container
- * - creates event listeners for user interactions
- * - performs the initial `draw()` of the `ThermalCanvasLayer`
- * 
- * Integration
- * - as part of a `ThermalGroup`, the `ThermalFileInstance` synchronises its properties with the group
- * 
- * Events:
- * - ThermalEvents.INSTANCE_BINDED
- * - ThermalEvents.INSTANCE_INITIALISED
- * - ThermalEvents.RANGE_UPDATED
- * - ThermalEvents.MINMAX_UPDATED
- * - ThermalEvents.OPACITY_UPDATED
- * - ThermalEvents.CURSOR_UPDATED
+ * @todo implement variants toggling
+ * @todo implement activation properly!
+ * @todo implement unmounting
+ * @todo rename binding to mounting
  */
-export class ThermalFileInstance extends ThermalObjectBase {
+export class ThermalFileInstance extends EventTarget implements IThermalObjectBase {
     
 
 
@@ -63,15 +42,27 @@ export class ThermalFileInstance extends ThermalObjectBase {
         protected readonly source: ThermalFileSource,
         public readonly group: ThermalGroup
     ) {
+
         super();
+
         this.id = `instance_${this.group.id}_${this.source.url}`;
         this.horizontalLimit = (this.width / 4) * 3;
         this.verticalLimit = (this.height / 4) * 3;
     }
 
 
+
+    public destroySelfAndBelow() {
+        this.unmount();
+    };
+    public removeAllChildren() {
+        this.unmount();
+    };
+    public reset() {};
+
+
     protected onDestroySelf() {
-        this.clearDom();
+        this.unmount();
     }
 
 
@@ -102,17 +93,19 @@ export class ThermalFileInstance extends ThermalObjectBase {
      * Dom bindings
      */
 
-    protected _binded: boolean = false;
-    public get binded() { return this._binded; }
-    protected set binded(value: boolean) { this._binded = value; }
+    protected _mounted: boolean = false;
+    public get mounted() { return this._mounted; }
+    protected set mounted(value: boolean) { this._mounted = value; }
 
-    public buildDom(
+    /** @todo what if the instance remounts back to another element? The layers should be mounted as well! */
+    public mount(
         container: HTMLDivElement
     ) {
 
-        if ( this.root !== null || this.binded === true ) {
+        if ( this.root !== null || this.mounted === true ) {
             console.info("The instance already has its DOM.");
-            // this.clearDom();
+            /** @todo this used to be commented. Wny? It should be on! */
+            this.unmount();
             return;
         }
 
@@ -141,15 +134,16 @@ export class ThermalFileInstance extends ThermalObjectBase {
         this.listenerLayer = new ThermalListenerLayer( this );
 
 
-
+        this.root.dataset.mounted = "true";
+        this.mounted = true;
 
 
     }
 
-    protected clearDom() {
-        this.binded = false;
+    protected unmount() {
+        this.mounted = false;
         if ( this.root )
-            this.root.dataset.binded = "false";
+            this.root.dataset.mounted = "false";
         // this.root?.remove();
         this.visibleLayer?.destroy();
         this.canvasLayer?.destroy();
@@ -166,9 +160,10 @@ export class ThermalFileInstance extends ThermalObjectBase {
 
     /**
      * Activation status
+     * @todo refactor this with variants!
      */
 
-    protected onActivateInternal() {
+    public hydrate() {
 
         if (this.root) {
 
@@ -190,9 +185,9 @@ export class ThermalFileInstance extends ThermalObjectBase {
         }
 
         // Mark this instance as binded
-        this.binded = true;
+        this.mounted = true;
 
-        if (this.active && this.listenerLayer && this.root && this.cursorLayer) {
+        if (this.listenerLayer && this.root && this.cursorLayer) {
 
             this.draw();
 
@@ -202,7 +197,7 @@ export class ThermalFileInstance extends ThermalObjectBase {
                 this.cursorLayer!.show = true;
         
                 this.isHover = true;
-                this.group.registry.hightlightTime = this.timestamp;
+                this.group.registry.highlight.higlightTime( this.timestamp );
         
                 const client = this.width;
                 const parent = this.root!.clientWidth;
@@ -221,7 +216,7 @@ export class ThermalFileInstance extends ThermalObjectBase {
                 this.cursorLayer!.show = false;
         
                 this.isHover = false;
-                this.group.registry.hightlightTime = undefined;
+                this.group.registry.highlight.clearHighlight();
         
                 this.imposeCursorPosition(undefined);
         
@@ -238,26 +233,13 @@ export class ThermalFileInstance extends ThermalObjectBase {
 
     }
 
-    protected onDeactivateInternal() {
+    public dehydrate() {
 
         if ( this.visibleLayer ) {
             this.visibleLayer.unmount();
         }
 
     }
-
-    protected onRecieveActivationStatus(status: boolean): void {
-        console.log( "Změna stavi zvenku na", status );
-        if ( status ) this.onActivateInternal();
-        else this.onDeactivateInternal();
-    }
-
-    protected onImposeActivationStatus(status: boolean): void {
-        this.onRecieveActivationStatus( status );
-        this.group.recalculateAllParameters();
-    }
-
-    protected recalculateAllParameters(): void {}
 
 
 
@@ -285,41 +267,15 @@ export class ThermalFileInstance extends ThermalObjectBase {
      */
 
     public draw() {
-        if (this.active && this.canvasLayer) {
+        if ( this.canvasLayer) {
             this.canvasLayer.draw();
         }
     }
 
-
-    
-
-
-
-
-
-
-
-    // Properties interaction
-
-
-
-
-
-    // Range
-
-    public get range() { return this._range; }
-    protected _range: ThermalRangeDataType = { from: this.min, to: this.max };
-    protected set range(value: ThermalRangeDataType) {
-        this._range = value;
-        this.dispatchEvent(ThermalEventsFactory.rangeUpdated(value));
-        this.onRangeUpdated(value);
-    }
-    public recieveRange(
-        value: ThermalRangeDataType
+    /** Recieve a palette setting */
+    public recievePalette(
+        palette: string | number
     ) {
-        this.range = value;
-    }
-    protected onRangeUpdated(value: ThermalRangeDataType) {
         this.draw();
     }
 
@@ -360,7 +316,7 @@ export class ThermalFileInstance extends ThermalObjectBase {
         if (this.cursorPosition !== undefined) {
 
             // Calculate the value
-            this._cursorValue = this.getValueAtCoordinate(this.cursorPosition.x, this.cursorPosition.y);
+            this._cursorValue = this._getValueAtCoordinate(this.cursorPosition.x, this.cursorPosition.y);
 
             // Propagate the change to the DOM
             if (this.cursorLayer && this.cursorValue) {
@@ -401,7 +357,7 @@ export class ThermalFileInstance extends ThermalObjectBase {
     }
 
 
-    protected getValueAtCoordinate(
+    protected _getValueAtCoordinate(
         x: number | undefined,
         y: number | undefined
     ) {
@@ -421,18 +377,20 @@ export class ThermalFileInstance extends ThermalObjectBase {
 
     // opacity
 
+    /** 
+     * Recieve the opacity and project it directly to the appropriate layer.
+     */
     public recieveOpacity(value: number) {
-        this.opacity = value;
-    }
 
-    protected onOpacityUpdated(value: number): void {
+
         if (this.visibleLayer && this.canvasLayer) {
             this.canvasLayer.opacity = value;
         }
     }
 
+
     // hightlighting
-    public highlight( value: boolean ) {
+    public setHighlight( value: boolean ) {
 
         if ( value ) {
             if (this.root )

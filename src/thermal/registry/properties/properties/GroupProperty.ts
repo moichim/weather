@@ -1,13 +1,13 @@
-import { ThermalGroup } from "../ThermalGroup";
-import { ThermalRegistry, ThermalStatistics } from "../ThermalRegistry";
-import { MinmaxRegistryProperty } from "./MinmaxRegistryProperty";
-import { RangeDriver } from "./RangeDriver";
-import { AbstractProperty, IBaseProperty } from "./abstractProperty";
+import { ThermalGroup } from "../../ThermalGroup";
+import { ThermalRegistry } from "../../ThermalRegistry";
+import { AbstractProperty, IBaseProperty } from "../abstractProperty";
 
 export interface IWithGroups extends IBaseProperty {
     groups: GroupsProperty
 }
 
+
+/** Handles group creation and removal */
 export class GroupsProperty extends AbstractProperty<ThermalGroup[], ThermalRegistry> {
 
     protected _map: Map<string, ThermalGroup> = new Map<string,ThermalGroup>();
@@ -57,7 +57,7 @@ export class GroupsProperty extends AbstractProperty<ThermalGroup[], ThermalRegi
         }
 
         // Call the destroy method of the group
-        this._map.get( groupId )?.destroySelf();
+        this._map.get( groupId )?.destroySelfAndBelow();
 
         // Delete the group from the index
         this._map.delete( groupId );
@@ -70,7 +70,7 @@ export class GroupsProperty extends AbstractProperty<ThermalGroup[], ThermalRegi
     public removeAllGroups() {
 
         // Trigger the destruction of all existing groups
-        this.value.forEach( group => group.destroySelf() );
+        this.value.forEach( group => group.destroySelfAndBelow() );
 
         // Set the empty array of groups
         this.value = [];

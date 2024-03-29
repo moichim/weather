@@ -4,15 +4,10 @@ import { ThermalMinmaxOrUndefined } from "../interfaces";
 import { IThermalContainer } from "../interfaces/interfaces";
 import { AbstractProperty, IBaseProperty } from "./abstractProperty"
 
-export interface IWithMinmax extends IBaseProperty {}
 
+/** 
+ * A common basis for all Minmax properties 
+ */
 export abstract class AbstractMinmaxProperty<Target extends ThermalRegistry|ThermalGroup> extends AbstractProperty<ThermalMinmaxOrUndefined, Target> {
 
-    protected validate(value: ThermalMinmaxOrUndefined): ThermalMinmaxOrUndefined {
-        return value;
-    }
-
-    protected afterSetEffect(value: ThermalMinmaxOrUndefined) {
-    
-    }
 }

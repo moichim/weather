@@ -13,8 +13,12 @@ export class ThermalCanvasLayer extends AbstractLayer {
     protected get width() { return this.instance.width; }
     protected get height() { return this.instance.height; }
     protected get pixels() { return this.instance.pixels; }
-    protected get from() { return this.instance.range.from; }
-    protected get to() { return this.instance.range.to; }
+    protected get from() { return this.instance.group.registry.range.value
+        ? this.instance.group.registry.range.value.from 
+        : this.instance.min; }
+    protected get to() { return this.instance.group.registry.range.value
+        ? this.instance.group.registry.range.value.to 
+        : this.instance.max; }
 
     protected _opacity: number = 1;
     public get opacity() { return this._opacity; }
@@ -56,7 +60,7 @@ export class ThermalCanvasLayer extends AbstractLayer {
 
     /** Returns an array of 255 RGB colors */
     protected getPalette(): string[] {
-        return this.instance.group.registry.activePalette;
+        return this.instance.group.registry.palette.currentPalette.pixels;
     }
 
     public draw(): void {

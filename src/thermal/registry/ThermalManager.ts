@@ -23,8 +23,7 @@ export class ThermalManager extends EventTarget {
     ) {
         if ( this._registries[id] !== undefined ) {
             const registry = this._registries[id];
-            registry.recieveActivationStatus( false );
-            registry.destroySelf();
+            registry.destroySelfAndBelow();
             delete this._registries[id];
         }
     }

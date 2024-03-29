@@ -1,4 +1,4 @@
-import { AbstractProperty, IBaseProperty } from "./abstractProperty";
+import { AbstractProperty, IBaseProperty } from "../abstractProperty";
 
 export interface IWithLoading extends IBaseProperty {
 
@@ -9,7 +9,6 @@ export interface IWithLoading extends IBaseProperty {
 
 export class LoadingProperty extends AbstractProperty<boolean, IWithLoading> {
 
-    /** Make sure the value is allways between 0 and 1 */
     protected validate(value: boolean): boolean {
         return value;
     }

@@ -1,25 +1,56 @@
-import { ThermalRegistry } from "../ThermalRegistry";
-import { ThermalRangeOrUndefined } from "../interfaces";
-import { AbstractProperty, IBaseProperty } from "./abstractProperty";
+import { ThermalRegistry } from "../../ThermalRegistry";
+import { ThermalRangeOrUndefined } from "../../interfaces";
+import { AbstractProperty, IBaseProperty } from "../abstractProperty";
 
 export interface IWithRange extends IBaseProperty {}
 
 export class RangeDriver extends AbstractProperty< ThermalRangeOrUndefined, ThermalRegistry> {
 
+
+    /** 
+     * Make sure the range is allways within the minmax values.
+     * 
+     * If this method should work, the value needs to be set before the minmax is calculated.
+     */
     protected validate(value: ThermalRangeOrUndefined): ThermalRangeOrUndefined {
-        return value;
+
+        if ( value === undefined ) {
+            return undefined;
+        } 
+        
+        const minmax = this.parent.minmax.value;
+
+        if ( minmax === undefined ) {
+            return value;
+        }
+
+        const result = {...value};
+
+        if ( value.from < minmax.min )
+            result.from = minmax.min;
+
+        if ( value.to > minmax.max )
+            result.to = minmax.max;
+
+        return result;
+
     }
 
-    // Whenever the range changes, propagate it below
+    /**
+     * Whenever the range changes, propagate the value to all instances
+     */
     protected afterSetEffect(value: ThermalRangeOrUndefined) {
     
         if ( value )
-            this.parent.groups.value.forEach( group => group.getInstancesArray().forEach( instance => instance.recieveRange( value ) ) );
+            this.parent.forEveryInstance( instance => instance.recieveRange( value ) );
 
     }
 
 
-    /** Imposes a range to itself and below */
+    /** 
+     * Imposes a range to itself and below
+     * - needs to be called before the minmax is calculated!
+     */
     public imposeRange( value: ThermalRangeOrUndefined ) {
         
         // If new and old are undefined, do nothing
@@ -43,6 +74,8 @@ export class RangeDriver extends AbstractProperty< ThermalRangeOrUndefined, Ther
             }
 
         }
+
+        return this.value;
     }
 
 }

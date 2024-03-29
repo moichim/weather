@@ -12,6 +12,7 @@ export enum ThermalContainerStates {
 
 /**
  * Properties that are common to groups and the registry
+ * @deprecated To be removed!
  */
 export abstract class ThermalObjectContainer extends ThermalObjectBase {
 

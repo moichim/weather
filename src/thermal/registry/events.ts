@@ -4,9 +4,8 @@ import { ThermalFileInstance } from "../file/ThermalFileInstance";
 import { ThermalFileSource } from "../file/ThermalFileSource";
 import { ThermalPalette, ThermalPalettes } from "../file/palettes";
 import { ThermalGroup } from "./ThermalGroup";
-import { ThermalRegistry } from "./ThermalRegistry";
 import { ThermalContainerStates, ThermalObjectContainer } from "./abstractions/ThermalObjectContainer";
-import { ThermalCursorPositionOrundefined, ThermalMinmaxOrUndefined, ThermalMinmaxType, ThermalRangeOrUndefined } from "./interfaces";
+import { ThermalCursorPositionOrundefined, ThermalMinmaxOrUndefined, ThermalRangeOrUndefined } from "./interfaces";
 
 export enum ThermalEvents {
 
@@ -15,11 +14,6 @@ export enum ThermalEvents {
     CONTAINER_EMPTIED = "containeremptied",
 
     CONTAINER_LOADING_STATE_CHANGED = "containerloadingstatechanged",
-
-    /** @deprecated */
-    GROUP_LOADING_START = "grouprequeststart",
-    /** @deprecated */
-    GROUP_LOADING_FINISH = "grouploadingfinish",
 
     SOURCE_REGISTERED = "sourceregistered",
     INSTANCE_CREATED = "instancecreated",

@@ -1,9 +1,11 @@
-import { IWithGroups } from "../properties/GroupProperty";
-import { IWithLoading } from "../properties/LoadingProperty";
-import { IWithMinmaxRegistry } from "../properties/MinmaxRegistryProperty";
-import { IWithOpacity } from "../properties/OpacityDrive";
-import { IWithRangeGroup } from "../properties/RangeGroupProperty";
-import { IWithRange } from "../properties/RangeDriver";
+import { IWithHighlight } from "../properties/drives/HighlightDrive";
+import { IWithOpacity } from "../properties/drives/OpacityDrive";
+import { IWithPalette } from "../properties/drives/PaletteDrive";
+import { IWithRange } from "../properties/drives/RangeDriver";
+import { IWithGroups } from "../properties/properties/GroupProperty";
+import { IWithLoading } from "../properties/properties/LoadingProperty";
+import { IWithMinmaxGroup } from "../properties/properties/MinmaxGroupProperty";
+import { IWithMinmaxRegistry } from "../properties/properties/MinmaxRegistryProperty";
 
 export interface IThermalObjectBase {
     destroySelfAndBelow: () => void,
@@ -12,20 +14,21 @@ export interface IThermalObjectBase {
 }
 
 export interface IThermalContainer 
-    extends IThermalObjectBase,
-        IWithOpacity, 
-        IWithLoading,
-        IWithOpacity,
-        IWithMinmaxRegistry,
-        IWithRange
+    extends IThermalObjectBase
     {}
 
 export interface IThermalGroup 
 extends IThermalContainer,
-        IWithRangeGroup
+    IWithMinmaxGroup
 {}
 
 export interface IThermalRegistry 
     extends IThermalContainer,
-        IWithGroups
+        IWithGroups,
+        IWithOpacity, 
+        IWithLoading,
+        IWithMinmaxRegistry,
+        IWithRange,
+        IWithPalette,
+        IWithHighlight
 {}

@@ -1,37 +1,24 @@
 "use client";
 
-import { NumberDomain } from "recharts/types/util/types";
-import { ThermalFileSource } from "../file/ThermalFileSource";
-import { ThermalGroup } from "./ThermalGroup";
-import { ThermalObjectContainer } from "./abstractions/ThermalObjectContainer";
-import { GroupLoadingEvent, ThermalEvents, ThermalEventsFactory } from "./events";
-import { ThermalMinmaxOrUndefined, ThermalRangeOrUndefined } from "./interfaces";
-import { GRAYSCALE, PALETTE, ThermalPalettes } from "../file/palettes";
-import { addHours } from "date-fns";
-import { ThermalManager } from "./ThermalManager";
-import { ThermalFileRequest, ThermalRequest } from "./ThermalRequest";
-import { ThermalRegistryLoader } from "./utilities/ThermalRegistryLoader";
-import { IWithOpacity, OpacityDrive } from "./properties/OpacityDrive";
 import { ProjectDescription } from "../context/useProjectLoader";
-import { LoadingProperty } from "./properties/LoadingProperty";
-import { GroupsProperty } from "./properties/GroupProperty";
-import { IThermalContainer, IThermalRegistry } from "./interfaces/interfaces";
-import { MinmaxRegistryProperty } from "./properties/MinmaxRegistryProperty";
-import { RangeDriver } from "./properties/RangeDriver";
-import { HistogramProperty } from "./properties/HistogramProperty";
+import { ThermalFileInstance } from "../file/ThermalFileInstance";
+import { ThermalGroup } from "./ThermalGroup";
+import { ThermalManager } from "./ThermalManager";
+import { ThermalFileRequest } from "./ThermalRequest";
+import { IThermalRegistry } from "./interfaces/interfaces";
+import { GroupsProperty } from "./properties/properties/GroupProperty";
+import { HighlightDrive } from "./properties/drives/HighlightDrive";
+import { HistogramProperty } from "./properties/properties/HistogramProperty";
+import { LoadingProperty } from "./properties/properties/LoadingProperty";
+import { MinmaxRegistryProperty } from "./properties/properties/MinmaxRegistryProperty";
+import { OpacityDrive } from "./properties/drives/OpacityDrive";
+import { PaletteDrive } from "./properties/drives/PaletteDrive";
+import { RangeDriver } from "./properties/drives/RangeDriver";
+import { ThermalRegistryLoader } from "./utilities/ThermalRegistryLoader";
 
 /**
  * The global thermal registry
- * 
- * Creation:
- * - the singleton should by stored globally and all groups and instances need to be part of this singleton
- * 
- * Events:
- * - ThermalEvents.GROUP_INIT
- * - ThermalEvents.MINMAX_UPDATED
- * - ThermalEvents.OPACITY_UPDATED
- * - ThermalEvents.RANGE_UPDATED
- * - ThermalEvents.READY
+ * @todo implementing EventTarget
  */
 export class ThermalRegistry implements IThermalRegistry {
 
@@ -51,6 +38,37 @@ export class ThermalRegistry implements IThermalRegistry {
 
     /** Groups are stored in an observable property */
     public readonly groups: GroupsProperty = new GroupsProperty( this, [] );
+
+
+
+    /** Iterator methods */
+
+    public forEveryGroup( fn: ( ( group: ThermalGroup ) => any ) ) {
+        this.groups.value.forEach( fn );
+    }
+
+    public forEveryInstance( fn: ( instance: ThermalFileInstance ) => any ) {
+        this.forEveryGroup( group => group.forEveryInstance( fn ) );
+    }
+
+    /** @deprecated Not used, but functional */
+    public filterInstances( fn: ( (instance: ThermalFileInstance) => boolean ) ) {
+        const result: ThermalFileInstance[] = [];
+
+        this.groups.value.forEach( group => {
+
+            group.getInstancesArray().forEach( instance => {
+                
+                if ( fn( instance ) ) {
+                    result.push( instance );
+                }
+
+            });
+
+        } );
+
+        return result;
+    }
 
 
 
@@ -85,6 +103,9 @@ export class ThermalRegistry implements IThermalRegistry {
         // Resolve the query and create the instances where they should be
         await this.loader.resolveQuery();
 
+        // Recalculate individual minmaxes
+        this.forEveryGroup( group => group.minmax.recalculateFromInstances() );
+
         // Recalculate the minmax
         this.minmax.recalculateFromGroups();
 
@@ -93,7 +114,7 @@ export class ThermalRegistry implements IThermalRegistry {
             this.range.imposeRange( {from: this.minmax.value.min, to: this.minmax.value.max} );
 
         // Recalculate the histogram
-        this.histogram.recalculate();
+        this.histogram.recalculateWithCurrentSetting();
 
         this.loading.markAsLoaded();
 
@@ -114,15 +135,18 @@ export class ThermalRegistry implements IThermalRegistry {
         // Resolve the entire query
         await this.loader.resolveQuery();
 
+        // Recalculate individual minmaxes
+        this.forEveryGroup( group => group.minmax.recalculateFromInstances() );
+
         // Recalculate the minmax
         this.minmax.recalculateFromGroups();
 
-        // If there is minmax, impose it down
+        // If there is minmax, set it as range
         if ( this.minmax.value )
             this.range.imposeRange( {from: this.minmax.value.min, to: this.minmax.value.max} );
 
         // Recalculate the histogram
-        this.histogram.recalculate();
+        this.histogram.recalculateWithCurrentSetting();
 
         this.loading.markAsLoaded();
 
@@ -142,13 +166,19 @@ export class ThermalRegistry implements IThermalRegistry {
         this.groups.removeAllGroups();
     };
 
-    public destroySelfAndBelow() {}
+    public destroySelfAndBelow() {
+        this.reset();
+    }
+
+
+
+
 
 
 
 
     /**
-     * Properties
+     * Observable properties and drives
      */
 
 
@@ -177,6 +207,23 @@ export class ThermalRegistry implements IThermalRegistry {
      */
     public readonly histogram: HistogramProperty = new HistogramProperty( this, [] );
 
+    /**
+     * Palette
+     */
+    public readonly palette: PaletteDrive = new PaletteDrive( this, "jet" );
+
+
+    /**
+     * Highlight
+     */
+    public readonly highlight: HighlightDrive = new HighlightDrive( this, undefined );
+
+
+
+
+
+
+
 
 
 
@@ -184,28 +231,6 @@ export class ThermalRegistry implements IThermalRegistry {
         this.opacity.addListener( "test", value => {console.log( value );} );
     }
 
-
-
-    protected clearListeners() {
-        this.opacity.clearAllListeners();
-    }
-
-
-
-
-
-    /** 
-     * Activation status 
-    */
-
-
-    protected onRecieveActivationStatus(status: boolean): void {
-        this.groups.value.forEach(group => group.recieveActivationStatus(status));
-    }
-
-    protected onImposeActivationStatus(status: boolean): void {
-        this.onRecieveActivationStatus(status);
-    }
 
 
 
@@ -216,157 +241,11 @@ export class ThermalRegistry implements IThermalRegistry {
     /**
      * Groups creation
      */
-    /** Create a group or get an existing instance */
+    /** Create a group or get an existing instance @deprecated */
     public addOrGetGroup(
         id: string
     ) {
         return this.groups.addOrGetGroup(id);
-    }
-
-
-
-
-    /**
-     * Parameters recalculation
-     * - minmax
-     * - range
-     * - histogram
-     */
-
-    public recalculateAllParameters(): void {
-        this.recalculateMinmaxAndRange();
-        // this.histogram = this._getHistorgramFromAllGroups();
-    }
-
-    /** Completely calculate the minmax and set it also as the range */
-    protected recalculateMinmaxAndRange() {
-        this.minmax = this._getMinmaxFromAllGroups();
-        if (this.minmax) {
-            this.range = { from: this.minmax.min, to: this.minmax.max };
-        }
-    }
-
-
-
-
-
-    /**
-     * Global parameters
-     */
-
-
-
-
-
-
-
-
-
-    /**
-     * Range
-     */
-
-    public imposeRange(value: ThermalRangeOrUndefined) {
-        this.range = value;
-    }
-
-    protected onRangeUpdated(value: ThermalRangeOrUndefined): void {
-        this.getGroupsArray().forEach(group => group.recieveRange(value));
-    }
-
-
-
-
-
-
-    /**
-     * Opacity
-     */
-    public imposeOpacity(value: number) {
-        this.opacity = value;
-    }
-
-    protected onOpacityUpdated(value: number): void {
-        this.getGroupsArray().forEach(group => group.recieveOpacity(value));
-    }
-
-
-    /**
-     * Palette
-     */
-
-    public readonly palettes = {
-        iron: PALETTE
-    }
-
-    public readonly _availablePalettes = ThermalPalettes;
-
-    public get availablePalettes() {
-        return this._availablePalettes;
-    }
-
-    protected _activePalette: keyof typeof ThermalPalettes = "jet";
-    public set palette( value: keyof typeof ThermalPalettes ) {
-        this._activePalette = value;
-        this.getGroupsArray().forEach( group => group.getInstancesArray().forEach( instance => instance.draw() ) );
-        this.dispatchEvent( ThermalEventsFactory.paletteChanged( value ) );
-    }
-    public get palette() {
-        return this._activePalette;
-    }
-
-    public get currentPalette() {
-        return this._availablePalettes[ this._activePalette ];
-    }
-
-    public get activePalette() {
-        return this._availablePalettes[ this._activePalette ].pixels;    
-    }
-
-
-
-    protected _highlightTime?: number;
-    public get hightlightTime() {
-        return this._highlightTime;
-    }
-    public set hightlightTime(
-        value: number | undefined
-    ) {
-        this._highlightTime = value;
-        if ( value !== undefined ) {
-            const min = this._getHourDown( value );
-            const max = this._getHourUp( value );
-            this.getGroupsArray().forEach( group => {
-                group.getInstancesArray().forEach( instance => {
-                    if ( instance.timestamp >= min && instance.timestamp <= max ) {
-                        instance.highlight( true );
-                    } else {
-                        instance.highlight( false );
-                    }
-                } );
-            } );
-        }
-        else {
-            this.getGroupsArray().forEach( group => group.getInstancesArray().forEach( instance => {
-                instance.highlight(false)
-            } ) )
-        }
-    }
-
-    protected _getHourDown(
-        timestamp: number
-    ): number {
-        const d = new Date();
-        d.setTime( timestamp );
-        return addHours(d, -1).getTime();
-    }
-
-    protected _getHourUp(
-        timestamp: number
-    ): number {
-        const d = new Date();
-        d.setTime( timestamp );
-        return addHours(d, 1).getTime();
     }
 
 

@@ -36,6 +36,10 @@ export const useRegistryContextInternal = () => {
 
     }, []);
 
+
+    const 
+
+
     const { minmax } = useThermalMinmax(registry);
     const { opacity, imposeGlobalOpacity } = useThermalOpacity(registry);
     const { range, imposeGlobalRange } = useThermalRange(registry);

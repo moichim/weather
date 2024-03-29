@@ -1,4 +1,3 @@
-import { IntroThermograms } from '@/thermal/components/intro/IntroThermograms';
 import { Code, Link } from '@nextui-org/react';
 
 export default async function Home() {
