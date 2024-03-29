@@ -20,6 +20,11 @@ export class ThermalDateLayer extends AbstractLayer {
         this.container.appendChild( this.inner );
     }
 
+    public setColor( color: string ) {
+        this.inner.style.backgroundColor = color;
+        this.inner.style.borderColor = color;
+    }
+
     protected getContent() {
 
         if ( this.instance.isHover ) {

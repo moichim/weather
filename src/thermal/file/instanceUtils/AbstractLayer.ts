@@ -8,20 +8,21 @@ export abstract class AbstractLayer {
 
     public abstract getLayerRoot(): HTMLElement;
 
-    protected mounted = false;
+    protected _mounted = false;
+    public get mounted() { return this._mounted; }
 
     public mount() {
-        if ( !this.mounted )
+        if ( !this._mounted )
         if ( this.instance.root !== null ) {
-            this.mounted = true;
+            this._mounted = true;
             this.instance.root.appendChild( this.getLayerRoot() );
         }
     }
 
     public unmount() {
-        if ( this.mounted )
+        if ( this._mounted )
         if ( this.instance.root !== null ) {
-            this.mounted = false;
+            this._mounted = false;
             this.instance.root.removeChild( this.getLayerRoot() );
         }
     }

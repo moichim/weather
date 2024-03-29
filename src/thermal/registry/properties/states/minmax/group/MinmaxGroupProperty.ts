@@ -1,7 +1,7 @@
-import { ThermalGroup } from "../../ThermalGroup";
-import { ThermalMinmaxOrUndefined, ThermalMinmaxType } from "../../interfaces";
-import { AbstractMinmaxProperty } from "../abstractMinmaxProperty";
-import { IBaseProperty } from "../abstractProperty";
+import { ThermalGroup } from "../../../../ThermalGroup";
+import { ThermalMinmaxOrUndefined, ThermalMinmaxType } from "../../../../interfaces";
+import { AbstractMinmaxProperty } from "../../../abstractMinmaxProperty";
+import { IBaseProperty } from "../../../abstractProperty";
 
 export interface IWithMinmaxGroup extends IBaseProperty {
     minmax: MinmaxGroupProperty
@@ -28,7 +28,7 @@ export class MinmaxGroupProperty extends AbstractMinmaxProperty<ThermalGroup> {
 
     protected _getMinmaxFromInstances(): ThermalMinmaxOrUndefined {
 
-        const instances = this.parent.getInstancesArray();
+        const instances = this.parent.instances.value;
 
         if (instances.length === 0)
             return undefined;

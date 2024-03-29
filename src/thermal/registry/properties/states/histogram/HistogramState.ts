@@ -1,14 +1,14 @@
-import { ThermalStatistics, ThermalRegistry } from "../../ThermalRegistry";
-import { AbstractProperty, IBaseProperty } from "../abstractProperty";
+import { ThermalStatistics, ThermalRegistry } from "../../../ThermalRegistry";
+import { AbstractProperty, IBaseProperty } from "../../abstractProperty";
 
 export interface IWithHistogram extends IBaseProperty {
-    histogram: HistogramProperty
+    histogram: HistogramState
 }
 
 /** Handles the histogram creation and subscription.
  * - should be used only in registries
  */
-export class HistogramProperty extends AbstractProperty<ThermalStatistics[], ThermalRegistry> {
+export class HistogramState extends AbstractProperty<ThermalStatistics[], ThermalRegistry> {
 
     protected resolution = 50;
 
@@ -57,7 +57,7 @@ export class HistogramProperty extends AbstractProperty<ThermalStatistics[], The
                 current
             ) => {
 
-                const pixels = current.getInstancesArray().reduce((buf, instance) => {
+                const pixels = current.instances.value.reduce((buf, instance) => {
 
                     buf = [...buf, ...instance.pixels];
 

@@ -24,9 +24,12 @@ export class TimeFormat extends TimeUtilsBase {
     }
 
     /** HH:mm */
-    public static humanTime = (value: AcceptableDateInput) => {
+    public static humanTime = (
+        value: AcceptableDateInput,
+        showSeconds: boolean = false
+    ) => {
         value = TimeFormat.inputToDate(value);
-        return format(value, "HH:mm");
+        return format(value, showSeconds ? "HH:mm:ss" : "HH:mm");
     }
     /** j. M. ???? (y) */
     public static humanDate = (
@@ -51,6 +54,14 @@ export class TimeFormat extends TimeUtilsBase {
             TimeFormat.humanDate(from),
             TimeFormat.humanDate(to)
         ].join(" - ");
+
+    }
+
+    public static human(
+        date: AcceptableDateInput
+    ) {
+
+        return `${TimeFormat.humanDate( date )} ${TimeFormat.humanTime( date, true )} `;
 
     }
 }

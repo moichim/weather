@@ -1,6 +1,6 @@
 import { addHours } from "date-fns";
-import { ThermalRegistry } from "../../ThermalRegistry";
-import { AbstractProperty, IBaseProperty } from "../abstractProperty";
+import { ThermalRegistry } from "../../../ThermalRegistry";
+import { AbstractProperty, IBaseProperty } from "../../abstractProperty";
 
 export interface IWithHighlight extends IBaseProperty {
     highlight: HighlightDrive;
@@ -14,7 +14,7 @@ export class HighlightDrive extends AbstractProperty<number|undefined, ThermalRe
 
         // If the value is undefined stop every highlighting
         if ( value === undefined ) {
-            this.parent.forEveryInstance( instance => instance.setHighlight( false ) );
+            this.parent.forEveryInstance( instance => instance.recieveTimeHighlight( false ) );
         } 
         // If the value is different than in the previous step, do the changes
         else if ( value !== this.value ) {
@@ -25,9 +25,9 @@ export class HighlightDrive extends AbstractProperty<number|undefined, ThermalRe
             this.parent.forEveryInstance( instance => {
 
                 if ( instance.timestamp >= min && instance.timestamp < max ) {
-                    instance.setHighlight( true );
+                    instance.recieveTimeHighlight( true );
                 } else {
-                    instance.setHighlight( false );
+                    instance.recieveTimeHighlight( false );
                 }
 
             } );

@@ -1,8 +1,8 @@
 import { ThermalPalettes } from "@/thermal/file/palettes";
-import { ThermalRegistry } from "../../ThermalRegistry";
-import { AbstractProperty, IBaseProperty } from "../abstractProperty";
+import { ThermalRegistry } from "../../../ThermalRegistry";
+import { AbstractProperty, IBaseProperty } from "../../abstractProperty";
 
-type PaletteId = keyof typeof ThermalPalettes;
+export type PaletteId = keyof typeof ThermalPalettes;
 
 export interface IWithPalette extends IBaseProperty {
     palette: PaletteDrive
@@ -32,6 +32,10 @@ export class PaletteDrive extends AbstractProperty< PaletteId, ThermalRegistry >
     /** Any changes to the value should propagate directly to every instance. */
     protected afterSetEffect(value: PaletteId) {
         this.parent.forEveryInstance( instance => instance.recievePalette(value) );
+    }
+
+    public setPalette( key: PaletteId ) {
+        this.value = key;
     }
 
 }

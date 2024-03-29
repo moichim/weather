@@ -1,14 +1,14 @@
-import { ThermalGroup } from "../../ThermalGroup";
-import { ThermalRegistry } from "../../ThermalRegistry";
-import { AbstractProperty, IBaseProperty } from "../abstractProperty";
+import { ThermalGroup } from "../../../ThermalGroup";
+import { ThermalRegistry } from "../../../ThermalRegistry";
+import { AbstractProperty, IBaseProperty } from "../../abstractProperty";
 
 export interface IWithGroups extends IBaseProperty {
-    groups: GroupsProperty
+    groups: GroupsState
 }
 
 
 /** Handles group creation and removal */
-export class GroupsProperty extends AbstractProperty<ThermalGroup[], ThermalRegistry> {
+export class GroupsState extends AbstractProperty<ThermalGroup[], ThermalRegistry> {
 
     protected _map: Map<string, ThermalGroup> = new Map<string,ThermalGroup>();
 
@@ -23,7 +23,7 @@ export class GroupsProperty extends AbstractProperty<ThermalGroup[], ThermalRegi
         // Clear the index
         this._map.clear();
 
-        // Create the new values
+        // Create the new values in the index
         value.forEach( group => this._map.set( group.id, group ) );
 
     }

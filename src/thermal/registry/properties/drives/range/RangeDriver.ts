@@ -1,6 +1,6 @@
-import { ThermalRegistry } from "../../ThermalRegistry";
-import { ThermalRangeOrUndefined } from "../../interfaces";
-import { AbstractProperty, IBaseProperty } from "../abstractProperty";
+import { ThermalRegistry } from "../../../ThermalRegistry";
+import { ThermalRangeOrUndefined } from "../../../interfaces";
+import { AbstractProperty, IBaseProperty } from "../../abstractProperty";
 
 export interface IWithRange extends IBaseProperty {}
 

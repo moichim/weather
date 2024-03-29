@@ -1,7 +1,7 @@
 import { ThermalGroup } from "../registry/ThermalGroup";
-import { ThermalEventsFactory } from "../registry/events";
-import { ThermalCursorPositionOrundefined } from "../registry/interfaces";
-import { IThermalObjectBase } from "../registry/interfaces/interfaces";
+import { ThermalCursorPositionOrundefined, ThermalRangeOrUndefined } from "../registry/interfaces";
+import { IThermalInstance } from "../registry/interfaces/interfaces";
+import { CursorValueDrive } from "../registry/properties/states/cursorValue/CursorValueDrive";
 import { ThermalFileSource } from "./ThermalFileSource";
 import { VisibleLayer } from "./instanceUtils/VisibleLayer";
 import { ThermalCanvasLayer } from "./instanceUtils/thermalCanvasLayer";
@@ -15,8 +15,8 @@ import { ThermalListenerLayer } from "./instanceUtils/thermalListenerLayer";
  * @todo implement unmounting
  * @todo rename binding to mounting
  */
-export class ThermalFileInstance extends EventTarget implements IThermalObjectBase {
-    
+export class ThermalFileInstance extends EventTarget implements IThermalInstance {
+
 
 
     // Core properties are mirrored from the source
@@ -53,17 +53,12 @@ export class ThermalFileInstance extends EventTarget implements IThermalObjectBa
 
 
     public destroySelfAndBelow() {
-        this.unmount();
+        this.unmountBaseLayers();
     };
     public removeAllChildren() {
-        this.unmount();
+        this.unmountBaseLayers();
     };
-    public reset() {};
-
-
-    protected onDestroySelf() {
-        this.unmount();
-    }
+    public reset() { };
 
 
 
@@ -72,19 +67,19 @@ export class ThermalFileInstance extends EventTarget implements IThermalObjectBa
     public root: HTMLDivElement | null = null;
 
     // The canvas layer
-    protected canvasLayer: ThermalCanvasLayer | null = null;
+    public readonly canvasLayer: ThermalCanvasLayer = new ThermalCanvasLayer(this);
 
     // The visible layer
-    protected visibleLayer: VisibleLayer | null = null;
+    public readonly visibleLayer: VisibleLayer = new VisibleLayer(this, this.visibleUrl);
 
     /// The cursor layer
-    protected cursorLayer: ThermalCursorLayer | null = null;
+    public readonly cursorLayer: ThermalCursorLayer = new ThermalCursorLayer(this);
 
     // The date popup layer
-    protected datelayer: ThermalDateLayer | null = null;
+    public readonly dateLayer: ThermalDateLayer = new ThermalDateLayer(this);
 
     // The listener layer
-    protected listenerLayer: ThermalListenerLayer | null = null;
+    public readonly listenerLayer: ThermalListenerLayer = new ThermalListenerLayer(this);
 
 
 
@@ -94,65 +89,68 @@ export class ThermalFileInstance extends EventTarget implements IThermalObjectBa
      */
 
     protected _mounted: boolean = false;
-    public get mounted() { return this._mounted; }
-    protected set mounted(value: boolean) { this._mounted = value; }
+    public get mountedBaseLayers() { return this._mounted; }
+    protected set mountedBaseLayers(value: boolean) { this._mounted = value; }
 
     /** @todo what if the instance remounts back to another element? The layers should be mounted as well! */
-    public mount(
+    protected attachToDom(
         container: HTMLDivElement
     ) {
 
-        if ( this.root !== null || this.mounted === true ) {
-            console.info("The instance already has its DOM.");
-            /** @todo this used to be commented. Wny? It should be on! */
-            this.unmount();
-            return;
+        if (this.root !== null || this.mountedBaseLayers === true) {
+            console.warn(`The instance ${this.id} has already mounted base layers therefore the inner DOM tree is deleted and built from the scratch.`);
+            this.unmountBaseLayers();
+            this.setInteractionsOff();
         }
 
         this.root = container;
+
+        // Container styles
         this.root.style.borderWidth = "2px";
         this.root.style.borderStyle = "solid";
         this.root.style.borderColor = "transparent";
         this.root.style.margin = "-1px";
         this.root.style.transition = "border-color .1s ease-in-out";
+        this.root.style.zIndex = "10";
 
-        // Create the visible layer if necessary
-        if (this.visibleUrl) {
-            this.visibleLayer = new VisibleLayer(this, this.visibleUrl);
-        }
+        // Visible layer is mounted on the bottom 
+        // and only if the URL exists
+        if (this.visibleLayer.exists)
+            this.visibleLayer.mount();
 
-        // Create the canvas layer
-        this.canvasLayer = new ThermalCanvasLayer(this);
-
-        // Create the cursor layer
-        this.cursorLayer = new ThermalCursorLayer(this);
-
-        // 
-        this.datelayer = new ThermalDateLayer( this );
-
-        // Create the listener layer
-        this.listenerLayer = new ThermalListenerLayer( this );
+        // The rest is mounted in the given order
+        this.canvasLayer.mount();
+        this.cursorLayer.mount();
+        this.dateLayer.mount();
 
 
+        // Container dataset
+        this.root.dataset.thermalFile = this.id;
         this.root.dataset.mounted = "true";
-        this.mounted = true;
+
+        // Global state
+        this.mountedBaseLayers = true;
 
 
     }
 
-    protected unmount() {
-        this.mounted = false;
-        if ( this.root )
+    protected unmountBaseLayers() {
+
+        if (this.root === undefined) {
+            console.warn(`The instance ${this.id} does not have a root, therefore the base layers can not be unmounted.`);
+        }
+
+        if (this.root) {
             this.root.dataset.mounted = "false";
+            this.root.dataset.thermalFile = undefined;
+        }
         // this.root?.remove();
-        this.visibleLayer?.destroy();
-        this.canvasLayer?.destroy();
-        this.cursorLayer?.destroy();
-        this.listenerLayer?.destroy();
-        this.visibleLayer = null;
-        this.canvasLayer = null;
-        this.cursorLayer = null;
-        this.listenerLayer = null;
+        this.visibleLayer.unmount();
+        this.canvasLayer.unmount();
+        this.cursorLayer.unmount();
+        this.dateLayer.unmount();
+
+        this.mountedBaseLayers = false;
 
     }
 
@@ -163,101 +161,118 @@ export class ThermalFileInstance extends EventTarget implements IThermalObjectBa
      * @todo refactor this with variants!
      */
 
-    public hydrate() {
+    public setInteractionsOn() {
 
-        if (this.root) {
-
-            if (this.visibleLayer)
-                this.visibleLayer.mount();
-            if (this.canvasLayer)
-                this.canvasLayer.mount();
-            if (this.cursorLayer)
-                this.cursorLayer.mount();
-            if (this.datelayer)
-                this.datelayer.mount();
-            if (this.listenerLayer)
-                this.listenerLayer.mount();
-
-            // Update the root element
-            this.root.setAttribute("id", this.id);
-            this.root.dataset.binded = "true";
-            this.root.style.zIndex = "10";
+        if (this.root === undefined) {
+            console.warn(`The instance ${this.id} does not have a root, therefore the listener can not be mounted.`);
+            return;
         }
 
-        // Mark this instance as binded
-        this.mounted = true;
+        this.listenerLayer.mount();
 
-        if (this.listenerLayer && this.root && this.cursorLayer) {
+        this.listenerLayer.getLayerRoot().onmousemove = (event: MouseEvent) => {
 
-            this.draw();
+            // Show the cursor
+            this.cursorLayer.show = true;
 
-            this.listenerLayer.getLayerRoot().onmousemove = (event: MouseEvent) => {
+            // Store the local hover state
+            this.isHover = true;
 
-                // Show the cursor
-                this.cursorLayer!.show = true;
-        
-                this.isHover = true;
-                this.group.registry.highlight.higlightTime( this.timestamp );
-        
-                const client = this.width;
-                const parent = this.root!.clientWidth;
-        
-                const aspect = client / parent;
-        
-                const x = Math.round(event.offsetX * aspect);
-                const y = Math.round(event.offsetY * aspect);
-        
-                this.imposeCursorPosition({ x, y });
-        
-            };
+            // Send the time highlight whenever syncing
+            if ( this._timeHighlightSync === true )
+                this.group.registry.highlight.higlightTime(this.timestamp);
 
-            this.listenerLayer.getLayerRoot().onmouseleave = () => {
+            // Highlight on hover whenever needed
+            if ( this._highlightOnHover === true ) {
+                    this.doHighlight(true);
+            }
 
-                this.cursorLayer!.show = false;
-        
-                this.isHover = false;
-                this.group.registry.highlight.clearHighlight();
-        
-                this.imposeCursorPosition(undefined);
-        
-            };
+            const client = this.width;
+            const parent = this.root!.clientWidth;
 
-            this.listenerLayer.getLayerRoot().onclick = () => {
-                if ( this._emitsDetail ) 
-                    this.dispatchEvent( ThermalEventsFactory.emitInstanceDetail( this ) );
-            };
+            const aspect = client / parent;
 
-            
+            const x = Math.round(event.offsetX * aspect);
+            const y = Math.round(event.offsetY * aspect);
 
-        }
+            this.group.cursorPosition.recieveCursorPosition({ x, y });
+
+            if (this._onHover)
+                this._onHover(event, this);
+
+        };
+
+        this.listenerLayer.getLayerRoot().onmouseleave = () => {
+
+            this.cursorLayer!.show = false;
+
+            this.isHover = false;
+
+            // Clear the synchronised time in any case
+            this.group.registry.highlight.clearHighlight();
+
+            // Clear the synchronised cursor in any case
+            this.group.cursorPosition.recieveCursorPosition(undefined);
+
+            // RemoveThe highlight in any case
+            this.doHighlight( false );
+
+        };
+
+        this.listenerLayer.getLayerRoot().onclick = (event) => {
+
+            if (this._onClick)
+                this._onClick(event, this);
+
+        };
 
     }
 
-    public dehydrate() {
+    public setInteractionsOff() {
 
-        if ( this.visibleLayer ) {
-            this.visibleLayer.unmount();
-        }
+        this.listenerLayer.unmount();
 
     }
 
 
+    public mountToDom( container: HTMLDivElement ) {
+        this.attachToDom(container);
+        this.setInteractionsOn();
+    }
 
-    public emit = () => {
-        this.dispatchEvent( ThermalEventsFactory.emitInstanceDetail( this ) );
+    public unmountFromDom() {
+        this.unmountBaseLayers();
+        this.setInteractionsOff();
     }
 
 
     /**
-     * User interactions
+     * Onmousemove interactions
      */
-    protected _emitsDetail: boolean = true;
-    public get emitsDetail() { return this._emitsDetail; }
-    public set emitsDetail( value: boolean ) {
-        this._emitsDetail = value;
-        if ( this.listenerLayer ) {
-            this.listenerLayer.getLayerRoot().style.cursor = value ? "pointer" : "normal";
-        }
+
+    protected _onHover?: ((event: MouseEvent, target: ThermalFileInstance) => any) = undefined;
+
+    public setHoverHandler(handler?: ((event: MouseEvent, target: ThermalFileInstance) => any)) {
+        this._onHover = handler;
+    }
+
+    public setHoverCursor(
+        value: CSSStyleDeclaration["cursor"]
+    ) {
+        if (this.root)
+            if (this.root.style.cursor !== value)
+                this.root.style.cursor = value;
+    }
+
+
+    /**
+     * Onclick interactions
+     */
+
+    protected _onClick?: ((event: MouseEvent, target: ThermalFileInstance) => any) = undefined;
+
+    public setClickHandler(handler: ((event: MouseEvent, target: ThermalFileInstance) => any)| undefined = undefined ) {
+        this._onClick = handler;
     }
 
 
@@ -267,9 +282,7 @@ export class ThermalFileInstance extends EventTarget implements IThermalObjectBa
      */
 
     public draw() {
-        if ( this.canvasLayer) {
-            this.canvasLayer.draw();
-        }
+        this.canvasLayer.draw();
     }
 
     /** Recieve a palette setting */
@@ -284,104 +297,48 @@ export class ThermalFileInstance extends EventTarget implements IThermalObjectBa
 
 
 
-    // Cursor & Value
+    /** 
+     * CursorValue & hover state 
+    */
+
+    public readonly cursorValue: CursorValueDrive = new CursorValueDrive(this, undefined);
+
 
     protected _isHover: boolean = false;
     public get isHover() { return this._isHover }
-    protected set isHover( value: boolean ) {
+    protected set isHover(value: boolean) {
         this._isHover = value;
-
-        if ( value ) {
-            //this.datelayer?.show()
-            if ( this.root )
-                this.root.style.borderColor = "black";
-        } else {
-            this.datelayer?.hide();
-            if ( this.root )
-                this.root.style.borderColor = "transparent";
-        }
-    }
-
-    protected _cursorValue: number | undefined;
-    public get cursorValue() { return this._cursorValue; }
-
-    protected _cursorPosition: ThermalCursorPositionOrundefined;
-    public get cursorPosition() { return this._cursorPosition; }
-    protected set cursorPosition(value: ThermalCursorPositionOrundefined) {
-
-        // Store it locally
-        this._cursorPosition = value;
-
-        // calculate and propagate the value
-        if (this.cursorPosition !== undefined) {
-
-            // Calculate the value
-            this._cursorValue = this._getValueAtCoordinate(this.cursorPosition.x, this.cursorPosition.y);
-
-            // Propagate the change to the DOM
-            if (this.cursorLayer && this.cursorValue) {
-                this.cursorLayer.show = true;
-                this.cursorLayer.setCursor(this.cursorPosition.x, this.cursorPosition.y, this.cursorValue);
-            }
-
-        } else {
-
-            this._cursorValue = undefined;
-            if (this.cursorLayer) {
-                this.cursorLayer.resetCursor();
-                this.cursorLayer.show = false;
-            }
-
-        }
-
-        this.dispatchEvent(ThermalEventsFactory.cursorUpdated(
-            this.isHover,
-            this.cursorPosition,
-            this.cursorValue
-        ));
-
     }
 
     public recieveCursorPosition(
         position: ThermalCursorPositionOrundefined,
     ) {
 
-        this.cursorPosition = position;
+        this.cursorValue.recalculateFromCursor(position);
 
     }
 
-    public imposeCursorPosition(
-        position: ThermalCursorPositionOrundefined
-    ) {
-        this.group.recieveCursorPosition(position);
-    }
-
-
-    protected _getValueAtCoordinate(
-        x: number | undefined,
-        y: number | undefined
-    ) {
-
-        if (x === undefined || y === undefined) {
-            return undefined;
-        }
-
-        const index = x + (y * this.width);
-        const value = this.pixels[index];
-        return value;
-
-    }
-
-
-
-
-    // opacity
-
-    /** 
-     * Recieve the opacity and project it directly to the appropriate layer.
+    /**
+     * Range
      */
-    public recieveOpacity(value: number) {
 
+
+    /** Recieve the range from the registry and redraw */
+    public recieveRange(
+        value: ThermalRangeOrUndefined
+    ) {
+        if (value !== undefined) {
+            this.draw();
+        }
+    }
+
+
+    /**
+     * Opacity
+     */
+
+    /** Recieve the opacity from the registry and project it to the canvas layer */
+    public recieveOpacity(value: number) {
 
         if (this.visibleLayer && this.canvasLayer) {
             this.canvasLayer.opacity = value;
@@ -389,17 +346,118 @@ export class ThermalFileInstance extends EventTarget implements IThermalObjectBa
     }
 
 
-    // hightlighting
-    public setHighlight( value: boolean ) {
+    /** 
+     * Highlighting
+     */
+    protected _isHighlight: boolean = false;
+    public get isHighlight() { return this._isHighlight; }
+    public doHighlight( state: boolean ) {
 
-        if ( value ) {
-            if (this.root )
-                this.root.style.borderColor = "black";
-            this.datelayer?.show()
-        } else {
-            if ( this.root )
+        this._isHighlight = state;
+
+        if ( this.root ) {
+
+            // If true, set propagate the color to the DOM and eventually show the highlight
+            if ( state === true ) {
+
+                this.root.style.borderColor = this.highlightColor;
+
+                if ( this.showDateOnHighlight === true ) {
+                    this.dateLayer.show();
+                }
+
+            } 
+            
+            // If false, propagate the color and hide the date
+            else {
                 this.root.style.borderColor = "transparent";
-            this.datelayer?.hide()
+                this.dateLayer.hide();
+            }
+        }
+
+    }
+
+
+    // Local highlight color is stored
+    protected _highlightColor: string = "transparent";
+    public get highlightColor() { return this._highlightColor; }
+    /** Set the highlight color of the root */
+    public setHighlightColor(value: string = "transparent") {
+
+        this._highlightColor = value;
+        this.dateLayer.setColor( value );
+
+    }
+
+
+    /**
+     * Synchronised highlighting
+     */
+    protected _timeHighlightSync: boolean = true;
+    public get timeHighlightSync() { return this._timeHighlightSync; }
+    public setTimeHiglightSync(value: boolean) {
+        this._timeHighlightSync = value;
+    }
+    public recieveTimeHighlight(value: boolean) {
+
+        // If should hide, hide anyway
+        if ( value === false ) {
+
+            this.doHighlight( false );
+
+        } 
+        // If should show, do it only when listening to highlight sync
+        else if ( this._timeHighlightSync === true ) {
+
+            this.doHighlight( false );
+
+        }
+
+    }
+
+
+    /** 
+     * Show date 
+     * 
+     * Whether or not the date shall be showed when highlighted
+     */
+    protected _showDateOnHighlight: boolean = true;
+    public get showDateOnHighlight() { return this._showDateOnHighlight; }
+    public setShowDateOnHighlight(
+        value: boolean
+    ) {
+        this._showDateOnHighlight = value;
+    }
+
+    /**
+     * Highlight on hover
+     */
+    protected _highlightOnHover: boolean = true;
+    public get highlightOnHover() { return this._highlightOnHover }
+    public setHighlightOnHover(
+        value: boolean
+    ) {
+        this._highlightOnHover = value;
+    }
+
+    protected _forceHighlight: boolean = false;
+    public get forceHighlight() { return this._forceHighlight; }
+    public setForceHighlight(
+        value: boolean
+    ) {
+
+        this._forceHighlight = value;
+
+        if ( value === true ) {
+            this.doHighlight( true );
+        } else {
+
+            if (
+                this._isHover === false && this.isHighlight === true
+            ) {
+                this.doHighlight( false );
+            }
+
         }
 
     }

@@ -53,7 +53,7 @@ export const useProjectLoader = (
     to: number
 ) => {
 
-    const [groups, setGroups] = useState<ProjectDescription>({});
+    const [projectDescription, setProjectDescription] = useState<ProjectDescription>({});
 
     const addGroup = useCallback((
         id: string,
@@ -62,7 +62,7 @@ export const useProjectLoader = (
         description?: string
     ) => {
 
-        setGroups(prev => {
+        setProjectDescription(prev => {
 
             // if (!Object.keys(prev).includes(id)) {
                 return {
@@ -80,7 +80,7 @@ export const useProjectLoader = (
 
         });
 
-    }, [setGroups]);
+    }, [setProjectDescription]);
 
     const [fetchQuery, query] = useLazyQuery<ProjectFilesQueryResponse>(PROJECT_FILES_QUERY, {
         variables: {
@@ -126,13 +126,13 @@ export const useProjectLoader = (
             
     }, [from, to]);
 
-    console.log( "skupiny", groups );
+    console.log( "skupiny", projectDescription );
 
 
 
     return {
         loading: query.loading,
-        groups
+        projectDescription
     }
 
 }

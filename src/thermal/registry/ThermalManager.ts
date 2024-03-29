@@ -10,12 +10,14 @@ export class ThermalManager extends EventTarget {
         [index: string]: ThermalRegistry
      } = {};
 
-    public addRegistry(
+    public addOrGetRegistry(
         id: string
     ) {
         if ( this._registries[id] !== undefined ) {
             this._registries[id] = new ThermalRegistry(id, this);
         }
+
+        return this._registries[id];
     }
 
     public removeRegistry(

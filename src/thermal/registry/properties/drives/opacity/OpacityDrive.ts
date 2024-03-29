@@ -1,5 +1,5 @@
-import { ThermalRegistry } from "../../ThermalRegistry";
-import { AbstractProperty, IBaseProperty } from "../abstractProperty";
+import { ThermalRegistry } from "../../../ThermalRegistry";
+import { AbstractProperty, IBaseProperty } from "../../abstractProperty";
 
 export interface IWithOpacity extends IBaseProperty {
     opacity: OpacityDrive

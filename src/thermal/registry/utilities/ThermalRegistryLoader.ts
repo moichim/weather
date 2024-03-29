@@ -74,7 +74,7 @@ export class ThermalRegistryLoader {
                 const file = this.registry.manager.registerSource(response.file);
 
                 // Add the request in the group in a unified way
-                response.request.group.instantiateSource(file);
+                response.request.group.instances.instantiateSource(file);
 
             }
 

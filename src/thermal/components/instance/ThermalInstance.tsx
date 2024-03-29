@@ -40,9 +40,9 @@ export const ThermalInstance: React.FC<ThermalInstanceProps> = ({
 
         setContent(payload);
 
-        const instance = group.instantiateSource(registry.manager.sourcesByUrl[payload.url]);
+        const instance = group.instances.instantiateSource(registry.manager.sourcesByUrl[payload.url]);
         if (registry.range)
-            instance.recieveRange(registry.range);
+            instance.recieveRange(registry.range.value);
 
         setDetail(instance);
 
@@ -62,7 +62,7 @@ export const ThermalInstance: React.FC<ThermalInstanceProps> = ({
             if (ref.current) {
                 // if (!props.instance.binded) {
 
-                    props.instance.mount(ref.current);
+                    props.instance.attachToDom(ref.current);
 
                 // }
 

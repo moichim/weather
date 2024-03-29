@@ -1,11 +1,14 @@
-import { IWithHighlight } from "../properties/drives/HighlightDrive";
-import { IWithOpacity } from "../properties/drives/OpacityDrive";
-import { IWithPalette } from "../properties/drives/PaletteDrive";
-import { IWithRange } from "../properties/drives/RangeDriver";
-import { IWithGroups } from "../properties/properties/GroupProperty";
-import { IWithLoading } from "../properties/properties/LoadingProperty";
-import { IWithMinmaxGroup } from "../properties/properties/MinmaxGroupProperty";
-import { IWithMinmaxRegistry } from "../properties/properties/MinmaxRegistryProperty";
+import { IWithCursorPosition } from "../properties/drives/cursorPosition/CursorPositionDrive";
+import { IWithHighlight } from "../properties/drives/highlight/HighlightDrive";
+import { IWithOpacity } from "../properties/drives/opacity/OpacityDrive";
+import { IWithPalette } from "../properties/drives/palette/PaletteDrive";
+import { IWithRange } from "../properties/drives/range/RangeDriver";
+import { IWithGroups } from "../properties/lists/groups/GroupsState";
+import { IWithInstances } from "../properties/lists/instances/InstancesState";
+import { IWithCursorValue } from "../properties/states/cursorValue/CursorValueDrive";
+import { IWithLoading } from "../properties/states/loading/LoadingState";
+import { IWithMinmaxGroup } from "../properties/states/minmax/group/MinmaxGroupProperty";
+import { IWithMinmaxRegistry } from "../properties/states/minmax/registry/MinmaxRegistryState";
 
 export interface IThermalObjectBase {
     destroySelfAndBelow: () => void,
@@ -17,9 +20,17 @@ export interface IThermalContainer
     extends IThermalObjectBase
     {}
 
+export interface IThermalInstance
+    extends IThermalObjectBase,
+        IWithCursorValue
+    {}
+
+
 export interface IThermalGroup 
 extends IThermalContainer,
-    IWithMinmaxGroup
+    IWithMinmaxGroup,
+    IWithInstances,
+    IWithCursorPosition
 {}
 
 export interface IThermalRegistry 

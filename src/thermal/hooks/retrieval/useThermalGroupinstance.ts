@@ -21,7 +21,7 @@ export const useThermalGroupInstance = (
 
     const { loadingState } = useThermalLoadingState( group );
 
-    const [instances, setInstances] = useState<ThermalFileInstance[]>( group.getInstancesArray() );
+    const [instances, setInstances] = useState<ThermalFileInstance[]>( group.instances.value );
 
     const [minmax, setMinmax] = useState<ThermalMinmaxOrUndefined>(  );
 
@@ -46,7 +46,7 @@ export const useThermalGroupInstance = (
 
                 console.log( "Skupina byla načtena", groupId, g.getInstancesArray() );
 
-                setInstances( g.getInstancesArray() );
+                setInstances( g.instances.value );
 
             } else if (
                 event.detail.state === ThermalContainerStates.LOADING

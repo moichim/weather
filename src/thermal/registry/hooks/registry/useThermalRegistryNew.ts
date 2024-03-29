@@ -1,0 +1,21 @@
+import { useEffect, useMemo } from "react";
+import { useThermalManagerContext } from "../thermalManagerContext"
+
+/** 
+ * Creates and stores a registry instance.  
+ * 
+ * Does not remove the instance on unmount. To destroy the instance, call the manager's method `removeRegistry`
+*/
+export const useThermalRegistryNew = (
+    registryId: string
+) => {
+
+    const manager = useThermalManagerContext();
+
+    const registry = useMemo( () => {
+        return manager.addOrGetRegistry( registryId );
+    }, [registryId] );
+
+    return registry;
+
+}

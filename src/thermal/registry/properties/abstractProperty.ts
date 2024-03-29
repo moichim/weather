@@ -1,13 +1,16 @@
+import { ThermalFileInstance } from "@/thermal/file/ThermalFileInstance";
 import { ThermalGroup } from "../ThermalGroup";
-import { ThermalRegistry, ThermalStatistics } from "../ThermalRegistry";
-import { ThermalRangeOrUndefined, ThermalMinmaxOrUndefined } from "../interfaces";
+import { ThermalStatistics } from "../ThermalRegistry";
+import { ThermalCursorPositionOrundefined, ThermalMinmaxOrUndefined, ThermalRangeOrUndefined } from "../interfaces";
 
 type PropertyListenersTypes = boolean 
     | number 
     | string
     | ThermalRangeOrUndefined 
     | ThermalMinmaxOrUndefined
+    | ThermalCursorPositionOrundefined
     | ThermalGroup[]
+    | ThermalFileInstance[]
     | ThermalStatistics[];
 
 type PropertyListenerFn<T extends PropertyListenersTypes> = ( value: T ) => any

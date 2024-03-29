@@ -6,14 +6,14 @@ import { ThermalGroup } from "./ThermalGroup";
 import { ThermalManager } from "./ThermalManager";
 import { ThermalFileRequest } from "./ThermalRequest";
 import { IThermalRegistry } from "./interfaces/interfaces";
-import { GroupsProperty } from "./properties/properties/GroupProperty";
-import { HighlightDrive } from "./properties/drives/HighlightDrive";
-import { HistogramProperty } from "./properties/properties/HistogramProperty";
-import { LoadingProperty } from "./properties/properties/LoadingProperty";
-import { MinmaxRegistryProperty } from "./properties/properties/MinmaxRegistryProperty";
-import { OpacityDrive } from "./properties/drives/OpacityDrive";
-import { PaletteDrive } from "./properties/drives/PaletteDrive";
-import { RangeDriver } from "./properties/drives/RangeDriver";
+import { GroupsState } from "./properties/lists/groups/GroupsState";
+import { HighlightDrive } from "./properties/drives/highlight/HighlightDrive";
+import { HistogramState } from "./properties/states/histogram/HistogramState";
+import { LoadingState } from "./properties/states/loading/LoadingState";
+import { MinmaxRegistryProperty } from "./properties/states/minmax/registry/MinmaxRegistryState";
+import { OpacityDrive } from "./properties/drives/opacity/OpacityDrive";
+import { PaletteDrive } from "./properties/drives/palette/PaletteDrive";
+import { RangeDriver } from "./properties/drives/range/RangeDriver";
 import { ThermalRegistryLoader } from "./utilities/ThermalRegistryLoader";
 
 /**
@@ -37,7 +37,7 @@ export class ThermalRegistry implements IThermalRegistry {
     
 
     /** Groups are stored in an observable property */
-    public readonly groups: GroupsProperty = new GroupsProperty( this, [] );
+    public readonly groups: GroupsState = new GroupsState( this, [] );
 
 
 
@@ -48,7 +48,7 @@ export class ThermalRegistry implements IThermalRegistry {
     }
 
     public forEveryInstance( fn: ( instance: ThermalFileInstance ) => any ) {
-        this.forEveryGroup( group => group.forEveryInstance( fn ) );
+        this.forEveryGroup( group => group.instances.forEveryInstance( fn ) );
     }
 
     /** @deprecated Not used, but functional */
@@ -57,7 +57,7 @@ export class ThermalRegistry implements IThermalRegistry {
 
         this.groups.value.forEach( group => {
 
-            group.getInstancesArray().forEach( instance => {
+            group.instances.value.forEach( instance => {
                 
                 if ( fn( instance ) ) {
                     result.push( instance );
@@ -195,7 +195,7 @@ export class ThermalRegistry implements IThermalRegistry {
     /**
      * Loading
      */
-    public readonly loading: LoadingProperty = new LoadingProperty( this, false );
+    public readonly loading: LoadingState = new LoadingState( this, false );
 
     /**
      * Range
@@ -205,7 +205,7 @@ export class ThermalRegistry implements IThermalRegistry {
     /**
      * Histogram
      */
-    public readonly histogram: HistogramProperty = new HistogramProperty( this, [] );
+    public readonly histogram: HistogramState = new HistogramState( this, [] );
 
     /**
      * Palette

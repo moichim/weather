@@ -1,8 +1,8 @@
-import { ThermalGroup } from "../../ThermalGroup";
-import { ThermalRegistry } from "../../ThermalRegistry";
-import { ThermalMinmaxOrUndefined } from "../../interfaces";
-import { AbstractMinmaxProperty } from "../abstractMinmaxProperty";
-import { IBaseProperty } from "../abstractProperty";
+import { ThermalGroup } from "../../../../ThermalGroup";
+import { ThermalRegistry } from "../../../../ThermalRegistry";
+import { ThermalMinmaxOrUndefined } from "../../../../interfaces";
+import { AbstractMinmaxProperty } from "../../../abstractMinmaxProperty";
+import { IBaseProperty } from "../../../abstractProperty";
 
 export interface IWithMinmaxRegistry extends IBaseProperty {
     minmax: MinmaxRegistryProperty

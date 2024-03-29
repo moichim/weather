@@ -6,25 +6,33 @@ import ThermalDomFactory from "./domFactories";
 export class VisibleLayer extends AbstractLayer {
 
     protected container: HTMLDivElement;
-    protected image: HTMLImageElement;
+    protected image?: HTMLImageElement;
 
     public get url() {
         return this._url;
     }
-    public set url( value: string ) {
+    public set url(value: string|undefined) {
         this._url = value;
-        this.image.src = value;
+        if ( this.image && value ) {
+            this.image.src = value;
+        }
+    }
+
+    public get exists() {
+        return this._url !== undefined;
     }
 
     public constructor(
         instance: ThermalFileInstance,
-        public _url: string
+        public _url?: string
     ) {
-        super( instance );
+        super(instance);
         this.container = ThermalDomFactory.createVisibleLayer();
-        this.image = ThermalDomFactory.createVisibleImage();
-        this.url = this._url;
-        this.container.appendChild( this.image );
+        if (this._url) {
+            this.image = ThermalDomFactory.createVisibleImage();
+            this.url = this._url;
+            this.container.appendChild(this.image);
+        }
     }
 
     public getLayerRoot(): HTMLElement {
@@ -32,7 +40,7 @@ export class VisibleLayer extends AbstractLayer {
     }
 
     protected onDestroy(): void {
-        this.image.remove();
+        if (this.image) this.image.remove();
         this.container.remove();
     }
 
