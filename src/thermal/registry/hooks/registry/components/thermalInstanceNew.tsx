@@ -144,7 +144,7 @@ export const ThermalInstanceNew: React.FC<ThermalInstanceProps> = ({
         <Modal
             isOpen={popupOpen}
             onOpenChange={setPopupOpen}
-            size="xl"
+            size="5xl"
             backdrop="blur"
         >
             <ModalContent>
@@ -154,6 +154,7 @@ export const ThermalInstanceNew: React.FC<ThermalInstanceProps> = ({
                             {instance.group.name ?? instance.group.id}: {TimeFormat.human(instance.timestamp)}
                         </ModalHeader>
                         <ModalBody>
+
                             <SingleController
 
                                 thermalUrl={instance.url}

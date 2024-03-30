@@ -83,6 +83,7 @@ export const SingleInstanceDetail: React.FC<SingleInstanceDetailProps> = ({
                 removeWrapper
                 hideHeader
                 fullWidth
+                isCompact
             >
                 <TableHeader>
                     <TableColumn>Vlastnost</TableColumn>
