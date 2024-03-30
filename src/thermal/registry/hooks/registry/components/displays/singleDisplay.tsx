@@ -3,7 +3,7 @@
 import { ThermalRegistry } from "@/thermal/registry/ThermalRegistry"
 import { ThermalInstanceDisplayParameters } from "../thermalInstanceNew"
 import { useThermalRegistryGroups } from "@/thermal/registry/properties/lists/groups/useThermalRegistryGroupsState"
-import { useMemo } from "react"
+import { useEffect, useMemo } from "react"
 import { useThermalRegistryLoadingState } from "@/thermal/registry/properties/states/loading/useThermalRegistryLoadingState"
 import { Spinner } from "@nextui-org/react"
 import { SingleInstanceDetail } from "./detail/singleInstanceDetail"
@@ -37,6 +37,11 @@ export const SingleDisplay: React.FC<SingleDisplayProps> = ({
     const groups = useThermalRegistryGroups(registry, ID);
 
     const loading = useThermalRegistryLoadingState(registry, ID);
+
+    useEffect( () => {
+        registry.histogram.setResolution( 200 );
+        // registry.histogram.recalculateWithCurrentSetting();
+    }, [registry] );
 
 
     if (loading.value === true) {

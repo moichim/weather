@@ -26,7 +26,7 @@ export const PaletteControl: React.FC<PaletteControlProps> = ({
         <DropdownTrigger
         >
             <Button >
-                <div className="flex gap-2 items-center w-60">
+                <div className="flex gap-2 items-center">
 
                     <div className={cn(
                         `thermal-scale-${palette.value}`,

@@ -44,7 +44,7 @@ export const SingleInstanceDetail: React.FC<SingleInstanceDetailProps> = ({
 
     return <>
 
-        <div>
+        <div className="pb-6">
             <div className="w-full">
                 <ThermalRangeSlider
                     registry={instance.group.registry}
@@ -75,7 +75,7 @@ export const SingleInstanceDetail: React.FC<SingleInstanceDetailProps> = ({
 
         />
 
-        <div className="">
+        <div className="pt-6">
 
             <Table
                 aria-label="Shrnutí vlastností termogramu"

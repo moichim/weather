@@ -6,6 +6,7 @@ import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, cn } 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { SingleController } from "./controllers/singleController";
 import { SingleInstanceDownloadButtons } from "./displays/detail/singleInstanceDownloadButtons";
+import { TimeFormat } from "@/state/time/reducerInternals/timeUtils/formatting";
 
 export type ThermalInstanceDisplayParameters = {
     hasPopup?: boolean,
@@ -150,7 +151,7 @@ export const ThermalInstanceNew: React.FC<ThermalInstanceProps> = ({
                 {(onClose) => (
                     <>
                         <ModalHeader>
-                            {instance.url}
+                            {instance.group.id}: {TimeFormat.human(instance.timestamp)}
                         </ModalHeader>
                         <ModalBody>
                             <SingleController
