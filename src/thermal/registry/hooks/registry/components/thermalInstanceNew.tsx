@@ -57,7 +57,7 @@ export const ThermalInstanceNew: React.FC<ThermalInstanceProps> = ({
 
         return () => instance.unmountFromDom();
 
-    }, []);
+    }, [instance]);
 
 
     // Propagate the current popup state
@@ -71,7 +71,7 @@ export const ThermalInstanceNew: React.FC<ThermalInstanceProps> = ({
             instance.setClickHandler();
         }
 
-    }, [hasPopup]);
+    }, [hasPopup,instance]);
 
 
     // Propagate date on highlight display
@@ -80,7 +80,7 @@ export const ThermalInstanceNew: React.FC<ThermalInstanceProps> = ({
         if (showDateOnHighlight !== instance.showDateOnHighlight)
             instance.setShowDateOnHighlight(showDateOnHighlight);
 
-    }, [showDateOnHighlight]);
+    }, [showDateOnHighlight,instance]);
 
     // Propagate the time highlight synchronisation
     useEffect(() => {
@@ -88,7 +88,7 @@ export const ThermalInstanceNew: React.FC<ThermalInstanceProps> = ({
         if (syncTimeHighlight !== instance.timeHighlightSync)
             instance.setTimeHiglightSync(syncTimeHighlight)
 
-    }, [syncTimeHighlight]);
+    }, [syncTimeHighlight,instance]);
 
     // Propagate the highlight color
     useEffect(() => {
@@ -96,7 +96,7 @@ export const ThermalInstanceNew: React.FC<ThermalInstanceProps> = ({
         if (highlightColor !== instance.highlightColor)
             instance.setHighlightColor(highlightColor);
 
-    }, [highlightColor]);
+    }, [highlightColor,instance]);
 
     // Propagate the highlight on hover
     useEffect(() => {
@@ -104,7 +104,7 @@ export const ThermalInstanceNew: React.FC<ThermalInstanceProps> = ({
         if (highlightOnHover !== instance.highlightOnHover)
             instance.setHighlightOnHover(highlightOnHover);
 
-    }, [highlightOnHover]);
+    }, [highlightOnHover,instance]);
 
     // Propagate the force highlight state
     useEffect(() => {
@@ -112,7 +112,7 @@ export const ThermalInstanceNew: React.FC<ThermalInstanceProps> = ({
         if (forceHighlight !== instance.forceHighlight)
             instance.setForceHighlight(forceHighlight);
 
-    }, [forceHighlight]);
+    }, [forceHighlight,instance]);
 
 
     // The popup open state
@@ -129,7 +129,9 @@ export const ThermalInstanceNew: React.FC<ThermalInstanceProps> = ({
             });
         }
 
-    }, [hasPopup, popupOpen, setPopupOpen]);
+        return() => instance.setClickHandler();
+
+    }, [hasPopup, popupOpen, setPopupOpen, instance]);
 
 
 
@@ -142,6 +144,7 @@ export const ThermalInstanceNew: React.FC<ThermalInstanceProps> = ({
             isOpen={popupOpen}
             onOpenChange={setPopupOpen}
             size="xl"
+            backdrop="blur"
         >
             <ModalContent>
                 {(onClose) => (
@@ -171,6 +174,7 @@ export const ThermalInstanceNew: React.FC<ThermalInstanceProps> = ({
                             />
                             <Button
                                 onClick={onClose}
+                                color="primary"
                             >Zavřít</Button>
                         </ModalFooter>
 

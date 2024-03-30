@@ -3,10 +3,14 @@
 import { TimeFormat } from "@/state/time/reducerInternals/timeUtils/formatting"
 import { ThermalFileInstance } from "@/thermal/file/ThermalFileInstance"
 import { useMemo } from "react"
-import { MinmaxTable } from "../../dataViews/minmaxTable"
+import { MinmaxTable, MinmaxTableRows } from "../../dataViews/minmaxTable"
 import { ThermalInstanceDisplayParameters, ThermalInstanceNew } from "../../thermalInstanceNew"
 import { SingleInstanceDownloadButtons } from "./singleInstanceDownloadButtons"
 import { useThermalRegistryMinmaxState } from "@/thermal/registry/properties/states/minmax/registry/useThermalRegistryMinmaxState";
+import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@nextui-org/react";
+import { ThermalRangeSlider } from "@/thermal/components/controls/ThermalRangeSlider";
+import { OpacityScale } from "@/thermal/components/registry/OpacityScale";
+import { PaletteControl } from "@/thermal/components/controls/paletteControl";
 
 type SingleInstanceDetailProps = ThermalInstanceDisplayParameters & {
     instance: ThermalFileInstance,
@@ -35,24 +39,28 @@ export const SingleInstanceDetail: React.FC<SingleInstanceDetailProps> = ({
         return `single_instance_detail___${instance.id}`;
     }, []);
 
-    const { value: minmax } = useThermalRegistryMinmaxState( instance.group.registry, ID );
+    const { value: minmax } = useThermalRegistryMinmaxState(instance.group.registry, ID);
+
+    const loading = instance.group.registry.loading.value;
 
     return <>
-        <div className="">
-            <MinmaxTable
-                minmax={minmax}
-                loading={ instance.group.registry.loading.value }
-                hideHeader={true}
-                removeWrapper={true}
-                fullWidth={true}
-            />
 
-            <div>
-                <div>Čas snímku: {TimeFormat.human(instance.timestamp)}</div>
-                <div>Rozlišení snímku: {instance.width} x {instance.height} px</div>
-                <div>Název souboru: {instance.url}</div>
+        <div>
+            <div className="w-full">
+                <ThermalRangeSlider
+                    registry={instance.group.registry}
+                />
+            </div>
+            <div className="w-full flex flex-wrap">
+                <div className="w-2/3">
+                    <OpacityScale registry={instance.group.registry} />
+                </div>
+                <div className="w-1/3">
+                    <PaletteControl registry={instance.group.registry} />
+                </div>
             </div>
         </div>
+
         <ThermalInstanceNew
 
             instance={instance}
@@ -67,6 +75,46 @@ export const SingleInstanceDetail: React.FC<SingleInstanceDetailProps> = ({
             forceHighlight={forceHighlight}
 
         />
+
+        <div className="">
+
+            <Table
+                aria-label="Shrnutí vlastností termogramu"
+                removeWrapper
+                hideHeader
+                fullWidth
+            >
+                <TableHeader>
+                    <TableColumn>Vlastnost</TableColumn>
+                    <TableColumn>Hodnota</TableColumn>
+                </TableHeader>
+
+                <TableBody
+                    isLoading={loading || minmax === undefined}
+                >
+
+                    <TableRow key="time">
+                        <TableCell>Čas snímku</TableCell>
+                        <TableCell>{TimeFormat.human(instance.timestamp)}</TableCell>
+                    </TableRow>
+
+                    <MinmaxTableRows minmax={minmax} decimals={4} loading={loading} />
+
+                    <TableRow key="resolution">
+                        <TableCell>Rozlišení</TableCell>
+                        <TableCell>{instance.width} x {instance.height} px</TableCell>
+                    </TableRow>
+
+                    <TableRow key="signature">
+                        <TableCell>Signatura</TableCell>
+                        <TableCell>{instance.signature}</TableCell>
+                    </TableRow>
+
+                </TableBody>
+
+            </Table>
+
+        </div>
 
         {hasDownloadButtons && <SingleInstanceDownloadButtons
             thermalUrl={instance.url}

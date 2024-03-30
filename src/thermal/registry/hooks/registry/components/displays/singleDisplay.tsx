@@ -46,20 +46,17 @@ export const SingleDisplay: React.FC<SingleDisplayProps> = ({
     }
 
     return <>
-
-        <div>Počet grup: {groups.value.length}</div>
-
         {groups.value
             .map(group => <div
                 className=""
                 key={group.id}
             >
-                <div>Počet instancí: {group.instances.value.length}</div>
                 {group.instances.value
                     .map(instance => <div className="" key={instance.id}>
                         <SingleInstanceDetail
 
                             instance={instance}
+                            hasDownloadButtons={hasDownloadButtons}
 
                             hasPopup={hasPopup}
                             showDateOnHighlight={showDateOnHighlight}
