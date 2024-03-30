@@ -15,8 +15,6 @@ export const useThermalRegistryLoadingState = (
 
         registry.loading.addListener(purpose, newValue => {
 
-            console.log("nová hodnota", newValue, "stará hodnota", value);
-
             setValue(newValue);
 
         });

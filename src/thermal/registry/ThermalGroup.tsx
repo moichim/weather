@@ -40,8 +40,6 @@ export class ThermalGroup implements IThermalGroup {
     /** Remove all instances, reset the minmax */
     public destroySelfAndBelow() {
 
-        console.log("Grupa", this.id, "se ničí!", this.hash);
-
         this.removeAllChildren();
 
         this.minmax.reset();

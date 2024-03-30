@@ -58,6 +58,7 @@ export class ThermalRegistryLoader {
     }
 
 
+    /** @todo If there is an error, it is here. In the instancing, it seems that deleted groups remain and instances are binded to old groups. */
     public async resolveQuery(): Promise<ThermalGroup[]> {
 
         if (this.loading === true) {
@@ -94,19 +95,14 @@ export class ThermalRegistryLoader {
 
         }
 
-        console.log( "Přišla odpověď a já jsem dostal toto:",mapByGroups );
 
         for (const groupId in mapByGroups) {
 
-            console.log( "Group", groupId );
-
             const groupInstance = this.registry.groups.map.get(groupId);
 
-            console.log(groupId, groupInstance, groupInstance?.hash);
 
             groupInstance?.instances.instantiateSources(mapByGroups[groupId]);
 
-            console.log( "výsledné instance", groupInstance?.instances.value );
 
         }
 

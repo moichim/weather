@@ -20,11 +20,7 @@ export class MinmaxGroupProperty extends AbstractMinmaxProperty<ThermalGroup> {
     /** Call this method once all instances are created */
     public recalculateFromInstances() {
 
-        console.log( "začínám rekalkulovat minmax", this.parent.id );
-
         this.value = this._getMinmaxFromInstances();
-
-        console.log( "Spočítal jsem minmax pro", this.parent.id, this.value );
 
         return this.value;
     }

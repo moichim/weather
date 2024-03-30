@@ -92,8 +92,6 @@ export const useProjectLoader = (
         fetchPolicy: "network-only",
         onCompleted: (result) => {
 
-            console.log( "edul.abir.cz/scopes/...", result );
-
             result.scopeFiles.forEach(folder => {
 
                 const files: ThermalFileRequest[] = folder.files.map(file => {

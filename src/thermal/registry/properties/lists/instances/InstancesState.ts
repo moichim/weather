@@ -55,8 +55,6 @@ export class InstancesState extends AbstractProperty<ThermalFileInstance[],Therm
         sources: ThermalFileSource[]
     ) {
 
-        console.log( "A jsme opět tady, přidávám tyto zdroje", sources );
-
         const newValue: ThermalFileInstance[] = [];
 
         sources.forEach( source => {

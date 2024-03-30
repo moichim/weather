@@ -45,12 +45,6 @@ export const ProjectController: React.FC<ProjectDisplayProps> = props => {
     /** @todo Implement API loading behaviour. */
     const { loading, projectDescription } = useProjectLoader(registryId, timeState.from, timeState.to);
 
-    useEffect(() => {
-
-        // console.log( registry, projectDescription, loading );
-
-    }, [registry, projectDescription, loading]);
-
 
     // Everytime the definition changes, reload the entire registry
     useEffect(() => {

@@ -2,7 +2,6 @@
 
 import { ThermalGroup } from "@/thermal/registry/ThermalGroup";
 import { ThermalRegistry } from "@/thermal/registry/ThermalRegistry";
-import { ThermalRangeOrUndefined } from "@/thermal/registry/interfaces";
 import { useEffect, useMemo, useState } from "react";
 
 export const useThermalRegistryGroups = (
@@ -17,9 +16,7 @@ export const useThermalRegistryGroups = (
 
         registry.groups.addListener(purpose, newValue => {
 
-                console.log( "Byly vyvořeny nové grupy", newValue.map( g => [g.id, g.hash] ) );
-
-                setValue(newValue);
+            setValue(newValue);
 
         });
 
@@ -31,7 +28,7 @@ export const useThermalRegistryGroups = (
     // The setting function
     const addOrGetGroup = useMemo(() => registry.groups.addOrGetGroup, [registry]);
     const removeAllGroups = useMemo(() => registry.groups.removeAllGroups, [registry]);
-    const removeGroup = useMemo( () => registry.groups.removeGroup, [registry] );
+    const removeGroup = useMemo(() => registry.groups.removeGroup, [registry]);
 
 
     // When this unmounts, remove the listeners

@@ -66,8 +66,6 @@ export class ThermalRegistry implements IThermalRegistry {
         description: ProjectDescription
     ): Promise<ThermalGroup[]> {
 
-        console.log("Začal jsem to načítat... poptávám toto:", description, this.id, this.hash);
-
         // Reset everything at first
         this.reset();
 
@@ -80,8 +78,6 @@ export class ThermalRegistry implements IThermalRegistry {
             this.loader.requestFiles(group, description[groupId].files);
 
         }
-
-        console.log("Poptal jsem tyto soubory: ", this.loader.requests);
 
         this.loading.markAsLoading();
 
@@ -114,15 +110,11 @@ export class ThermalRegistry implements IThermalRegistry {
 
         this.loading.markAsLoaded();
 
-        console.log("Teď je celé načtení hotovo. Budou vráceny vytvořené grupy.");
-
     }
 
 
 
     public async loadOneFile(file: ThermalFileRequest, groupId: string): Promise<ThermalGroup> {
-
-        console.log("Začal jsem to načítat... poptávám toto:", file, this.id, this.hash);
 
         this.reset();
 
@@ -130,20 +122,12 @@ export class ThermalRegistry implements IThermalRegistry {
 
         this.loader.requestFile(group, file.thermalUrl, file.visibleUrl);
 
-        // this.loader.requestFiles( group, [{thermalUrl, visibleUrl}] );
-
-        console.log("Poptal jsem tyto soubory: ", this.loader.requests);
-
         this.loading.markAsLoading();
 
         // Resolve the entire query
         await this.loader.resolveQuery();
 
         this.postLoadedProcessing();
-
-        console.log( this );
-
-        this.forEveryGroup( group => group.instances.forEveryInstance( console.log ) );
 
         return this.groups.map.get(groupId) as ThermalGroup
 
@@ -221,16 +205,6 @@ export class ThermalRegistry implements IThermalRegistry {
 
 
 
-
-
-
-
-
-
-
-    protected test() {
-        this.opacity.addListener("test", value => { console.log(value); });
-    }
 
 
 

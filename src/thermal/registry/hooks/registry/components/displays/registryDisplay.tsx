@@ -24,21 +24,6 @@ export const RegistryDisplay: React.FC<RegistryDisplayProps> = props => {
     const loading = useThermalRegistryLoadingState(props.registry, "display");
 
 
-    // Add the loaded listener
-    useEffect(() => {
-
-        props.registry.loading.addListener("range_display_loading", (value) => {
-
-            console.log("Změnil se stav načítání na", value, "načteno jest", props.registry.hash);
-
-
-        });
-
-        return () => props.registry.loading.removeListener( "range_display_loading" );
-
-    }, [props.registry]);
-
-
     if (loading.value === true) {
         return <>
             <Spinner /> Registr se načítá
