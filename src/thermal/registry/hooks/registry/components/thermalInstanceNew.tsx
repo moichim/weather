@@ -144,7 +144,7 @@ export const ThermalInstanceNew: React.FC<ThermalInstanceProps> = ({
         <Modal
             isOpen={popupOpen}
             onOpenChange={setPopupOpen}
-            size="5xl"
+            size="2xl"
             backdrop="blur"
         >
             <ModalContent>
