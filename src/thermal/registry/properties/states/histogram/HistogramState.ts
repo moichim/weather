@@ -24,10 +24,10 @@ export class HistogramState extends AbstractProperty<ThermalStatistics[], Therma
 
     /** If incorrect resolution is being set, set empty array */
     protected validate(value: ThermalStatistics[]): ThermalStatistics[] {
-        if (value.length !== this.resolution) {
+        if (value.length !== this.resolution && value.length !== 0) {
             console.warn( `Tried to set incorrect resolution. 
             Desired resolution: '${this.resolution}'. Incoming resolution ${value.length}. 
-            => No changes were made - using the old value instead the new.` );
+            => No changes were made - using the old value instead the new one.` );
             return this.value;
         }
         return value;

@@ -37,6 +37,7 @@ export class InstancesState extends AbstractProperty<ThermalFileInstance[],Therm
     public instantiateSource(
         source: ThermalFileSource
     ) {
+
         if (!this._map.has(source.url)) {
             const instance = source.createInstance(this.parent);
             this.value = [ ...this.value, instance ];
@@ -53,6 +54,8 @@ export class InstancesState extends AbstractProperty<ThermalFileInstance[],Therm
     public instantiateSources(
         sources: ThermalFileSource[]
     ) {
+
+        console.log( "A jsme opět tady, přidávám tyto zdroje", sources );
 
         const newValue: ThermalFileInstance[] = [];
 

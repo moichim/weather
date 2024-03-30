@@ -3,11 +3,13 @@
 import { Navbar } from "@/components/navigation/utils/Navbar";
 import { useTimeContext } from "@/state/time/timeContext";
 import { useProjectLoader } from "@/thermal/context/useProjectLoader";
-import { Spinner } from "@nextui-org/react";
 import { useEffect, useMemo } from "react";
 import { useThermalManagerContext } from "../../../thermalManagerContext";
 import { useThermalRegistryNew } from "../../useThermalRegistryNew";
 import { RegistryDisplay } from "../displays/registryDisplay";
+import { OpacityScale } from "@/thermal/components/registry/OpacityScale";
+import { PaletteControl } from "@/thermal/components/controls/paletteControl";
+import { ThermalRangeSlider } from "@/thermal/components/controls/ThermalRangeSlider";
 
 
 type ProjectDisplayProps = {
@@ -24,9 +26,9 @@ type ProjectDisplayProps = {
 export const ProjectController: React.FC<ProjectDisplayProps> = props => {
 
     // Store the ID once for all to prevent ID changes
-    const registryId = useMemo( () => {
+    const registryId = useMemo(() => {
         return props.scopeId;
-    }, [] );
+    }, []);
 
     // Observe the time state
     const { timeState } = useTimeContext();
@@ -36,28 +38,36 @@ export const ProjectController: React.FC<ProjectDisplayProps> = props => {
 
 
     // Hold the instance of the registry
-    const registry = useThermalRegistryNew( registryId );
+    const registry = useThermalRegistryNew(registryId);
 
 
     // Load and update the project files definitions
     /** @todo Implement API loading behaviour. */
-    const {loading, projectDescription } = useProjectLoader( registryId, timeState.from, timeState.to );
+    const { loading, projectDescription } = useProjectLoader(registryId, timeState.from, timeState.to);
+
+    useEffect(() => {
+
+        // console.log( registry, projectDescription, loading );
+
+    }, [registry, projectDescription, loading]);
 
 
     // Everytime the definition changes, reload the entire registry
-    useEffect( () => {
+    useEffect(() => {
 
-        registry.loadProject( projectDescription )
+        if (Object.keys(projectDescription).length > 0) {
+            registry.loadProject(projectDescription);
+        }
 
-    }, [projectDescription] );
+    }, [projectDescription, registry]);
 
 
     // Remove the registry on unmount
-    useEffect( () => {
+    useEffect(() => {
 
-        return () => manager.removeRegistry( registryId );
+        // return () => manager.removeRegistry(registryId);
 
-    }, [] );
+    }, []);
 
 
     return <>
@@ -65,9 +75,18 @@ export const ProjectController: React.FC<ProjectDisplayProps> = props => {
         <Navbar
             className="bg-slate-200"
             height="6rem"
+            innerContent={<>
+                <div className="flex-grow w-3/4">
+                    <ThermalRangeSlider 
+                        registry={registry} 
+                    />
+                </div>
+                <OpacityScale registry={registry} />
+                <PaletteControl registry={registry} />
+            </>}
         />
 
-        <RegistryDisplay registry={registry}/>
+        <RegistryDisplay registry={registry} />
 
     </>
 

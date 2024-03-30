@@ -16,15 +16,13 @@ export const useThermalRegistryMinmaxState = (
 
         registry.minmax.addListener(purpose, newValue => {
 
-            if (newValue !== value) {
-                setValue(newValue);
-            }
+            setValue(newValue);
 
         });
 
         return () => registry.minmax.removeListener(purpose);
 
-    }, [registry]);
+    }, [registry,setValue]);
 
     // When this unmounts, remove the listeners
     useEffect(() => {

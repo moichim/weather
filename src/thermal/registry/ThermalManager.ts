@@ -1,6 +1,5 @@
 import { ThermalFileSource } from "../file/ThermalFileSource";
 import { ThermalRegistry } from "./ThermalRegistry";
-import { ThermalEventsFactory } from "./events";
 
 export class ThermalManager extends EventTarget {
 
@@ -13,11 +12,12 @@ export class ThermalManager extends EventTarget {
     public addOrGetRegistry(
         id: string
     ) {
-        if ( this._registries[id] !== undefined ) {
+        if ( this._registries[id] === undefined ) {
             this._registries[id] = new ThermalRegistry(id, this);
         }
 
         return this._registries[id];
+        
     }
 
     public removeRegistry(
@@ -53,9 +53,6 @@ export class ThermalManager extends EventTarget {
 
             // Assign the source
             this.sourcesByUrl[source.url] = source;
-
-            // Emit the loaded event
-            this.dispatchEvent(ThermalEventsFactory.sourceRegistered(source));
 
             return source;
 

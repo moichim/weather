@@ -4,7 +4,7 @@ import { ThermalRegistry } from "@/thermal/registry/ThermalRegistry";
 import { ThermalRangeOrUndefined } from "@/thermal/registry/interfaces";
 import { useEffect, useMemo, useState } from "react";
 
-export const useThermalRegistryRange = (
+export const useThermalRegistryRangeDrive = (
     registry: ThermalRegistry,
     purpose: string
 ) => {
@@ -24,11 +24,11 @@ export const useThermalRegistryRange = (
 
         return () => registry.range.removeListener(purpose);
 
-    }, [registry]);
+    }, [registry,value,setValue]);
 
 
     // The setting function
-    const set = useMemo(() => registry.range.imposeRange, [registry]);
+    const set = useMemo(() => registry.range.imposeRange.bind( registry.range ), [registry]);
 
 
     // When this unmounts, remove the listeners

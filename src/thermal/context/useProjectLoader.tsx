@@ -1,6 +1,6 @@
 "use client";
 
-import { useLazyQuery, useQuery } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client";
 import gql from "graphql-tag";
 import { useCallback, useEffect, useState } from "react";
 import { ThermoFileDefinition, ThermoFileScope } from "../graphql/files";
@@ -92,7 +92,7 @@ export const useProjectLoader = (
         fetchPolicy: "network-only",
         onCompleted: (result) => {
 
-            console.log( result );
+            console.log( "edul.abir.cz/scopes/...", result );
 
             result.scopeFiles.forEach(folder => {
 
@@ -107,7 +107,8 @@ export const useProjectLoader = (
 
             });
 
-        }
+        },
+
     });
 
     useEffect(() => {
@@ -125,8 +126,6 @@ export const useProjectLoader = (
         }
             
     }, [from, to]);
-
-    console.log( "skupiny", projectDescription );
 
 
 

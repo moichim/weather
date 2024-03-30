@@ -1,10 +1,12 @@
-import { ThermalFileInstance } from "@/thermal/file/ThermalFileInstance"
-import { ThermalInstanceDisplayParameters, ThermalInstanceNew } from "../../thermalInstanceNew"
-import { useThermalRegistryMinmaxState } from "@/thermal/registry/properties/states/minmax/registry/useThermalRegistryMinmaxState"
-import { useMemo } from "react"
-import { RegistryMinmaxTable } from "../../dataViews/registryMinmaxTable"
+"use client";
+
 import { TimeFormat } from "@/state/time/reducerInternals/timeUtils/formatting"
+import { ThermalFileInstance } from "@/thermal/file/ThermalFileInstance"
+import { useMemo } from "react"
+import { MinmaxTable } from "../../dataViews/minmaxTable"
+import { ThermalInstanceDisplayParameters, ThermalInstanceNew } from "../../thermalInstanceNew"
 import { SingleInstanceDownloadButtons } from "./singleInstanceDownloadButtons"
+import { useThermalRegistryMinmaxState } from "@/thermal/registry/properties/states/minmax/registry/useThermalRegistryMinmaxState";
 
 type SingleInstanceDetailProps = ThermalInstanceDisplayParameters & {
     instance: ThermalFileInstance,
@@ -28,22 +30,25 @@ export const SingleInstanceDetail: React.FC<SingleInstanceDetailProps> = ({
     ...props
 }) => {
 
-    const ID = useMemo( () => {
-        if ( purpose ) return purpose;
+    const ID = useMemo(() => {
+        if (purpose) return purpose;
         return `single_instance_detail___${instance.id}`;
-    }, [] );
+    }, []);
+
+    const { value: minmax } = useThermalRegistryMinmaxState( instance.group.registry, ID );
 
     return <>
         <div className="">
-            <RegistryMinmaxTable 
-                registry={ instance.group.registry }
+            <MinmaxTable
+                minmax={minmax}
+                loading={ instance.group.registry.loading.value }
                 hideHeader={true}
                 removeWrapper={true}
                 fullWidth={true}
             />
 
             <div>
-                <div>Čas snímku: {TimeFormat.human( instance.timestamp )}</div>
+                <div>Čas snímku: {TimeFormat.human(instance.timestamp)}</div>
                 <div>Rozlišení snímku: {instance.width} x {instance.height} px</div>
                 <div>Název souboru: {instance.url}</div>
             </div>
@@ -63,8 +68,8 @@ export const SingleInstanceDetail: React.FC<SingleInstanceDetailProps> = ({
 
         />
 
-        {hasDownloadButtons && <SingleInstanceDownloadButtons 
-            thermalUrl={instance.url} 
+        {hasDownloadButtons && <SingleInstanceDownloadButtons
+            thermalUrl={instance.url}
             visibleUrl={instance.visibleUrl}
         />}
     </>

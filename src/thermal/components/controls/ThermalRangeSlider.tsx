@@ -1,39 +1,198 @@
 "use client";
 
 import { InfoIcon, SettingIcon } from "@/components/ui/icons";
-import { useRegistryContext } from "@/thermal/context/RegistryContext";
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Slider, SliderProps, Spinner, Tooltip, cn } from "@nextui-org/react";
-import { DOMAttributes, useCallback } from "react";
+import { ThermalRegistry } from "@/thermal/registry/ThermalRegistry";
+import { useThermalRegistryPaletteDrive } from "@/thermal/registry/properties/drives/palette/useThermalRegistryPaletteDrive";
+import { useThermalRegistryRangeDrive } from "@/thermal/registry/properties/drives/range/useThermalRegistryRangeDrive";
+import { useThermalRegistryHistogramState } from "@/thermal/registry/properties/states/histogram/useThermalRegistryHistogramState";
+import { useThermalRegistryLoadingState } from "@/thermal/registry/properties/states/loading/useThermalRegistryLoadingState";
+import { useThermalRegistryMinmaxState } from "@/thermal/registry/properties/states/minmax/registry/useThermalRegistryMinmaxState";
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Slider, SliderProps, SliderValue, Spinner, Tooltip } from "@nextui-org/react";
+import { DOMAttributes, useCallback, useEffect, useMemo, useState } from "react";
 
 type ThermalRangeProps = SliderProps & {
-    loaded: boolean
+    registry: ThermalRegistry,
+    rangeOffset?: number
 }
 
-export const ThermalRangeSlider: React.FC<ThermalRangeProps> = props => {
+export const ThermalRangeSlider: React.FC<ThermalRangeProps> = ({
+    registry,
+    rangeOffset = 0,
+    ...props
+}) => {
 
-    const {registry, minmax, imposeGlobalRange, histogram} = useRegistryContext();
+    const purpose = useMemo(() => {
+        return `thermal_scale__${registry.id}__${Math.random()}`;
+    }, []);
 
+
+
+
+    // Global properties
+
+    // Minmax
+    const { value: minmax } = useThermalRegistryMinmaxState(registry, purpose);
+
+    // Range
+    const { value: range, set: setRange } = useThermalRegistryRangeDrive(registry, purpose);
+
+    // Histogram
+    const { value: histogram } = useThermalRegistryHistogramState(registry, purpose);
+
+    // Palette
+    const { availablePalettes, value: currentPaletteSlug, palette: currentPalette } = useThermalRegistryPaletteDrive(registry, purpose);
+
+    // Loading
+    const { value: loading } = useThermalRegistryLoadingState(registry, purpose);
+
+
+
+
+
+
+    // Initial value calculation
+    const initialValue = useMemo(() => {
+
+        if (range !== undefined) {
+
+            const normalisedValue = [
+                Math.min(range.from, range.to),
+                Math.max(range.from, range.to)
+            ] as [number, number];
+
+
+            return normalisedValue;
+
+        }
+
+        return [
+            -Infinity,
+            Infinity
+        ] as [number, number]
+
+    }, [range]);
+
+
+    // Local state controlling the UI
+    const [value, setValue] = useState<[number, number]>(initialValue);
+
+    // Local state storing the final value
+    const [final, setFinal] = useState<[number, number]>(value);
+
+
+
+    const onUserSlide = (data: SliderValue) => {
+        if (Array.isArray(data))
+            setValue(data as [number, number]);
+    }
+
+    const onUserSlideEnd = (data: SliderValue) => {
+        if (Array.isArray(data))
+            setFinal(data as [number, number]);
+    }
+
+
+
+    // Impose the local change to global context
+    useEffect(() => {
+
+        if (range !== undefined) {
+            if (range.from !== final[0] || range.to !== final[1]) {
+                setRange({ from: final[0], to: final[1] });
+            }
+            if (final[0] !== value[0] || final[1] !== value[1]) {
+                setValue(final);
+            }
+        }
+
+
+    }, [final]);
+
+
+    // Reflect global changes to the local state
+    useEffect(() => {
+
+        if (range !== undefined) {
+
+            if (
+                range.from !== final[0]
+                || range.to !== final[1]
+            ) {
+                setFinal([range.from, range.to]);
+                setValue([range.from, range.to]);
+            }
+
+        }
+
+    }, [range]);
+
+
+
+
+    // The render thumb fn
+    /** @todo change colors of the points by the current palette */
     const renderThumb = useCallback((
         props: DOMAttributes<HTMLDivElement> & { index?: number }
     ) => {
 
         const bg = props.index === 0
-            ? "bg-black"
-            : "bg-white";
+            ? currentPalette.pixels[0]//"bg-black"
+            : currentPalette.pixels[255]//"bg-white";
         return (<div
             {...props}
             className={"group p-1 top-1/2 bg-gray-700 border-tiny border-default-200 rounded-full cursor-grab data-[dragging=true]:cursor-grabbing"}
             aria-label="some label"
         >
-            <span className={cn("transition-transform rounded-full w-6 h-6 block group-data-[dragging=true]:scale-80", bg)} />
+            <span className={"transition-transform rounded-full w-6 h-6 block group-data-[dragging=true]:scale-80"}
+                style={{ backgroundColor: bg }}
+            />
         </div>)
-    }, []);
+    }, [currentPalette]);
+
+
+
+
+    const step = useMemo(() => {
+
+        if (minmax === undefined)
+            return -Infinity;
+
+        return Math.round(minmax.max - minmax.min) / 50;
+
+    }, [minmax]);
+
+
+    const fillerClass = useMemo(() => {
+
+        if (loading === false) {
+            return `thermal-scale-${currentPaletteSlug} cursor-pointer`;
+        }
+
+        return "cursor-disabled";
+
+    }, [loading, currentPaletteSlug]);
+
+
+
+
+    /** Conditional rendering */
+
+    // If loading
+    if (minmax === undefined) {
+        return <div className="flex-grow flex gap-4 items-center text-primary h-full">
+            <Spinner size="sm" />
+            <span>Zpracovávám teplotní škálu</span>
+        </div>
+    }
+
+
+
 
     return <div className="flex-grow">
 
         <style>
 
-            {Object.entries(registry.availablePalettes).map(([key, palette]) => {
+            {Object.entries(availablePalettes).map(([key, palette]) => {
 
                 return `.thermal-scale-${key} {background-image: ${palette.gradient}}`
 
@@ -49,11 +208,11 @@ export const ThermalRangeSlider: React.FC<ThermalRangeProps> = props => {
                     <div className="border-1 border-solid border-gray-300 relative w-full h-full">
 
 
-                        {(histogram === undefined ) && <div className="flex gap-4 items-center text-primary justify-center h-full">
+                        {(histogram === undefined) && <div className="flex gap-4 items-center text-primary justify-center h-full">
                             <Spinner size="sm" />
                             <span>Zpracovávám histogram</span>
                         </div>}
-                        {(histogram ) && histogram.map((item, index) => {
+                        {(histogram) && histogram.map((item, index) => {
 
                             return <Tooltip
                                 content={`${item.percentage.toFixed(4)}% teplot je v rozmezí ${item.from.toFixed(2)} °C až ${item.to.toFixed(2)} °C`}
@@ -82,6 +241,34 @@ export const ThermalRangeSlider: React.FC<ThermalRangeProps> = props => {
 
                 <Slider
                     {...props}
+
+                    isDisabled={loading}
+
+                    step={step}
+                    showSteps={step !== -Infinity}
+
+                    onChange={onUserSlide}
+                    onChangeEnd={onUserSlideEnd}
+
+
+                    // Values
+                    minValue={Math.floor(minmax.min - rangeOffset)}
+                    maxValue={Math.ceil(minmax.max + rangeOffset)}
+
+                    value={value}
+
+
+                    // Appearance
+                    color="foreground"
+                    classNames={{
+                        base: "px-1 min-w-screen",
+                        mark: "bg-black",
+                        track: "bg-gray-400 h-6 cursor-pointer",
+                        filler: fillerClass,
+                        label: "text-xl"
+                    }}
+
+
                     // aria-label={props.label ?? "teplotní škála"}
                     renderThumb={renderThumb}
                     renderLabel={({ children, ...properties }) => (
@@ -119,7 +306,7 @@ export const ThermalRangeSlider: React.FC<ThermalRangeProps> = props => {
 
                         if (key === "all") {
                             if (minmax)
-                            imposeGlobalRange({ from: minmax.min, to: minmax.max });
+                                setRange({ from: minmax.min, to: minmax.max });
                         } else if (key === "auto") {
 
                             if (histogram && minmax)
@@ -142,7 +329,7 @@ export const ThermalRangeSlider: React.FC<ThermalRangeProps> = props => {
                                         return state;
                                     }, { min: minmax.max, max: minmax.min });
 
-                                    imposeGlobalRange({ from: min, to: max });
+                                    setRange({ from: min, to: max });
 
                                 }
 

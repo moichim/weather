@@ -30,11 +30,11 @@ export const useThermalOpacityHighlightDrive = (
 
         return () => group.cursorPosition.removeListener(purpose);
 
-    }, [group]);
+    }, [group,value, setValue]);
 
 
     // The highlighting function
-    const setCursorPosition = useMemo(() => group.cursorPosition.recieveCursorPosition, [group]);
+    const setCursorPosition = useMemo(() => group.cursorPosition.recieveCursorPosition.bind( group.cursorPosition ), [group]);
 
 
     // When this unmounts, remove the listeners

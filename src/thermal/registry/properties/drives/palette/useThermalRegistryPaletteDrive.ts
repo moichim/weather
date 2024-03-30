@@ -1,6 +1,6 @@
 "use client";
 
-import { ThermalPalette } from "@/thermal/file/palettes";
+import { ThermalPalette, ThermalPalettes } from "@/thermal/file/palettes";
 import { ThermalRegistry } from "@/thermal/registry/ThermalRegistry";
 import { useEffect, useMemo, useState } from "react";
 import { PaletteId } from "./PaletteDrive";
@@ -20,20 +20,18 @@ export const useThermalRegistryPaletteDrive = (
 
         registry.palette.addListener(purpose, newValue => {
 
-            if (newValue !== value) {
-                setValue(newValue);
-                setPalette(registry.palette.currentPalette);
-            }
+            setValue(newValue);
+            setPalette(registry.palette.currentPalette);
 
         });
 
         return () => registry.palette.removeListener(purpose);
 
-    }, [registry]);
+    }, [registry,value, setValue,palette,setPalette]);
 
 
     // The setter
-    const set = useMemo(() => registry.palette.setPalette, [registry]);
+    const set = useMemo(() => registry.palette.setPalette.bind(registry.palette), [registry]);
 
 
     // When this unmounts, remove the listeners
@@ -42,10 +40,16 @@ export const useThermalRegistryPaletteDrive = (
     }, []);
 
 
+    const availablePalettes = useMemo(() => {
+        return ThermalPalettes
+    }, []);
+
+
     return {
         value,
         palette,
-        set
+        set,
+        availablePalettes
     }
 
 }

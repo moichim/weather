@@ -16,15 +16,13 @@ export const useThermalGroupMinmaxProperty = (
 
         group.minmax.addListener(purpose, newValue => {
 
-            if (newValue !== value) {
-                setValue(newValue);
-            }
+            setValue(newValue);
 
         });
 
         return () => group.minmax.removeListener(purpose);
 
-    }, [group]);
+    }, [group,setValue]);
 
     // When this unmounts, remove the listeners
     useEffect(() => {

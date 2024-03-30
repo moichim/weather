@@ -17,7 +17,7 @@ export class HighlightDrive extends AbstractProperty<number|undefined, ThermalRe
             this.parent.forEveryInstance( instance => instance.recieveTimeHighlight( false ) );
         } 
         // If the value is different than in the previous step, do the changes
-        else if ( value !== this.value ) {
+        else {
 
             const min = this._getHourDown( value );
             const max = this._getHourUp( value );

@@ -1,8 +1,8 @@
 "use client"
 
-import { Button, Card, CardBody, Code, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Snippet, Tab, Tabs } from "@nextui-org/react";
+import { Button, Code, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tab, Tabs } from "@nextui-org/react";
 import Link from "next/link";
-import { useState } from "react"
+import { useState } from "react";
 
 export const ThermalAbout: React.FC = () => {
 

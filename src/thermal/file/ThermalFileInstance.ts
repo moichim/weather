@@ -53,10 +53,10 @@ export class ThermalFileInstance extends EventTarget implements IThermalInstance
 
 
     public destroySelfAndBelow() {
-        this.unmountBaseLayers();
+        this.detachFromDom();
     };
     public removeAllChildren() {
-        this.unmountBaseLayers();
+        this.detachFromDom();
     };
     public reset() { };
 
@@ -99,8 +99,8 @@ export class ThermalFileInstance extends EventTarget implements IThermalInstance
 
         if (this.root !== null || this.mountedBaseLayers === true) {
             console.warn(`The instance ${this.id} has already mounted base layers therefore the inner DOM tree is deleted and built from the scratch.`);
-            this.unmountBaseLayers();
-            this.setInteractionsOff();
+            this.detachFromDom();
+            this.unmountListener();
         }
 
         this.root = container;
@@ -128,13 +128,16 @@ export class ThermalFileInstance extends EventTarget implements IThermalInstance
         this.root.dataset.thermalFile = this.id;
         this.root.dataset.mounted = "true";
 
+        // Mount the interactions
+        this.mountListener();
+
         // Global state
         this.mountedBaseLayers = true;
 
 
     }
 
-    protected unmountBaseLayers() {
+    protected detachFromDom() {
 
         if (this.root === undefined) {
             console.warn(`The instance ${this.id} does not have a root, therefore the base layers can not be unmounted.`);
@@ -150,6 +153,8 @@ export class ThermalFileInstance extends EventTarget implements IThermalInstance
         this.cursorLayer.unmount();
         this.dateLayer.unmount();
 
+        this.unmountListener();
+
         this.mountedBaseLayers = false;
 
     }
@@ -161,7 +166,7 @@ export class ThermalFileInstance extends EventTarget implements IThermalInstance
      * @todo refactor this with variants!
      */
 
-    public setInteractionsOn() {
+    protected mountListener() {
 
         if (this.root === undefined) {
             console.warn(`The instance ${this.id} does not have a root, therefore the listener can not be mounted.`);
@@ -228,7 +233,7 @@ export class ThermalFileInstance extends EventTarget implements IThermalInstance
 
     }
 
-    public setInteractionsOff() {
+    protected unmountListener() {
 
         this.listenerLayer.unmount();
 
@@ -237,12 +242,10 @@ export class ThermalFileInstance extends EventTarget implements IThermalInstance
 
     public mountToDom( container: HTMLDivElement ) {
         this.attachToDom(container);
-        this.setInteractionsOn();
     }
 
     public unmountFromDom() {
-        this.unmountBaseLayers();
-        this.setInteractionsOff();
+        this.detachFromDom();
     }
 
 
@@ -282,6 +285,7 @@ export class ThermalFileInstance extends EventTarget implements IThermalInstance
      */
 
     public draw() {
+        if (this.mountedBaseLayers === true) 
         this.canvasLayer.draw();
     }
 
@@ -315,6 +319,14 @@ export class ThermalFileInstance extends EventTarget implements IThermalInstance
     ) {
 
         this.cursorValue.recalculateFromCursor(position);
+
+        if ( position !== undefined && this.cursorValue.value !== undefined ) {
+            this.cursorLayer.setCursor( position.x, position.y, this.cursorValue.value );
+            this.cursorLayer.show = true;
+        } else {
+            this.cursorLayer.show = false;
+            this.cursorLayer.resetCursor();
+        }
 
     }
 
@@ -362,7 +374,7 @@ export class ThermalFileInstance extends EventTarget implements IThermalInstance
 
                 this.root.style.borderColor = this.highlightColor;
 
-                if ( this.showDateOnHighlight === true ) {
+                if ( this.showDateOnHighlight === true || this.timeHighlightSync === true ) {
                     this.dateLayer.show();
                 }
 
@@ -407,9 +419,10 @@ export class ThermalFileInstance extends EventTarget implements IThermalInstance
 
         } 
         // If should show, do it only when listening to highlight sync
-        else if ( this._timeHighlightSync === true ) {
+        else if ( this._timeHighlightSync === true ) 
+        {
 
-            this.doHighlight( false );
+            this.doHighlight( true );
 
         }
 

@@ -1,6 +1,6 @@
 import { Navbar } from '@/components/navigation/utils/Navbar'
 import { NotificationListing } from '@/components/notifications/notificationListing'
-import { RegistryContextProvider } from '@/thermal/context/RegistryContext'
+import { ThermalManagerContextProvider } from '@/thermal/registry/hooks/thermalManagerContext'
 import { getMetadataTitle } from '@/utils/metadata'
 import { Link, cn } from '@nextui-org/react'
 import type { Metadata } from 'next'
@@ -28,7 +28,9 @@ export default function RootLayout({
           "h-[100vh]"
         ])}>
           <Providers>
-            
+
+            <ThermalManagerContextProvider>
+
               <Navbar
                 brandContent={<Link href="/" color="foreground" className="font-bold hover:text-primary">LabIR Edu Mikroklima</Link>}
                 endContent={<>
@@ -58,6 +60,9 @@ export default function RootLayout({
               />
               {children}
               <NotificationListing />
+
+            </ThermalManagerContextProvider>
+
           </Providers>
         </div>
       </body>

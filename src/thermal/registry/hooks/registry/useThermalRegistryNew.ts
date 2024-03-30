@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useMemo } from "react";
 import { useThermalManagerContext } from "../thermalManagerContext"
 
@@ -14,7 +16,7 @@ export const useThermalRegistryNew = (
 
     const registry = useMemo( () => {
         return manager.addOrGetRegistry( registryId );
-    }, [registryId] );
+    }, [registryId, manager] );
 
     return registry;
 

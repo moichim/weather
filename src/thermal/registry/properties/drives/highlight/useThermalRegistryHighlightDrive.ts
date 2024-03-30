@@ -23,15 +23,15 @@ export const useThermalOpacityHighlightDrive = (
 
         return () => registry.highlight.removeListener(purpose);
 
-    }, [registry]);
+    }, [registry,value,setValue]);
 
 
     // The highlighting function
-    const setTime = useMemo(() => registry.highlight.higlightTime, [registry]);
+    const setTime = useMemo(() => registry.highlight.higlightTime.bind( registry.highlight ), [registry]);
 
 
     // The clearing function
-    const clear = useMemo(() => registry.highlight.clearHighlight, []);
+    const clear = useMemo(() => registry.highlight.clearHighlight.bind( registry.highlight ), []);
 
 
     // When this unmounts, remove the listeners

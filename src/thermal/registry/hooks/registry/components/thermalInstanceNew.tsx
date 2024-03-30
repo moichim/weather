@@ -47,25 +47,17 @@ export const ThermalInstanceNew: React.FC<ThermalInstanceProps> = ({
     const ref = useRef<HTMLDivElement>(null);
 
 
-    const loading = useThermalRegistryLoadingState(instance.group.registry, `loading_${ID}`);
-
-
     // Mounting and unmounting
     useEffect(() => {
 
-        // Whenever loading starts, inmount the instance from the DOM
-        if (loading.value === false) {
-
-            instance.unmountFromDom();
-
-        }
-        // Whenever the loading finsihes, attach the instance to the DOM
-        else if (loading.value === true) {
-            if (ref.current)
-                instance.mountToDom(ref.current);
+        if (ref.current) {
+            instance.mountToDom(ref.current);
+            instance.draw();
         }
 
-    }, [loading]);
+        return () => instance.unmountFromDom();
+
+    }, []);
 
 
     // Propagate the current popup state
@@ -149,6 +141,7 @@ export const ThermalInstanceNew: React.FC<ThermalInstanceProps> = ({
         <Modal
             isOpen={popupOpen}
             onOpenChange={setPopupOpen}
+            size="xl"
         >
             <ModalContent>
                 {(onClose) => (
@@ -172,12 +165,12 @@ export const ThermalInstanceNew: React.FC<ThermalInstanceProps> = ({
                             />
                         </ModalBody>
                         <ModalFooter>
-                            <SingleInstanceDownloadButtons 
+                            <SingleInstanceDownloadButtons
                                 thermalUrl={instance.url}
                                 visibleUrl={instance.visibleUrl}
                             />
                             <Button
-                                onClick={ onClose }
+                                onClick={onClose}
                             >Zavřít</Button>
                         </ModalFooter>
 

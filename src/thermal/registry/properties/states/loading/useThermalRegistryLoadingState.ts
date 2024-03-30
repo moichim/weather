@@ -15,15 +15,15 @@ export const useThermalRegistryLoadingState = (
 
         registry.loading.addListener(purpose, newValue => {
 
-            if (newValue !== value) {
-                setValue(newValue);
-            }
+            console.log("nová hodnota", newValue, "stará hodnota", value);
+
+            setValue(newValue);
 
         });
 
         return () => registry.loading.removeListener(purpose);
 
-    }, [registry]);
+    }, [registry,value,setValue]);
 
 
 

@@ -17,9 +17,9 @@ export const useThermalRegistryGroups = (
 
         registry.groups.addListener(purpose, newValue => {
 
-            if (newValue !== value) {
+                console.log( "Byly vyvořeny nové grupy", newValue.map( g => [g.id, g.hash] ) );
+
                 setValue(newValue);
-            }
 
         });
 

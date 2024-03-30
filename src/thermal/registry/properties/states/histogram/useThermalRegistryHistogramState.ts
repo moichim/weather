@@ -23,13 +23,13 @@ export const useThermalRegistryHistogramState = (
 
         return () => registry.histogram.removeListener(purpose);
 
-    }, [registry]);
+    }, [registry,value,setValue]);
 
     // Expose the resolution setting
-    const setResolution = useMemo( () => registry.histogram.setResolution, [registry] );
+    const setResolution = useMemo( () => registry.histogram.setResolution.bind( registry.histogram ), [registry] );
 
     // Expose the recalculation fn
-    const recalculate = useMemo( () => registry.histogram.recalculateWithCurrentSetting, [registry] );
+    const recalculate = useMemo( () => registry.histogram.recalculateWithCurrentSetting.bind( registry.histogram ), [registry] );
 
 
 

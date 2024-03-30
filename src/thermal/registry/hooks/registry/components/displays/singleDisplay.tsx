@@ -1,3 +1,5 @@
+"use client";
+
 import { ThermalRegistry } from "@/thermal/registry/ThermalRegistry"
 import { ThermalInstanceDisplayParameters } from "../thermalInstanceNew"
 import { useThermalRegistryGroups } from "@/thermal/registry/properties/lists/groups/useThermalRegistryGroupsState"
@@ -5,6 +7,7 @@ import { useMemo } from "react"
 import { useThermalRegistryLoadingState } from "@/thermal/registry/properties/states/loading/useThermalRegistryLoadingState"
 import { Spinner } from "@nextui-org/react"
 import { SingleInstanceDetail } from "./detail/singleInstanceDetail"
+import { useThermalGroupInstancesState } from "@/thermal/registry/properties/lists/instances/useThermalGroupInstancesState";
 
 type SingleDisplayProps = ThermalInstanceDisplayParameters & {
     registry: ThermalRegistry,
@@ -27,43 +30,53 @@ export const SingleDisplay: React.FC<SingleDisplayProps> = ({
 }) => {
 
     // Hold the display id once for all
-    const ID = useMemo( () => {
+    const ID = useMemo(() => {
         return registry.id
-    }, [] );
+    }, []);
 
-    const groups = useThermalRegistryGroups( registry, ID );
+    const groups = useThermalRegistryGroups(registry, ID);
 
-    const loading = useThermalRegistryLoadingState( registry, ID );
+    const loading = useThermalRegistryLoadingState(registry, ID);
 
-    if ( loading.value === true ) {
+
+    if (loading.value === true) {
         return <>
-            <Spinner/> Načítám registr
+            <Spinner /> Načítám registr
         </>
     }
 
-    return <>{
+    return <>
 
-        groups.value.map( group => {
+        <div>Počet grup: {groups.value.length}</div>
 
-            group.instances.value.map( instance => {
+        {groups.value
+            .map(group => <div
+                className=""
+                key={group.id}
+            >
+                <div>Počet instancí: {group.instances.value.length}</div>
+                {group.instances.value
+                    .map(instance => <div className="" key={instance.id}>
+                        <SingleInstanceDetail
 
-                <SingleInstanceDetail 
-                    key={instance.id} 
-                    
-                    instance={instance} 
-                    
-                    hasPopup={hasPopup}
-                    showDateOnHighlight={showDateOnHighlight}
-                    highlightColor={highlightColor}
-                    highlightOnHover={highlightOnHover}
-                    forceHighlight={forceHighlight}
+                            instance={instance}
 
-                />
+                            hasPopup={hasPopup}
+                            showDateOnHighlight={showDateOnHighlight}
+                            highlightColor={highlightColor}
+                            highlightOnHover={highlightOnHover}
+                            forceHighlight={forceHighlight}
 
-            } );
+                        />
+                    </div>
 
-        } )
+                    )}
 
-    }</>
+            </div>
+
+            )
+
+        }
+    </>
 
 }

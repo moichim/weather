@@ -23,11 +23,11 @@ export const useThermalRegistryOpacityDrive = (
 
         return () => registry.opacity.removeListener(purpose);
 
-    }, [registry]);
+    }, [registry,value,setValue]);
 
 
     // The setting function
-    const set = useMemo(() => registry.opacity.imposeOpacity, [registry]);
+    const set = useMemo(() => registry.opacity.imposeOpacity.bind( registry.opacity ), [registry]);
 
 
 

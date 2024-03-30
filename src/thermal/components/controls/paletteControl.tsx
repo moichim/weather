@@ -1,20 +1,38 @@
-import { useRegistryContext } from "@/thermal/context/RegistryContext";
+"use client";
+
+import { ThermalRegistry } from "@/thermal/registry/ThermalRegistry";
+import { useThermalRegistryPaletteDrive } from "@/thermal/registry/properties/drives/palette/useThermalRegistryPaletteDrive";
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, cn } from "@nextui-org/react";
+import { useMemo } from "react";
 
-export const PaletteControl: React.FC = () => {
+type PaletteControlProps = {
+    registry: ThermalRegistry
+}
 
-    const {thermalPaletteSlug, thermalPalette, setThermalPalette, availableThermalPalettes} = useRegistryContext();
+export const PaletteControl: React.FC<PaletteControlProps> = ({
+    registry,
+    ...props
+}) => {
 
-    return <Dropdown>
-        <DropdownTrigger>
+    const purpose = useMemo( () => {
+        return `${registry.id}_opacity_${ ( Math.random() * 1000 ).toFixed(0) }`;
+    }, [] );
+
+    const palette = useThermalRegistryPaletteDrive( registry, purpose );
+
+    return <Dropdown
+        aria-label="Volba barevné palety"
+    >
+        <DropdownTrigger
+        >
             <Button >
                 <div className="flex gap-2 items-center w-60">
 
                     <div className={cn(
-                        `thermal-scale-${thermalPaletteSlug}`,
+                        `thermal-scale-${palette.value}`,
                         "w-10 h-4 rounded-xl"
                     )}></div>
-                    <div className="text-sm flex-grow">{thermalPalette.name}</div>
+                    <div className="text-sm flex-grow">{palette.palette.name}</div>
 
 
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
@@ -26,13 +44,17 @@ export const PaletteControl: React.FC = () => {
         <DropdownMenu
             onAction={key => {
 
-                setThermalPalette(key)
+                console.log( key );
+
+                palette.set(key)
 
             }}
         >
-            {Object.entries(availableThermalPalettes).map(([key, palette]) => {
+            {Object.entries( palette.availablePalettes ).map(([key, palette]) => {
                 return <DropdownItem
                     key={key}
+                    textValue={`Nastavit barevnou baletu ${palette.name}`}
+                    aria-label={palette.name}
                 >
                     <div>
                         <div className="text-sm text-gray-500 pb-2">{palette.name}</div>

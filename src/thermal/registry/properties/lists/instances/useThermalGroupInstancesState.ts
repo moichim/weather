@@ -16,15 +16,13 @@ export const useThermalGroupInstancesState = (
 
         group.instances.addListener(purpose, newValue => {
 
-            if (newValue !== value) {
-                setValue(newValue);
-            }
+            setValue(newValue);
 
         });
 
         return () => group.instances.removeListener(purpose);
 
-    }, [group]);
+    }, [group,value,setValue]);
 
 
     // The setting function

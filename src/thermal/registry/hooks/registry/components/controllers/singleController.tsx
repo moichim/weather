@@ -1,9 +1,10 @@
-import { ThermalRegistry } from "@/thermal/registry/ThermalRegistry";
-import { useThermalRegistryNew } from "../../useThermalRegistryNew"
-import { ThermalInstanceDisplayParameters } from "../thermalInstanceNew";
+"use client";
+
 import { useEffect, useMemo } from "react";
 import { useThermalManagerContext } from "../../../thermalManagerContext";
+import { useThermalRegistryNew } from "../../useThermalRegistryNew";
 import { SingleDisplay } from "../displays/singleDisplay";
+import { ThermalInstanceDisplayParameters } from "../thermalInstanceNew";
 
 type SingleDisplayProps = ThermalInstanceDisplayParameters & {
     thermalUrl: string
@@ -56,13 +57,13 @@ export const SingleController: React.FC<SingleDisplayProps> = ({
 
     // Remove the registry on unmount
     useEffect(() => {
-        return () => manager.removeRegistry(ID);
+        // return () => manager.removeRegistry(ID);
     }, []);
 
 
 
     return <SingleDisplay
-    
+
         registry={registry}
         hasDownloadButtons={hasDownloadButtons}
 

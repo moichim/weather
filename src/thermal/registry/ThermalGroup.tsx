@@ -56,23 +56,7 @@ export class ThermalGroup implements IThermalGroup {
     public reset() {
         this.instances.reset();
         this.minmax.reset();
-    }
-
-
-
-
-    /**
-     * Instances
-     */
-
-
-
-    protected _instancesByUrl: {
-        [index: string]: ThermalFileInstance
-    } = {}
-    /** @deprecated */
-    public getInstancesArray() {
-        return Object.values(this._instancesByUrl);
+        this.cursorPosition.reset();
     }
 
 

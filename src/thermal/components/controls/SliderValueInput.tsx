@@ -1,3 +1,5 @@
+"use client";
+
 import { Input, Tooltip } from "@nextui-org/react"
 import { ChangeEvent, DOMAttributes, useState } from "react"
 

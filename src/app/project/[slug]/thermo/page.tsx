@@ -1,8 +1,8 @@
 import { googleSheetsProvider } from "@/graphql/google/googleProvider/googleProvider";
-import { ProjectController } from "@/thermal/components/ProjectController";
 import { ScopePageProps } from "../layout";
 import { getMetadataPublisher, getMetadataTitle } from "@/utils/metadata";
 import { ResolvingMetadata, Metadata } from "next";
+import { ProjectController } from "@/thermal/registry/hooks/registry/components/controllers/projectController";
 
 export const generateStaticParams = async () => {
 
@@ -29,7 +29,7 @@ export async function generateMetadata(
 const InfoPage = async ( props: ScopePageProps ) => {
 
   return <div className="">
-    <ProjectController scope={props.params.slug
+    <ProjectController scopeId={props.params.slug
     } />
   </div>;
 

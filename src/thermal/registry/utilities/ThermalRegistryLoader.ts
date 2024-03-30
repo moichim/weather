@@ -1,3 +1,4 @@
+import { ThermalFileSource } from "@/thermal/file/ThermalFileSource";
 import { ThermalGroup } from "../ThermalGroup";
 import { ThermalRegistry } from "../ThermalRegistry";
 import { ThermalFileRequest, ThermalRequest } from "../ThermalRequest";
@@ -49,21 +50,28 @@ export class ThermalRegistryLoader {
         }
 
         // Add multiple requests
-        this._requests = ThermalRequest.multiple(group, requests);
+        this._requests = [
+            ...this._requests,
+            ...ThermalRequest.multiple(group, requests)
+        ];
 
     }
 
 
     public async resolveQuery(): Promise<ThermalGroup[]> {
 
-        if ( this.loading === true ) {
-        
+        if (this.loading === true) {
+
         }
 
         // Perform the fetches
         const result = await Promise.all(
             this._requests.map(request => request.fetch())
         );
+
+        const mapByGroups: {
+            [index: string]: ThermalFileSource[]
+         } = {};
 
         // Process the requests
         for (let response of result) {
@@ -73,12 +81,37 @@ export class ThermalRegistryLoader {
                 // This makes sure that there are no duplicite sources
                 const file = this.registry.manager.registerSource(response.file);
 
-                // Add the request in the group in a unified way
-                response.request.group.instances.instantiateSource(file);
+
+                // Register this request to the map for further processing
+                if ( response.request.group.id in mapByGroups === false ) {
+                    mapByGroups[response.request.group.id] = [file];
+                } else {
+                    mapByGroups[response.request.group.id].push(file);
+                }
 
             }
 
+
         }
+
+        console.log( "Přišla odpověď a já jsem dostal toto:",mapByGroups );
+
+        for (const groupId in mapByGroups) {
+
+            console.log( "Group", groupId );
+
+            const groupInstance = this.registry.groups.map.get(groupId);
+
+            console.log(groupId, groupInstance, groupInstance?.hash);
+
+            groupInstance?.instances.instantiateSources(mapByGroups[groupId]);
+
+            console.log( "výsledné instance", groupInstance?.instances.value );
+
+        }
+
+        // Important step! reset all the requests!
+        this._requests = [];
 
         return this.registry.groups.value;
 
