@@ -53,7 +53,7 @@ export default class ThermalDomFactory {
         inner.style.left = "-2px";
         // inner.style.transform = "scale(.5)";
         inner.style.opacity = "0";
-        inner.style.transition = "all .1s ease-in-out";
+        inner.style.transition = "opacity .1s ease-in-out";
         inner.style.textAlign = "center";
         return inner;
     }

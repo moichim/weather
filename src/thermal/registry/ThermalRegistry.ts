@@ -72,7 +72,7 @@ export class ThermalRegistry implements IThermalRegistry {
         // Create the groups from the definition
         for (const groupId in description) {
 
-            const group = this.groups.addOrGetGroup(groupId);
+            const group = this.groups.addOrGetGroup(groupId, description[groupId].name, description[groupId].description);
 
             // Request the files
             this.loader.requestFiles(group, description[groupId].files);
@@ -203,25 +203,6 @@ export class ThermalRegistry implements IThermalRegistry {
      */
     public readonly highlight: HighlightDrive = new HighlightDrive(this, undefined);
 
-
-
-
-
-
-
-
-
-
-
-    /**
-     * Groups creation
-     */
-    /** Create a group or get an existing instance @deprecated */
-    public addOrGetGroup(
-        id: string
-    ) {
-        return this.groups.addOrGetGroup(id);
-    }
 
 
 

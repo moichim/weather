@@ -71,16 +71,18 @@ export const ProjectController: React.FC<ProjectDisplayProps> = props => {
             height="6rem"
             innerContent={<>
                 <div className="flex-grow w-3/4">
-                    <ThermalRangeSlider 
-                        registry={registry} 
+                    <ThermalRangeSlider
+                        registry={registry}
                     />
                 </div>
-                <OpacityScale registry={registry} />
+                <OpacityScale registry={registry} className="md:w-60" />
                 <PaletteControl registry={registry} />
             </>}
         />
 
-        <RegistryDisplay registry={registry} />
+        <div className="px-2 pt-4">
+            <RegistryDisplay registry={registry} />
+        </div >
 
     </>
 

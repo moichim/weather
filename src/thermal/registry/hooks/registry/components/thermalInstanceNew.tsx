@@ -151,7 +151,7 @@ export const ThermalInstanceNew: React.FC<ThermalInstanceProps> = ({
                 {(onClose) => (
                     <>
                         <ModalHeader>
-                            {instance.group.id}: {TimeFormat.human(instance.timestamp)}
+                            {instance.group.name ?? instance.group.id}: {TimeFormat.human(instance.timestamp)}
                         </ModalHeader>
                         <ModalBody>
                             <SingleController

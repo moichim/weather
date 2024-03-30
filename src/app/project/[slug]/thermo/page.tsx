@@ -29,8 +29,7 @@ export async function generateMetadata(
 const InfoPage = async ( props: ScopePageProps ) => {
 
   return <div className="">
-    <ProjectController scopeId={props.params.slug
-    } />
+    <ProjectController scopeId={props.params.slug} />
   </div>;
 
 }

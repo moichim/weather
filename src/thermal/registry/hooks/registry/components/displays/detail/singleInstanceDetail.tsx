@@ -48,9 +48,10 @@ export const SingleInstanceDetail: React.FC<SingleInstanceDetailProps> = ({
             <div className="w-full">
                 <ThermalRangeSlider
                     registry={instance.group.registry}
+                    histogramBorder={false}
                 />
             </div>
-            <div className="w-full flex flex-wrap">
+            <div className="w-full flex flex-wrap items-center">
                 <div className="w-2/3">
                     <OpacityScale registry={instance.group.registry} />
                 </div>

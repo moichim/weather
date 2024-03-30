@@ -28,6 +28,7 @@ export const OpacityScale: React.FC<OpacitySliderProps> = ({
 
 
     return <Slider
+        {...props}
         label="IR / Visible"
         step={step}
         showSteps={showSteps}

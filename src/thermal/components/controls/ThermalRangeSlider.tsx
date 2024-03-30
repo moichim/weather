@@ -7,17 +7,19 @@ import { useThermalRegistryRangeDrive } from "@/thermal/registry/properties/driv
 import { useThermalRegistryHistogramState } from "@/thermal/registry/properties/states/histogram/useThermalRegistryHistogramState";
 import { useThermalRegistryLoadingState } from "@/thermal/registry/properties/states/loading/useThermalRegistryLoadingState";
 import { useThermalRegistryMinmaxState } from "@/thermal/registry/properties/states/minmax/registry/useThermalRegistryMinmaxState";
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Slider, SliderProps, SliderValue, Spinner, Tooltip } from "@nextui-org/react";
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Slider, SliderProps, SliderValue, Spinner, Tooltip, cn } from "@nextui-org/react";
 import { DOMAttributes, useCallback, useEffect, useMemo, useState } from "react";
 
 type ThermalRangeProps = SliderProps & {
     registry: ThermalRegistry,
-    rangeOffset?: number
+    rangeOffset?: number,
+    histogramBorder?: boolean
 }
 
 export const ThermalRangeSlider: React.FC<ThermalRangeProps> = ({
     registry,
     rangeOffset = 0,
+    histogramBorder = true,
     ...props
 }) => {
 
@@ -205,7 +207,7 @@ export const ThermalRangeSlider: React.FC<ThermalRangeProps> = ({
             <div className="flex-grow">
 
                 <div className="w-full h-10 px-4">
-                    <div className="border-1 border-solid border-gray-300 relative w-full h-full">
+                    <div className={cn( histogramBorder && "border-1 border-solid border-gray-300"," relative w-full h-full" )}>
 
 
                         {(histogram === undefined) && <div className="flex gap-4 items-center text-primary justify-center h-full">
@@ -220,7 +222,7 @@ export const ThermalRangeSlider: React.FC<ThermalRangeProps> = ({
                                 color="foreground"
                                 key={item.from.toString()}
                             ><div
-                                className="absolute hover:bg-white bottom-0 h-full transition-all duration-300 ease-in-out border-s-1 border-gray-300 border-solid first:border-s-0"
+                                className={cn( "absolute hover:bg-white bottom-0 h-full transition-all duration-300 ease-in-out", histogramBorder && "border-s-1 border-gray-300 border-solid first:border-s-0" )}
                                 style={{
                                     width: `${100 / histogram.length}%`,
                                     left: `${index * (100 / histogram.length)}%`

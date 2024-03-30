@@ -20,7 +20,9 @@ export class ThermalGroup implements IThermalGroup {
 
     public constructor(
         public readonly registry: ThermalRegistry,
-        public readonly id: string
+        public readonly id: string,
+        public readonly name?: string,
+        public readonly description?: string
     ) {
     }
 

@@ -1,9 +1,7 @@
 
 const LrcLayout: React.FC<React.PropsWithChildren> = props => {
 
-    return <>
-        {props.children}
-    </>
+    return <>{props.children}</>
 }
 
 export default LrcLayout;
