@@ -17,23 +17,23 @@ export const MinmaxTableRows: React.FC<MinmaxTableProps> = ({
 
     return <>
         <TableRow key="min">
-                <TableCell>Minimum</TableCell>
-                <TableCell>
-                    {minmax !== undefined
-                        ? <>{minmax.min.toFixed(decimals)} °C</>
-                        : "načítám"
-                    }
-                </TableCell>
-            </TableRow>
-            <TableRow key="max">
-                <TableCell>Maximum</TableCell>
-                <TableCell>
-                    {minmax !== undefined
-                        ? <>{minmax.max.toFixed(decimals)} °C</>
-                        : "načítám"
-                    }
-                </TableCell>
-            </TableRow>
+            <TableCell>Minimum</TableCell>
+            <TableCell>
+                {minmax !== undefined
+                    ? <>{minmax.min.toFixed(decimals)} °C</>
+                    : "načítám"
+                }
+            </TableCell>
+        </TableRow>
+        <TableRow key="max">
+            <TableCell>Maximum</TableCell>
+            <TableCell>
+                {minmax !== undefined
+                    ? <>{minmax.max.toFixed(decimals)} °C</>
+                    : "načítám"
+                }
+            </TableCell>
+        </TableRow>
     </>
 }
 
@@ -57,7 +57,24 @@ export const MinmaxTable: React.FC<MinmaxTableProps> = ({
         <TableBody
             isLoading={loading || minmax === undefined}
         >
-            <MinmaxTableRows minmax={minmax} decimals={decimals} loading={loading}/>
+            <TableRow key="min">
+            <TableCell>Minimum</TableCell>
+            <TableCell>
+                {minmax !== undefined
+                    ? <>{minmax.min.toFixed(decimals)} °C</>
+                    : "načítám"
+                }
+            </TableCell>
+        </TableRow>
+        <TableRow key="max">
+            <TableCell>Maximum</TableCell>
+            <TableCell>
+                {minmax !== undefined
+                    ? <>{minmax.max.toFixed(decimals)} °C</>
+                    : "načítám"
+                }
+            </TableCell>
+        </TableRow>
         </TableBody>
 
     </Table>

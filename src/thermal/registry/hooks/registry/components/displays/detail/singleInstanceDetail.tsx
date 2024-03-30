@@ -1,16 +1,15 @@
 "use client";
 
-import { TimeFormat } from "@/state/time/reducerInternals/timeUtils/formatting"
-import { ThermalFileInstance } from "@/thermal/file/ThermalFileInstance"
-import { useMemo } from "react"
-import { MinmaxTable, MinmaxTableRows } from "../../dataViews/minmaxTable"
-import { ThermalInstanceDisplayParameters, ThermalInstanceNew } from "../../thermalInstanceNew"
-import { SingleInstanceDownloadButtons } from "./singleInstanceDownloadButtons"
+import { TimeFormat } from "@/state/time/reducerInternals/timeUtils/formatting";
+import { ThermalRangeSlider } from "@/thermal/components/controls/ThermalRangeSlider";
+import { PaletteControl } from "@/thermal/components/controls/paletteControl";
+import { OpacityScale } from "@/thermal/components/registry/OpacityScale";
+import { ThermalFileInstance } from "@/thermal/file/ThermalFileInstance";
 import { useThermalRegistryMinmaxState } from "@/thermal/registry/properties/states/minmax/registry/useThermalRegistryMinmaxState";
 import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@nextui-org/react";
-import { ThermalRangeSlider } from "@/thermal/components/controls/ThermalRangeSlider";
-import { OpacityScale } from "@/thermal/components/registry/OpacityScale";
-import { PaletteControl } from "@/thermal/components/controls/paletteControl";
+import { useMemo } from "react";
+import { ThermalInstanceDisplayParameters, ThermalInstanceNew } from "../../thermalInstanceNew";
+import { SingleInstanceDownloadButtons } from "./singleInstanceDownloadButtons";
 
 type SingleInstanceDetailProps = ThermalInstanceDisplayParameters & {
     instance: ThermalFileInstance,
@@ -98,7 +97,25 @@ export const SingleInstanceDetail: React.FC<SingleInstanceDetailProps> = ({
                         <TableCell>{TimeFormat.human(instance.timestamp)}</TableCell>
                     </TableRow>
 
-                    <MinmaxTableRows minmax={minmax} decimals={4} loading={loading} />
+
+                    <TableRow key="min">
+                        <TableCell>Minimum</TableCell>
+                        <TableCell>
+                            {minmax !== undefined
+                                ? <>{minmax.min.toFixed(4)} °C</>
+                                : "načítám"
+                            }
+                        </TableCell>
+                    </TableRow>
+                    <TableRow key="max">
+                        <TableCell>Maximum</TableCell>
+                        <TableCell>
+                            {minmax !== undefined
+                                ? <>{minmax.max.toFixed(4)} °C</>
+                                : "načítám"
+                            }
+                        </TableCell>
+                    </TableRow>
 
                     <TableRow key="resolution">
                         <TableCell>Rozlišení</TableCell>
