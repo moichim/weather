@@ -3,7 +3,7 @@
 
 import { ThermalFileInstance } from "../file/ThermalFileInstance";
 import { ThermalRegistry } from "./ThermalRegistry";
-import { IThermalGroup } from "./interfaces/interfaces";
+import { IThermalGroup } from "./interfaces";
 import { CursorPositionDrive } from "./properties/drives/cursorPosition/CursorPositionDrive";
 import { InstancesState } from "./properties/lists/instances/InstancesState";
 import { MinmaxGroupProperty } from "./properties/states/minmax/group/MinmaxGroupProperty";

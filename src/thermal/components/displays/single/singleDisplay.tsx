@@ -1,13 +1,14 @@
 "use client";
 
 import { ThermalRegistry } from "@/thermal/registry/ThermalRegistry"
-import { ThermalInstanceDisplayParameters } from "../thermalInstanceNew"
+import { ThermalInstanceDisplayParameters } from "../instance/thermalInstance"
 import { useThermalRegistryGroups } from "@/thermal/registry/properties/lists/groups/useThermalRegistryGroupsState"
 import { useEffect, useMemo } from "react"
 import { useThermalRegistryLoadingState } from "@/thermal/registry/properties/states/loading/useThermalRegistryLoadingState"
 import { Spinner } from "@nextui-org/react"
 import { SingleInstanceDetail } from "./detail/singleInstanceDetail"
 import { useThermalGroupInstancesState } from "@/thermal/registry/properties/lists/instances/useThermalGroupInstancesState";
+import { useThermalObjectPurpose } from "@/thermal/context/useThermalObjectPurpose";
 
 type SingleDisplayProps = ThermalInstanceDisplayParameters & {
     registry: ThermalRegistry,
@@ -29,10 +30,7 @@ export const SingleDisplay: React.FC<SingleDisplayProps> = ({
     ...props
 }) => {
 
-    // Hold the display id once for all
-    const ID = useMemo(() => {
-        return registry.id
-    }, []);
+    const ID = useThermalObjectPurpose( registry, "singleDisplay" );
 
     const groups = useThermalRegistryGroups(registry, ID);
 

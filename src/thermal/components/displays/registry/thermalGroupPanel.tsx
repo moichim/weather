@@ -1,12 +1,12 @@
 "use client";
 
-import { ThermalGroup } from "@/thermal/registry/ThermalGroup"
-import { useThermalGroupInstancesState } from "@/thermal/registry/properties/lists/instances/useThermalGroupInstancesState"
-import { useThermalGroupMinmaxProperty } from "@/thermal/registry/properties/states/minmax/group/useThermalGroupMinmaxState"
-import { ThermalInstanceNew } from "./thermalInstanceNew"
-import { MinmaxTable } from "./dataViews/minmaxTable";
-import { ThermalRegistry } from "@/thermal/registry/ThermalRegistry";
+import { ThermalGroup } from "@/thermal/registry/ThermalGroup";
+import { useThermalGroupInstancesState } from "@/thermal/registry/properties/lists/instances/useThermalGroupInstancesState";
 import { useThermalRegistryLoadingState } from "@/thermal/registry/properties/states/loading/useThermalRegistryLoadingState";
+import { useThermalGroupMinmaxProperty } from "@/thermal/registry/properties/states/minmax/group/useThermalGroupMinmaxState";
+import { MinmaxTable } from "../../dataViews/minmaxTable";
+import { ThermalInstance } from "../instance/thermalInstance";
+import { useThermalObjectPurpose } from "@/thermal/context/useThermalObjectPurpose";
 
 type ThermalGroupPanelProps = {
     group: ThermalGroup
@@ -14,11 +14,13 @@ type ThermalGroupPanelProps = {
 
 export const ThermalGroupPanel: React.FC<ThermalGroupPanelProps> = props => {
 
-    const instances = useThermalGroupInstancesState(props.group, "panel display wtf");
+    const ID = useThermalObjectPurpose( props.group, "panel" );
 
-    const minmax = useThermalGroupMinmaxProperty(props.group, "panel display");
+    const instances = useThermalGroupInstancesState(props.group, ID );
 
-    const loading = useThermalRegistryLoadingState(props.group.registry, "panel display");
+    const minmax = useThermalGroupMinmaxProperty(props.group, ID );
+
+    const loading = useThermalRegistryLoadingState(props.group.registry, ID );
 
     return <div className="w-1/3 px-2">
         <div className="bg-white rounded-t-xl">
@@ -57,7 +59,7 @@ export const ThermalGroupPanel: React.FC<ThermalGroupPanelProps> = props => {
 
             <div className="flex flex-wrap -ms-[1px] -me-[3px] lg:-me-[7px] -mb-[2px]">
 
-                {instances.value.map(instance => <ThermalInstanceNew
+                {instances.value.map(instance => <ThermalInstance
                     instance={instance}
                     key={instance.id}
                     highlightColor="black"

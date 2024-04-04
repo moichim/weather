@@ -4,8 +4,8 @@ import { ProjectDescription } from "../context/useProjectLoader";
 import { ThermalFileInstance } from "../file/ThermalFileInstance";
 import { ThermalGroup } from "./ThermalGroup";
 import { ThermalManager } from "./ThermalManager";
-import { ThermalFileRequest } from "./ThermalRequest";
-import { IThermalRegistry } from "./interfaces/interfaces";
+import { ThermalFileRequest } from "./utilities/ThermalRequest";
+import { IThermalRegistry } from "./interfaces";
 import { GroupsState } from "./properties/lists/groups/GroupsState";
 import { HighlightDrive } from "./properties/drives/highlight/HighlightDrive";
 import { HistogramState } from "./properties/states/histogram/HistogramState";
@@ -54,17 +54,11 @@ export class ThermalRegistry implements IThermalRegistry {
 
 
     /**
-     * 
-     * 1. resets everything
-     * 2. set as loading (T)
-     * 3. create the groups and register their filed
-     * 4. fetch all requests (this will register and instantiate the sources)
-     * 5. mark as loaded
-     * 6. return the groups
+     * Loads the registry with a complete API response
      */
     public async loadProject(
         description: ProjectDescription
-    ): Promise<ThermalGroup[]> {
+    ) {
 
         // Reset everything at first
         this.reset();
@@ -81,12 +75,37 @@ export class ThermalRegistry implements IThermalRegistry {
 
         this.loading.markAsLoading();
 
-        // Resolve the query and create the instances where they should be
-        await this.loader.resolveQuery();
+        setTimeout(async () => {
 
-        this.postLoadedProcessing();
+            // Resolve the query and create the instances where they should be
+            await this.loader.resolveQuery();
 
-        return this.groups.value;
+            this.postLoadedProcessing();
+
+        }, 0);
+
+    }
+
+
+    /** Load the registry with only one file. */
+    public async loadOneFile(file: ThermalFileRequest, groupId: string) {
+
+        this.reset();
+
+        const group = this.groups.addOrGetGroup(groupId);
+
+        this.loader.requestFile(group, file.thermalUrl, file.visibleUrl);
+
+        this.loading.markAsLoading();
+
+        setTimeout(async () => {
+
+            // Resolve the entire query
+            await this.loader.resolveQuery();
+
+            this.postLoadedProcessing();
+
+        }, 0);
 
     }
 
@@ -114,30 +133,10 @@ export class ThermalRegistry implements IThermalRegistry {
 
 
 
-    public async loadOneFile(file: ThermalFileRequest, groupId: string): Promise<ThermalGroup> {
-
-        this.reset();
-
-        const group = this.groups.addOrGetGroup(groupId);
-
-        this.loader.requestFile(group, file.thermalUrl, file.visibleUrl);
-
-        this.loading.markAsLoading();
-
-        // Resolve the entire query
-        await this.loader.resolveQuery();
-
-        this.postLoadedProcessing();
-
-        return this.groups.map.get(groupId) as ThermalGroup
-
-    }
-
-
 
     public reset() {
 
-        this.forEveryGroup( group => group.reset() );
+        this.forEveryGroup(group => group.reset());
 
         if (this.loader.loading === false) {
             // this.removeAllChildren();
@@ -153,6 +152,10 @@ export class ThermalRegistry implements IThermalRegistry {
 
     public destroySelfAndBelow() {
         this.reset();
+    }
+
+    public destroySelfInTheManager() {
+        this.manager.removeRegistry(this.id);
     }
 
 

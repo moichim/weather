@@ -1,5 +1,6 @@
 "use client";
 
+import { useThermalObjectPurpose } from "@/thermal/context/useThermalObjectPurpose";
 import { ThermalRegistry } from "@/thermal/registry/ThermalRegistry";
 import { useThermalRegistryOpacityDrive } from "@/thermal/registry/properties/drives/opacity/useThermalRegistryOpacityDrive";
 import { Slider, SliderProps } from "@nextui-org/react";
@@ -14,7 +15,7 @@ type OpacitySliderProps = SliderProps & {
  * 
  * Subscribes to `ThermalRegistry` property `opacity` and modifies it.
  */
-export const OpacityScale: React.FC<OpacitySliderProps> = ({
+export const OpacitySlider: React.FC<OpacitySliderProps> = ({
     registry,
     step = 0.1,
     showSteps = true,
@@ -24,7 +25,9 @@ export const OpacityScale: React.FC<OpacitySliderProps> = ({
     ...props
 }) => {
 
-    const { value, set } = useThermalRegistryOpacityDrive(registry, "opacity_drive");
+    const ID = useThermalObjectPurpose( registry, "opacitySlider" );
+
+    const { value, set } = useThermalRegistryOpacityDrive(registry, ID );
 
 
     return <Slider

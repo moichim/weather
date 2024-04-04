@@ -4,7 +4,7 @@ import { useLazyQuery } from "@apollo/client";
 import gql from "graphql-tag";
 import { useCallback, useEffect, useState } from "react";
 import { ThermoFileDefinition, ThermoFileScope } from "../graphql/files";
-import { ThermalFileRequest } from "../registry/ThermalRequest";
+import { ThermalFileRequest } from "../registry/utilities/ThermalRequest";
 
 export const PROJECT_FILES_QUERY = gql`
 

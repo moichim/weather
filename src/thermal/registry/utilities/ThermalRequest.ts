@@ -1,8 +1,7 @@
 "use client";
 
-import { ThermalFileSource } from "../file/ThermalFileSource";
-import { ThermalGroup } from "./ThermalGroup";
-import { ThermalRegistry } from "./ThermalRegistry";
+import { ThermalFileSource } from "../../file/ThermalFileSource";
+import { ThermalGroup } from "../ThermalGroup";
 
 export type ThermalFileRequest = {
     thermalUrl: string,
@@ -16,6 +15,8 @@ export type ThermalFileRequest = {
  * - All the group's requests need to be triggered at once
  * 
  * When triggered, the request looks for the file in the cache. If the file is not cached yet, the request tries to fetch it from the URL.
+ * 
+* @todo Stores the entire instance of the group. Should store only the ID, because the group instances may change.
  */
 export class ThermalRequest extends EventTarget {
 

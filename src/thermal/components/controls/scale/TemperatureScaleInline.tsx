@@ -2,7 +2,7 @@
 
 import { ThermalRegistry } from "@/thermal/registry/ThermalRegistry";
 import { cn } from "@nextui-org/react";
-import { ThermalRangeSlider } from "./ThermalRangeSlider";
+import { TemperatureScaleBase } from "./internals/ThermalRangeSlider";
 
 type ThermalRangeProps = {
     registry: ThermalRegistry,
@@ -11,22 +11,28 @@ type ThermalRangeProps = {
     className?: string,
     rangeOffset?: number,
     tooltip?: React.ReactNode,
-    loaded: boolean
+    loaded: boolean,
+    histogramHasBorder?: boolean
 }
 
-export const ThermalRangeInline: React.FC<ThermalRangeProps> = ({
+/**
+ * Composition of inline temperature scale
+ */
+export const TemperatureScaleInline: React.FC<ThermalRangeProps> = ({
     registry,
     label = "Teplotní škála",
     className = "w-full",
     rangeOffset = 0,
+    histogramHasBorder = true,
     ...props
 }) => {
 
     return <div className={cn(className, "flex gap-4 w-full items-center thermal-scale-inline")}>
-        <ThermalRangeSlider
+        <TemperatureScaleBase
             registry={registry}
             label={label}
             rangeOffset={rangeOffset}
+            histogramBorder={histogramHasBorder}
         />
 
         {/**

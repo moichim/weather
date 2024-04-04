@@ -1,14 +1,14 @@
 "use client";
 
 import { TimeFormat } from "@/state/time/reducerInternals/timeUtils/formatting";
-import { ThermalRangeSlider } from "@/thermal/components/controls/ThermalRangeSlider";
-import { PaletteControl } from "@/thermal/components/controls/paletteControl";
-import { OpacityScale } from "@/thermal/components/registry/OpacityScale";
+import { PaletteDropdown } from "@/thermal/components/controls/palette/paletteDropdown";
+import { TemperatureScaleBase } from "@/thermal/components/controls/scale/internals/ThermalRangeSlider";
+import { OpacitySlider } from "@/thermal/components/controls/opacity/OpacitySlider";
+import { useThermalObjectPurpose } from "@/thermal/context/useThermalObjectPurpose";
 import { ThermalFileInstance } from "@/thermal/file/ThermalFileInstance";
 import { useThermalRegistryMinmaxState } from "@/thermal/registry/properties/states/minmax/registry/useThermalRegistryMinmaxState";
 import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@nextui-org/react";
-import { useMemo } from "react";
-import { ThermalInstanceDisplayParameters, ThermalInstanceNew } from "../../thermalInstanceNew";
+import { ThermalInstance, ThermalInstanceDisplayParameters } from "../../instance/thermalInstance";
 import { SingleInstanceDownloadButtons } from "./singleInstanceDownloadButtons";
 
 type SingleInstanceDetailProps = ThermalInstanceDisplayParameters & {
@@ -33,10 +33,8 @@ export const SingleInstanceDetail: React.FC<SingleInstanceDetailProps> = ({
     ...props
 }) => {
 
-    const ID = useMemo(() => {
-        if (purpose) return purpose;
-        return `single_instance_detail___${instance.id}`;
-    }, []);
+
+    const ID = useThermalObjectPurpose( instance, "detail" );
 
     const { value: minmax } = useThermalRegistryMinmaxState(instance.group.registry, ID);
 
@@ -46,22 +44,22 @@ export const SingleInstanceDetail: React.FC<SingleInstanceDetailProps> = ({
 
         <div className="pb-6">
             <div className="w-full">
-                <ThermalRangeSlider
+                <TemperatureScaleBase
                     registry={instance.group.registry}
                     histogramBorder={false}
                 />
             </div>
             <div className="w-full flex flex-wrap items-center">
                 <div className="w-2/3">
-                    <OpacityScale registry={instance.group.registry} />
+                    <OpacitySlider registry={instance.group.registry} />
                 </div>
                 <div className="w-1/3">
-                    <PaletteControl registry={instance.group.registry} />
+                    <PaletteDropdown registry={instance.group.registry} />
                 </div>
             </div>
         </div>
 
-        <ThermalInstanceNew
+        <ThermalInstance
 
             instance={instance}
 

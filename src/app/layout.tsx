@@ -1,6 +1,6 @@
 import { Navbar } from '@/components/navigation/utils/Navbar'
 import { NotificationListing } from '@/components/notifications/notificationListing'
-import { ThermalManagerContextProvider } from '@/thermal/registry/hooks/thermalManagerContext'
+import { ThermalManagerContextProvider } from '@/thermal/context/thermalManagerContext'
 import { getMetadataTitle } from '@/utils/metadata'
 import { Link, cn } from '@nextui-org/react'
 import type { Metadata } from 'next'

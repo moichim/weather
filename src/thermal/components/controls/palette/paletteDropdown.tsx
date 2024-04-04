@@ -1,26 +1,26 @@
 "use client";
 
+import { useThermalObjectPurpose } from "@/thermal/context/useThermalObjectPurpose";
 import { ThermalRegistry } from "@/thermal/registry/ThermalRegistry";
 import { useThermalRegistryPaletteDrive } from "@/thermal/registry/properties/drives/palette/useThermalRegistryPaletteDrive";
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, cn } from "@nextui-org/react";
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownProps, DropdownTrigger, cn } from "@nextui-org/react";
 import { useMemo } from "react";
 
 type PaletteControlProps = {
     registry: ThermalRegistry
 }
 
-export const PaletteControl: React.FC<PaletteControlProps> = ({
+export const PaletteDropdown: React.FC<PaletteControlProps> = ({
     registry,
     ...props
 }) => {
 
-    const purpose = useMemo( () => {
-        return `${registry.id}_opacity_${ ( Math.random() * 1000 ).toFixed(0) }`;
-    }, [] );
+    const ID = useThermalObjectPurpose( registry, "paletteDropdown" );
 
-    const palette = useThermalRegistryPaletteDrive( registry, purpose );
+    const palette = useThermalRegistryPaletteDrive(registry, ID);
 
     return <Dropdown
+        {...props}
         aria-label="Volba barevné palety"
     >
         <DropdownTrigger
@@ -44,13 +44,13 @@ export const PaletteControl: React.FC<PaletteControlProps> = ({
         <DropdownMenu
             onAction={key => {
 
-                console.log( key );
+                console.log(key);
 
                 palette.set(key)
 
             }}
         >
-            {Object.entries( palette.availablePalettes ).map(([key, palette]) => {
+            {Object.entries(palette.availablePalettes).map(([key, palette]) => {
                 return <DropdownItem
                     key={key}
                     textValue={`Nastavit barevnou baletu ${palette.name}`}

@@ -2,10 +2,11 @@
 
 import { ThermalRegistry } from "@/thermal/registry/ThermalRegistry"
 import { useThermalRegistryGroups } from "@/thermal/registry/properties/lists/groups/useThermalRegistryGroupsState"
-import { ThermalGroupPanel } from "../thermalGroupPanel"
+import { ThermalGroupPanel } from "./thermalGroupPanel"
 import { useThermalRegistryLoadingState } from "@/thermal/registry/properties/states/loading/useThermalRegistryLoadingState"
 import { Spinner } from "@nextui-org/react"
 import { useEffect } from "react";
+import { useThermalObjectPurpose } from "@/thermal/context/useThermalObjectPurpose";
 
 export type RegistryDisplayProps = {
     registry: ThermalRegistry
@@ -18,10 +19,12 @@ export type RegistryDisplayProps = {
  */
 export const RegistryDisplay: React.FC<RegistryDisplayProps> = props => {
 
-    const groups = useThermalRegistryGroups(props.registry, "display");
+    const ID = useThermalObjectPurpose( props.registry, "registryDisplay" );
+
+    const groups = useThermalRegistryGroups(props.registry, ID);
 
     /** @todo Perhaps this step should be moved down to the group */
-    const loading = useThermalRegistryLoadingState(props.registry, "display");
+    const loading = useThermalRegistryLoadingState(props.registry, ID);
 
 
     if (loading.value === true) {

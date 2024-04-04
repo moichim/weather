@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import { useThermalManagerContext } from "../../../thermalManagerContext";
-import { useThermalRegistryNew } from "../../useThermalRegistryNew";
-import { SingleDisplay } from "../displays/singleDisplay";
-import { ThermalInstanceDisplayParameters } from "../thermalInstanceNew";
+import { useThermalManagerContext } from "../../context/thermalManagerContext";
+import { useThermalRegistry } from "../../context/useThermalRegistry";
+import { ThermalInstanceDisplayParameters } from "../displays/instance/thermalInstance";
+import { SingleDisplay } from "../displays/single/singleDisplay";
+import { useThermalObjectPurpose } from "@/thermal/context/useThermalObjectPurpose";
 
 type SingleDisplayProps = ThermalInstanceDisplayParameters & {
     thermalUrl: string
@@ -31,7 +32,7 @@ export const SingleController: React.FC<SingleDisplayProps> = ({
 }) => {
 
     // Calculate the ID once for all (until the thermalUrl changes)
-    const ID = useMemo(() => {
+    const registryIdentificator = useMemo(() => {
 
         if (registryId) {
             return registryId;
@@ -41,7 +42,8 @@ export const SingleController: React.FC<SingleDisplayProps> = ({
 
     }, [thermalUrl]);
 
-    const registry = useThermalRegistryNew(ID);
+    const registry = useThermalRegistry(registryIdentificator);
+
     const manager = useThermalManagerContext();
 
     // Load the file everytime the URLs change
@@ -50,7 +52,7 @@ export const SingleController: React.FC<SingleDisplayProps> = ({
         registry.loadOneFile({
             thermalUrl: thermalUrl,
             visibleUrl: visibleUrl
-        }, ID);
+        }, registryIdentificator);
 
     }, []);
 

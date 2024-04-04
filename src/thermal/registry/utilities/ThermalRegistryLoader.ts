@@ -1,8 +1,13 @@
 import { ThermalFileSource } from "@/thermal/file/ThermalFileSource";
 import { ThermalGroup } from "../ThermalGroup";
 import { ThermalRegistry } from "../ThermalRegistry";
-import { ThermalFileRequest, ThermalRequest } from "../ThermalRequest";
+import { ThermalFileRequest, ThermalRequest } from "./ThermalRequest";
 
+/**
+ * Member of ThermalRegistry.
+ * 
+ * - takes care of loading files.
+ */
 export class ThermalRegistryLoader {
 
     public constructor(

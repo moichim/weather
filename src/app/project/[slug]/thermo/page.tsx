@@ -2,7 +2,7 @@ import { googleSheetsProvider } from "@/graphql/google/googleProvider/googleProv
 import { ScopePageProps } from "../layout";
 import { getMetadataPublisher, getMetadataTitle } from "@/utils/metadata";
 import { ResolvingMetadata, Metadata } from "next";
-import { ProjectController } from "@/thermal/registry/hooks/registry/components/controllers/projectController";
+import { ProjectController } from "@/thermal/components/controllers/projectController";
 
 export const generateStaticParams = async () => {
 

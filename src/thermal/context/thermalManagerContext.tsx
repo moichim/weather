@@ -2,7 +2,7 @@
 
 import { createContext, useContext } from "react";
 import { useThermalManagerInternal } from "./useThermalManagerInternal";
-import { ThermalManager } from "../ThermalManager";
+import { ThermalManager } from "../registry/ThermalManager";
 
 const ThermalManagerContext = createContext<ReturnType<typeof useThermalManagerInternal>>( new ThermalManager );
 

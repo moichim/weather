@@ -1,12 +1,12 @@
 "use client";
 
+import { TimeFormat } from "@/state/time/reducerInternals/timeUtils/formatting";
 import { ThermalFileInstance } from "@/thermal/file/ThermalFileInstance";
-import { useThermalRegistryLoadingState } from "@/thermal/registry/properties/states/loading/useThermalRegistryLoadingState";
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, cn } from "@nextui-org/react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { SingleController } from "./controllers/singleController";
-import { SingleInstanceDownloadButtons } from "./displays/detail/singleInstanceDownloadButtons";
-import { TimeFormat } from "@/state/time/reducerInternals/timeUtils/formatting";
+import { SingleController } from "../../controllers/singleController";
+import { SingleInstanceDownloadButtons } from "../single/detail/singleInstanceDownloadButtons";
+import { useThermalObjectPurpose } from "@/thermal/context/useThermalObjectPurpose";
 
 export type ThermalInstanceDisplayParameters = {
     hasPopup?: boolean,
@@ -27,7 +27,7 @@ type ThermalInstanceProps = ThermalInstanceDisplayParameters & {
  * 
  * Creates the DOM inside which the instance shall be rendered.
 */
-export const ThermalInstanceNew: React.FC<ThermalInstanceProps> = ({
+export const ThermalInstance: React.FC<ThermalInstanceProps> = ({
     className = "w-full xs:w-1/2 lg:w-1/3",
     instance,
 
@@ -40,10 +40,6 @@ export const ThermalInstanceNew: React.FC<ThermalInstanceProps> = ({
 
     ...props
 }) => {
-
-    const ID = useMemo(() => {
-        return instance.id;
-    }, []);
 
     const ref = useRef<HTMLDivElement>(null);
 

@@ -4,12 +4,12 @@ import { Navbar } from "@/components/navigation/utils/Navbar";
 import { useTimeContext } from "@/state/time/timeContext";
 import { useProjectLoader } from "@/thermal/context/useProjectLoader";
 import { useEffect, useMemo } from "react";
-import { useThermalManagerContext } from "../../../thermalManagerContext";
-import { useThermalRegistryNew } from "../../useThermalRegistryNew";
-import { RegistryDisplay } from "../displays/registryDisplay";
-import { OpacityScale } from "@/thermal/components/registry/OpacityScale";
-import { PaletteControl } from "@/thermal/components/controls/paletteControl";
-import { ThermalRangeSlider } from "@/thermal/components/controls/ThermalRangeSlider";
+import { useThermalManagerContext } from "../../context/thermalManagerContext";
+import { useThermalRegistry } from "../../context/useThermalRegistry";
+import { RegistryDisplay } from "../displays/registry/registryDisplay";
+import { OpacitySlider } from "@/thermal/components/controls/opacity/OpacitySlider";
+import { PaletteDropdown } from "@/thermal/components/controls/palette/paletteDropdown";
+import { TemperatureScaleBase } from "@/thermal/components/controls/scale/internals/ThermalRangeSlider";
 
 
 type ProjectDisplayProps = {
@@ -38,7 +38,7 @@ export const ProjectController: React.FC<ProjectDisplayProps> = props => {
 
 
     // Hold the instance of the registry
-    const registry = useThermalRegistryNew(registryId);
+    const registry = useThermalRegistry(registryId);
 
 
     // Load and update the project files definitions
@@ -71,12 +71,12 @@ export const ProjectController: React.FC<ProjectDisplayProps> = props => {
             height="6rem"
             innerContent={<>
                 <div className="flex-grow w-3/4">
-                    <ThermalRangeSlider
+                    <TemperatureScaleBase
                         registry={registry}
                     />
                 </div>
-                <OpacityScale registry={registry} className="md:w-60" />
-                <PaletteControl registry={registry} />
+                <OpacitySlider registry={registry} className="md:w-60" />
+                <PaletteDropdown registry={registry} />
             </>}
         />
 
