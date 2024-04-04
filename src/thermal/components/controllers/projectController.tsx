@@ -81,7 +81,7 @@ export const ProjectController: React.FC<ProjectDisplayProps> = props => {
         />
 
         <div className="px-2 pt-4">
-            <RegistryDisplay registry={registry} />
+            <RegistryDisplay registry={registry} scopeId={ props.scopeId }/>
         </div >
 
     </>

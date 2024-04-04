@@ -7,6 +7,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { SingleController } from "../../controllers/singleController";
 import { SingleInstanceDownloadButtons } from "../single/detail/singleInstanceDownloadButtons";
 import { useThermalObjectPurpose } from "@/thermal/context/useThermalObjectPurpose";
+import { useRouter } from "next/navigation";
 
 export type ThermalInstanceDisplayParameters = {
     hasPopup?: boolean,
@@ -18,6 +19,7 @@ export type ThermalInstanceDisplayParameters = {
 }
 
 type ThermalInstanceProps = ThermalInstanceDisplayParameters & {
+    scopeId: string,
     instance: ThermalFileInstance,
     className?: string,
 }
@@ -115,11 +117,17 @@ export const ThermalInstance: React.FC<ThermalInstanceProps> = ({
     // The popup open state
     const [popupOpen, setPopupOpen] = useState<boolean>(false);
 
+    const router = useRouter();
+
     // Has popup propagation
     useEffect(() => {
 
         if (hasPopup === true) {
             instance.setClickHandler(() => {
+
+                // const url = `/project/${props.scopeId}/thermo/${instance.timestamp + 1}`;
+
+                // router.push( url );
 
                 setPopupOpen(!popupOpen);
 

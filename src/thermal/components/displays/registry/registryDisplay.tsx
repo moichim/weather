@@ -9,7 +9,8 @@ import { useEffect } from "react";
 import { useThermalObjectPurpose } from "@/thermal/context/useThermalObjectPurpose";
 
 export type RegistryDisplayProps = {
-    registry: ThermalRegistry
+    registry: ThermalRegistry,
+    scopeId: string
 }
 
 /**
@@ -37,7 +38,7 @@ export const RegistryDisplay: React.FC<RegistryDisplayProps> = props => {
 
         {/** Zde by měla být teplotní škála a další vlastnosti */}
 
-        {groups.value.map(group => <ThermalGroupPanel group={group} key={group.id} />)}
+        {groups.value.map(group => <ThermalGroupPanel group={group} key={group.id} scopeId={props.scopeId}/>)}
 
     </div>
 

@@ -33,7 +33,7 @@ const ScopePage = async (props: ScopePageProps) => {
     const scope = await googleSheetsProvider.fetchScopeDefinition(props.params.slug);
 
     return <GraphContextProvider>
-        <GraphGrid {...scope}/>
+        <GraphGrid scope={scope}/>
     </GraphContextProvider>
 }
 

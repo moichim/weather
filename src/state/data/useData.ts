@@ -2,14 +2,29 @@ import { GoogleScope } from "@/graphql/google/google";
 import { useGraphData } from "./useGraphData";
 import { useGraphStatistics } from "./useGraphStatitics";
 import { useTimeContext } from "../time/timeContext";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 export const useData = (
-    scope: GoogleScope
+    scope: GoogleScope,
+    fixedTime?: { from: number, to: number }
 ) => {
 
     // Read the time
     const { timeState: time } = useTimeContext();
+
+    const range = useMemo( () => {
+
+        if ( fixedTime )
+            return fixedTime;
+
+        return {
+            from: time.from,
+            to: time.to
+        }
+
+    }, [ fixedTime, time.from, time.to ] );
+
+    console.log( range );
 
     // Initialise the queries
     const graphData = useGraphData( scope );
@@ -19,7 +34,7 @@ export const useData = (
     // Fire the initial query
     useEffect( () => {
 
-        graphData.fetch( time.from, time.to );
+        graphData.fetch( range.from, range.to );
 
     }, [] );
 
@@ -28,11 +43,11 @@ export const useData = (
     // Hook the range change to the main data query
     useEffect( () => {
 
-        graphData.fetch( time.from, time.to );
+        graphData.fetch( range.from, range.to );
         viewStats.clear();
         selectionStats.clear();
 
-    }, [ time.from, time.to ] );
+    }, [ range.from, range.to ] );
 
 
 
@@ -40,7 +55,7 @@ export const useData = (
     useEffect( () => {
 
         if ( graphData.data !== undefined ) {
-            viewStats.fetch( time.from, time.to );
+            viewStats.fetch( range.from, range.to );
         }
 
     }, [ graphData.data ] );

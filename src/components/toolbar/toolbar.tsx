@@ -49,10 +49,30 @@ const Tool: React.FC<GraphToolType> = props => {
     </Tooltip>
 }
 
-export const Toolbar: React.FC = () => {
+type ToolbarProps = {
+    hasZoom?: boolean
+}
+
+export const Toolbar: React.FC<ToolbarProps> = ({
+    hasZoom = true,
+    ...props
+}) => {
+
+    const objects = useMemo( () => {
+
+        if ( hasZoom === true ) {
+            return graphTools;
+        }
+
+        return {
+            inspect: graphTools.inspect,
+            select: graphTools.select
+        }
+
+    }, [ hasZoom ] );
 
     return <div className="flex flex-col gap-1">
-        {Object.values(graphTools).map(tool => <Tool
+        {Object.values(objects).map(tool => <Tool
             key={tool.name}
             {...tool}
         />)}

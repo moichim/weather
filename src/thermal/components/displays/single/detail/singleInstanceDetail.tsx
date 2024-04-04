@@ -7,7 +7,7 @@ import { OpacitySlider } from "@/thermal/components/controls/opacity/OpacitySlid
 import { useThermalObjectPurpose } from "@/thermal/context/useThermalObjectPurpose";
 import { ThermalFileInstance } from "@/thermal/file/ThermalFileInstance";
 import { useThermalRegistryMinmaxState } from "@/thermal/registry/properties/states/minmax/registry/useThermalRegistryMinmaxState";
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@nextui-org/react";
+import { Snippet, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@nextui-org/react";
 import { ThermalInstance, ThermalInstanceDisplayParameters } from "../../instance/thermalInstance";
 import { SingleInstanceDownloadButtons } from "./singleInstanceDownloadButtons";
 
@@ -70,8 +70,8 @@ export const SingleInstanceDetail: React.FC<SingleInstanceDetailProps> = ({
             showDateOnHighlight={showDateOnHighlight}
             highlightColor={highlightColor}
             highlightOnHover={highlightOnHover}
-            forceHighlight={forceHighlight}
-
+            forceHighlight={forceHighlight} 
+            scopeId={""}
         />
 
         <div className="pt-6">
@@ -81,7 +81,7 @@ export const SingleInstanceDetail: React.FC<SingleInstanceDetailProps> = ({
                 removeWrapper
                 hideHeader
                 fullWidth
-                isCompact
+                // isCompact
             >
                 <TableHeader>
                     <TableColumn>Vlastnost</TableColumn>
@@ -94,7 +94,7 @@ export const SingleInstanceDetail: React.FC<SingleInstanceDetailProps> = ({
 
                     <TableRow key="time">
                         <TableCell>Čas snímku</TableCell>
-                        <TableCell>{TimeFormat.human(instance.timestamp)}</TableCell>
+                        <TableCell>{TimeFormat.human(instance.timestamp)} <Snippet hideSymbol size="sm">{instance.timestamp}</Snippet></TableCell>
                     </TableRow>
 
 

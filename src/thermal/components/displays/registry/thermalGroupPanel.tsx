@@ -9,7 +9,8 @@ import { ThermalInstance } from "../instance/thermalInstance";
 import { useThermalObjectPurpose } from "@/thermal/context/useThermalObjectPurpose";
 
 type ThermalGroupPanelProps = {
-    group: ThermalGroup
+    group: ThermalGroup,
+    scopeId: string
 }
 
 export const ThermalGroupPanel: React.FC<ThermalGroupPanelProps> = props => {
@@ -67,6 +68,7 @@ export const ThermalGroupPanel: React.FC<ThermalGroupPanelProps> = props => {
                     highlightOnHover={true}
                     showDateOnHighlight={true}
                     hasPopup={true}
+                    scopeId={props.scopeId}
                 />)}
 
             </div>

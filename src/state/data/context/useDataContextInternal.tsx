@@ -45,10 +45,11 @@ export type GraphInstanceProps = {
 }
 
 export const useDataContextInternal = (
-    scope: GoogleScope
+    scope: GoogleScope,
+    fixedTime?: { from: number, to: number }
 ) => {
 
-    const data = useData( scope );
+    const data = useData( scope, fixedTime );
 
     const graph = useGraphContext();
 

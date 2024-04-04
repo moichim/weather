@@ -7,7 +7,14 @@ import { CloseIcon, ZoomInIcon } from "@/components/ui/icons";
 import { TimeEventsFactory, TimePeriod } from "../reducerInternals/actions";
 import { formatDuration, intervalToDuration } from "date-fns";
 
-export const SelectionBar: React.FC = () => {
+type SelectionBarProps = {
+    hasZoom?: boolean
+}
+
+export const SelectionBar: React.FC<SelectionBarProps> = ({
+    hasZoom = true,
+    ...props
+}) => {
 
     const { timeState: state, timeDispatch: dispatch } = useTimeContext();
 
@@ -21,15 +28,15 @@ export const SelectionBar: React.FC = () => {
                 <div className="flex-grow">
                     <h2 className="text-sm opacity-50 pb-2">Vyznačené rozmezí</h2>
                     <div className="flex gap-3 pb-1">
-                        
-                        <span>{TimeFormat.humanDate( state.selectionFrom! )} <sup className="opacity-90">{TimeFormat.humanTime( state.selectionFrom! )}</sup></span>
+
+                        <span>{TimeFormat.humanDate(state.selectionFrom!)} <sup className="opacity-90">{TimeFormat.humanTime(state.selectionFrom!)}</sup></span>
                         <span>—</span>
-                        <span>{TimeFormat.humanDate( state.selectionTo! )} <sup className="opacity-80">{TimeFormat.humanTime( state.selectionTo! )}</sup></span>
+                        <span>{TimeFormat.humanDate(state.selectionTo!)} <sup className="opacity-80">{TimeFormat.humanTime(state.selectionTo!)}</sup></span>
 
                     </div>
                 </div>
 
-                <Tooltip
+                {hasZoom && <Tooltip
                     content="Přiblížit na vyznačenou oblast"
                 >
                     <Button
@@ -38,7 +45,8 @@ export const SelectionBar: React.FC = () => {
                     >
                         <ZoomInIcon />
                     </Button>
-                </Tooltip>
+                </Tooltip>}
+
 
                 <Tooltip
                     content="Zrušit výběr"
