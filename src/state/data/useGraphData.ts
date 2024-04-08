@@ -6,6 +6,7 @@ import { useLazyQuery } from "@apollo/client";
 import gql from "graphql-tag";
 import { useCallback, useMemo } from "react";
 
+/** Provides the apollo query for the data of the given scope */
 export const useGraphData = (
   scope: GoogleScope
 ) => {

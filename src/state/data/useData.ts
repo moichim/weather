@@ -4,6 +4,7 @@ import { useGraphStatistics } from "./useGraphStatitics";
 import { useTimeContext } from "../time/timeContext";
 import { useEffect, useMemo } from "react";
 
+/** @deprecated */
 export const useData = (
     scope: GoogleScope,
     fixedTime?: { from: number, to: number }

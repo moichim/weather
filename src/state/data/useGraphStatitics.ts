@@ -5,6 +5,7 @@ import { useCallback, useState } from "react";
 import { MeteoRequestType } from "./processors/query";
 import { GraphStatisticsDataType, StatisticsProcessing } from "./processors/statisticsProcessing";
 
+/** Provides the apollo query for the statistics at the given time */
 export const useGraphStatistics = (
   scope: GoogleScope
 ) => {
